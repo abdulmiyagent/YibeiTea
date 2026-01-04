@@ -67,7 +67,7 @@ export function Footer() {
               <li className="flex items-start space-x-2">
                 <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <span>
-                  Veldstraat 123<br />
+                  Sint-Niklaasstraat 36<br />
                   9000 Gent, België
                 </span>
               </li>
@@ -92,15 +92,11 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center space-x-2">
                 <Clock className="h-4 w-4" />
-                <span>Ma - Do: 11:00 - 20:00</span>
+                <span>Ma - Za: 11:00 - 20:00</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Clock className="h-4 w-4" />
-                <span>Vr - Za: 11:00 - 21:00</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Clock className="h-4 w-4" />
-                <span>Zo: 12:00 - 19:00</span>
+                <span>Zo: 10:00 - 19:00</span>
               </li>
             </ul>
           </div>

@@ -161,7 +161,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold">Adres</h3>
                   <p className="text-muted-foreground">
-                    Brabantdam 59
+                    Sint-Niklaasstraat 36
                     <br />
                     9000 Gent, België
                   </p>
@@ -205,9 +205,8 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold">{tLocation("hours")}</h3>
                   <div className="text-sm text-muted-foreground">
-                    <p>Ma - Do: 11:00 - 20:00</p>
-                    <p>Vr - Za: 11:00 - 21:00</p>
-                    <p>Zo: 12:00 - 19:00</p>
+                    <p>Ma - Za: 11:00 - 20:00</p>
+                    <p>Zo: 10:00 - 19:00</p>
                   </div>
                 </div>
               </div>
