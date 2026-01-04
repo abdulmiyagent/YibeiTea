@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="ovomaltine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513"/>
+      <stop offset="100%" style="stop-color:#5D3A1A"/>
+    </linearGradient>
+    <linearGradient id="creamCheeseOvo" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFEF5"/>
+      <stop offset="50%" style="stop-color:#FFF8DC"/>
+      <stop offset="100%" style="stop-color:#F5E6D3"/>
+    </linearGradient>
+  </defs>
+  <!-- Cup -->
+  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
+  <!-- Drink -->
+  <path d="M48 120 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 120 Z" fill="url(#ovomaltine)"/>
+  <!-- Malt powder specks -->
+  <circle cx="70" cy="160" r="2" fill="#D2691E" opacity="0.6"/>
+  <circle cx="100" cy="180" r="1.5" fill="#D2691E" opacity="0.6"/>
+  <circle cx="130" cy="150" r="2" fill="#D2691E" opacity="0.6"/>
+  <!-- Cream cheese layer -->
+  <path d="M48 80 L48 125 Q100 135 152 125 L152 80 Z" fill="url(#creamCheeseOvo)"/>
+  <ellipse cx="100" cy="122" rx="52" ry="8" fill="#FFF8DC"/>
+  <!-- Ovomaltine drizzle on cream -->
+  <path d="M65 95 Q70 105 65 115" stroke="#6B4423" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M100 90 Q95 100 100 110" stroke="#6B4423" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M135 93 Q130 103 135 113" stroke="#6B4423" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Foam top -->
+  <ellipse cx="100" cy="75" rx="55" ry="15" fill="#FFFEF5"/>
+  <ellipse cx="100" cy="72" rx="50" ry="12" fill="#FFFFFF"/>
+  <!-- Tapioca pearls -->
+  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
+  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
+  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
+  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
+  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <!-- Lid -->
+  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#6B4423"/>
+  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#7D5330"/>
+  <!-- Straw hole -->
+  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#4A2C0A"/>
+  <!-- Straw -->
+  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+</svg>

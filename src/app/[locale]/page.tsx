@@ -1,10 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { api } from "@/lib/trpc";
 import {
   Star,
   Leaf,
@@ -20,83 +22,22 @@ import {
   Droplets,
   Citrus,
   GlassWater,
+  Loader2,
 } from "lucide-react";
 
-// Featured products data - Top Picks from Yibei Tea
-const featuredProducts = [
-  {
-    id: "1",
-    slug: "cream-cheese-taro-milk",
-    name: "Cream Cheese Taro Milk",
-    price: 5.5,
-    category: "MILK_TEA",
-    image: "/images/products/cream-cheese-taro-milk.png",
-    gradient: "from-taro-200 via-taro-100 to-cream-100",
-  },
-  {
-    id: "2",
-    slug: "caramel-vanilla-latte",
-    name: "Caramel Vanilla Latte",
-    price: 5.5,
-    category: "ICED_COFFEE",
-    image: "/images/products/caramel-vanilla-latte.png",
-    gradient: "from-tea-200 via-cream-100 to-cream-50",
-  },
-  {
-    id: "3",
-    slug: "hazelnut-nutella",
-    name: "Hazelnut Nutella",
-    price: 5.5,
-    category: "ICED_COFFEE",
-    image: "/images/products/hazelnut-nutella.png",
-    gradient: "from-tea-300 via-tea-100 to-cream-100",
-  },
-  {
-    id: "4",
-    slug: "green-apple",
-    name: "Green Apple",
-    price: 5.5,
-    category: "ICE_TEA",
-    image: "/images/products/green-apple.png",
-    gradient: "from-matcha-200 via-matcha-100 to-cream-100",
-  },
-  {
-    id: "5",
-    slug: "strawberry",
-    name: "Strawberry",
-    price: 5.5,
-    category: "ICE_TEA",
-    image: "/images/products/strawberry.png",
-    gradient: "from-rose-200 via-rose-100 to-cream-100",
-  },
-  {
-    id: "6",
-    slug: "taro",
-    name: "Taro",
-    price: 5.5,
-    category: "MILK_TEA",
-    image: "/images/products/taro.png",
-    gradient: "from-taro-200 via-taro-100 to-cream-100",
-  },
-  {
-    id: "7",
-    slug: "blue-ocean",
-    name: "Blue Ocean",
-    price: 6.0,
-    category: "MOJITO",
-    image: "/images/products/blue-ocean.png",
-    gradient: "from-sky-200 via-sky-100 to-cream-100",
-  },
-  {
-    id: "8",
-    slug: "peach-garden",
-    name: "Peach Garden",
-    price: 6.0,
-    category: "MOJITO",
-    image: "/images/products/peach-garden.png",
-    gradient: "from-orange-200 via-orange-100 to-cream-100",
-  },
-];
+// Gradient mappings for categories
+const categoryGradients: Record<string, string> = {
+  "brown-sugar": "from-amber-200 via-amber-100 to-cream-100",
+  "milk-tea": "from-taro-200 via-taro-100 to-cream-100",
+  "cream-cheese": "from-cream-200 via-cream-100 to-white",
+  "iced-coffee": "from-tea-200 via-cream-100 to-cream-50",
+  "hot-coffee": "from-tea-300 via-tea-100 to-cream-100",
+  "ice-tea": "from-matcha-200 via-matcha-100 to-cream-100",
+  "mojito": "from-sky-200 via-sky-100 to-cream-100",
+  "kids-star": "from-rose-200 via-rose-100 to-cream-100",
+  "latte-special": "from-taro-200 via-cream-100 to-cream-50",
+  "frappucchino": "from-tea-200 via-taro-100 to-cream-100",
+};
 
 const reviews = [
   {
@@ -122,12 +63,19 @@ const reviews = [
   },
 ];
 
-const categories = [
-  { key: "bubbleTea", icon: Coffee, color: "tea" },
-  { key: "milkTea", icon: Droplets, color: "cream" },
-  { key: "icedTea", icon: Citrus, color: "matcha" },
-  { key: "mojito", icon: GlassWater, color: "taro" },
-];
+// Static category icons mapping
+const categoryIcons: Record<string, { icon: typeof Coffee; color: string }> = {
+  "brown-sugar": { icon: Coffee, color: "amber" },
+  "milk-tea": { icon: Droplets, color: "taro" },
+  "cream-cheese": { icon: Coffee, color: "cream" },
+  "iced-coffee": { icon: Coffee, color: "tea" },
+  "hot-coffee": { icon: Coffee, color: "tea" },
+  "ice-tea": { icon: Citrus, color: "matcha" },
+  "mojito": { icon: GlassWater, color: "sky" },
+  "kids-star": { icon: Sparkles, color: "rose" },
+  "latte-special": { icon: Coffee, color: "taro" },
+  "frappucchino": { icon: Coffee, color: "tea" },
+};
 
 // Animation variants
 const fadeInUp = {
@@ -151,7 +99,19 @@ const scaleIn = {
 export default function HomePage() {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");
+  const locale = useLocale() as "nl" | "en";
   const heroRef = useRef<HTMLDivElement>(null);
+
+  // Fetch featured products from database
+  const { data: featuredProducts, isLoading: productsLoading } = api.products.getFeatured.useQuery({
+    locale,
+    limit: 8,
+  });
+
+  // Fetch categories from database
+  const { data: categories, isLoading: categoriesLoading } = api.categories.getAll.useQuery({
+    locale,
+  });
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -327,43 +287,60 @@ export default function HomePage() {
             </motion.h2>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={staggerContainer}
-            className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            {featuredProducts.map((product, index) => (
-              <motion.div key={product.id} variants={scaleIn}>
-                <Link href={`/menu/${product.slug}`}>
-                  <div className="product-card group cursor-pointer overflow-hidden rounded-3xl border border-cream-200 bg-white">
-                    <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${product.gradient}`}>
-                      <div className="product-image absolute inset-0 flex items-center justify-center p-4">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
-                        />
+          {productsLoading ? (
+            <div className="mt-16 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
+            </div>
+          ) : (
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={staggerContainer}
+              className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              {(featuredProducts ?? []).map((product) => {
+                const translation = product.translations[0];
+                const categorySlug = product.category?.slug || "";
+                const gradient = categoryGradients[categorySlug] || "from-tea-200 via-cream-100 to-cream-50";
+                const categoryTranslation = product.category?.translations[0];
+
+                return (
+                  <motion.div key={product.id} variants={scaleIn}>
+                    <Link href={`/menu/${product.slug}`}>
+                      <div className="product-card group cursor-pointer overflow-hidden rounded-3xl border border-cream-200 bg-white">
+                        <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${gradient}`}>
+                          <div className="product-image absolute inset-0 flex items-center justify-center p-4">
+                            {product.imageUrl ? (
+                              <img
+                                src={product.imageUrl}
+                                alt={translation?.name || product.slug}
+                                className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                              />
+                            ) : (
+                              <span className="text-7xl transition-transform group-hover:scale-110">🧋</span>
+                            )}
+                          </div>
+                          {/* Price tag */}
+                          <div className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
+                            €{Number(product.price).toFixed(2)}
+                          </div>
+                        </div>
+                        <div className="p-5">
+                          <h3 className="font-serif text-lg font-medium text-tea-900 transition-colors group-hover:text-tea-600">
+                            {translation?.name || product.slug}
+                          </h3>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {categoryTranslation?.name || categorySlug}
+                          </p>
+                        </div>
                       </div>
-                      {/* Price tag */}
-                      <div className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
-                        €{product.price.toFixed(2)}
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <h3 className="font-serif text-lg font-medium text-tea-900 transition-colors group-hover:text-tea-600">
-                        {product.name}
-                      </h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {product.category.replace("_", " ")}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -501,34 +478,46 @@ export default function HomePage() {
             </motion.p>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            {categories.map((cat) => {
-              const Icon = cat.icon;
-              return (
-                <motion.div key={cat.key} variants={scaleIn}>
-                  <Link href={`/menu?category=${cat.key}`}>
-                    <div className="group cursor-pointer rounded-3xl border border-cream-200 bg-gradient-to-b from-cream-50 to-white p-8 text-center transition-all duration-300 hover:border-tea-200 hover:shadow-soft">
-                      <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-${cat.color}-100 transition-transform duration-300 group-hover:scale-110`}>
-                        <Icon className={`h-8 w-8 text-${cat.color}-600`} />
+          {categoriesLoading ? (
+            <div className="mt-16 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
+            </div>
+          ) : (
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+              className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              {(categories ?? []).slice(0, 8).map((cat) => {
+                const translation = cat.translations[0];
+                const iconConfig = categoryIcons[cat.slug] || { icon: Coffee, color: "tea" };
+                const Icon = iconConfig.icon;
+                const color = iconConfig.color;
+
+                return (
+                  <motion.div key={cat.id} variants={scaleIn}>
+                    <Link href={`/menu?category=${cat.slug}`}>
+                      <div className="group cursor-pointer rounded-3xl border border-cream-200 bg-gradient-to-b from-cream-50 to-white p-8 text-center transition-all duration-300 hover:border-tea-200 hover:shadow-soft">
+                        <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-${color}-100 transition-transform duration-300 group-hover:scale-110`}>
+                          <Icon className={`h-8 w-8 text-${color}-600`} />
+                        </div>
+                        <h3 className="mt-6 font-serif text-xl font-medium text-tea-900">
+                          {translation?.name || cat.slug}
+                        </h3>
+                        {translation?.description && (
+                          <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                            {translation.description}
+                          </p>
+                        )}
                       </div>
-                      <h3 className="mt-6 font-serif text-xl font-medium text-tea-900">
-                        {t(`categories.${cat.key}`)}
-                      </h3>
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {t(`categories.${cat.key}Desc`)}
-                      </p>
-                    </div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </motion.div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
         </div>
       </section>
 

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="caramelFrap" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8D4B8"/>
+      <stop offset="50%" style="stop-color:#C68E4E"/>
+      <stop offset="100%" style="stop-color:#8B5A2B"/>
+    </linearGradient>
+    <linearGradient id="caramelFrapDrizzle" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D2691E"/>
+      <stop offset="100%" style="stop-color:#8B4513"/>
+    </linearGradient>
+  </defs>
+  <!-- Cup -->
+  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
+  <!-- Drink (blended/icy texture) -->
+  <path d="M48 95 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 95 Z" fill="url(#caramelFrap)"/>
+  <!-- Ice crystal texture -->
+  <polygon points="70,120 75,130 65,130" fill="#FFFFFF" opacity="0.3"/>
+  <polygon points="110,140 115,150 105,150" fill="#FFFFFF" opacity="0.3"/>
+  <polygon points="90,160 95,170 85,170" fill="#FFFFFF" opacity="0.3"/>
+  <polygon points="125,130 130,140 120,140" fill="#FFFFFF" opacity="0.3"/>
+  <!-- Caramel drizzle inside -->
+  <path d="M60 110 Q70 150 65 190 Q60 220 70 240" stroke="url(#caramelFrapDrizzle)" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M135 105 Q145 135 140 175 Q130 215 140 240" stroke="url(#caramelFrapDrizzle)" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- Large whipped cream dome -->
+  <ellipse cx="100" cy="88" rx="55" ry="22" fill="#FFFEF5"/>
+  <ellipse cx="85" cy="78" rx="22" ry="14" fill="#FFFFFF"/>
+  <ellipse cx="115" cy="80" rx="20" ry="12" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="70" rx="18" ry="10" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="62" rx="12" ry="7" fill="#FFFFFF"/>
+  <!-- Caramel drizzle on cream -->
+  <path d="M70 78 Q80 88 90 78" stroke="#D2691E" stroke-width="3" fill="none"/>
+  <path d="M95 70 Q100 78 105 70" stroke="#D2691E" stroke-width="3" fill="none"/>
+  <path d="M110 80 Q120 90 130 80" stroke="#D2691E" stroke-width="3" fill="none"/>
+  <!-- Tapioca pearls -->
+  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
+  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
+  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
+  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
+  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <!-- Lid (dome) -->
+  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#D2691E"/>
+  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#E07B39"/>
+  <!-- Straw hole -->
+  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#8B4513"/>
+  <!-- Straw -->
+  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+</svg>

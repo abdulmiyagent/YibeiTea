@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="lemon" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFACD"/>
+      <stop offset="100%" style="stop-color:#FFD700"/>
+    </linearGradient>
+  </defs>
+  <!-- Cup -->
+  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
+  <!-- Drink -->
+  <path d="M48 80 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 80 Z" fill="url(#lemon)"/>
+  <!-- Lemon slice -->
+  <circle cx="120" cy="130" r="18" fill="#FFF44F" stroke="#FFD700" stroke-width="2"/>
+  <line x1="120" y1="115" x2="120" y2="145" stroke="#FFFACD" stroke-width="2"/>
+  <line x1="105" y1="130" x2="135" y2="130" stroke="#FFFACD" stroke-width="2"/>
+  <line x1="108" y1="118" x2="132" y2="142" stroke="#FFFACD" stroke-width="2"/>
+  <line x1="132" y1="118" x2="108" y2="142" stroke="#FFFACD" stroke-width="2"/>
+  <!-- Ice cubes -->
+  <rect x="60" y="100" width="25" height="20" fill="#FFFFFF" opacity="0.4" rx="3"/>
+  <rect x="75" y="160" width="22" height="18" fill="#FFFFFF" opacity="0.4" rx="3"/>
+  <!-- Foam top -->
+  <ellipse cx="100" cy="75" rx="55" ry="15" fill="#FFFEF5"/>
+  <ellipse cx="100" cy="72" rx="50" ry="12" fill="#FFFFFF"/>
+  <!-- Tapioca pearls -->
+  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
+  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
+  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
+  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
+  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <!-- Lid -->
+  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#FFD700"/>
+  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#FFF44F"/>
+  <!-- Straw hole -->
+  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#DAA520"/>
+  <!-- Straw -->
+  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+</svg>

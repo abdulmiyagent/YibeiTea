@@ -1,23 +1,39 @@
 import { z } from "zod";
-import { router, publicProcedure, adminProcedure } from "../trpc";
+import { router, publicProcedure, adminProcedure, superAdminProcedure } from "../trpc";
 
 export const productsRouter = router({
   getAll: publicProcedure
     .input(
       z.object({
-        category: z.string().optional(),
+        categoryId: z.string().optional(),
+        categorySlug: z.string().optional(),
         locale: z.enum(["nl", "en"]).default("nl"),
+        onlyAvailable: z.boolean().default(true),
       }).optional()
     )
     .query(async ({ ctx, input }) => {
       const products = await ctx.db.product.findMany({
-        where: input?.category ? { category: input.category as any } : undefined,
+        where: {
+          ...(input?.categoryId && { categoryId: input.categoryId }),
+          ...(input?.categorySlug && { category: { slug: input.categorySlug } }),
+          ...(input?.onlyAvailable && { isAvailable: true }),
+        },
         include: {
-          translations: {
-            where: { locale: input?.locale || "nl" },
+          translations: input?.locale
+            ? { where: { locale: input.locale } }
+            : true,
+          category: {
+            include: {
+              translations: input?.locale
+                ? { where: { locale: input.locale } }
+                : true,
+            },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: [
+          { category: { sortOrder: "asc" } },
+          { sortOrder: "asc" },
+        ],
       });
       return products;
     }),
@@ -32,6 +48,11 @@ export const productsRouter = router({
         where: { slug: input.slug },
         include: {
           translations: { where: { locale: input.locale } },
+          category: {
+            include: {
+              translations: { where: { locale: input.locale } },
+            },
+          },
           customizationOptions: {
             include: { translations: { where: { locale: input.locale } } },
           },
@@ -48,19 +69,54 @@ export const productsRouter = router({
     .query(async ({ ctx, input }) => {
       return ctx.db.product.findMany({
         where: { isFeatured: true, isAvailable: true },
-        include: { translations: { where: { locale: input?.locale || "nl" } } },
+        include: {
+          translations: { where: { locale: input?.locale || "nl" } },
+          category: {
+            include: {
+              translations: { where: { locale: input?.locale || "nl" } },
+            },
+          },
+        },
         take: input?.limit || 6,
+        orderBy: { sortOrder: "asc" },
       });
     }),
 
-  create: adminProcedure
+  getByCategory: publicProcedure
+    .input(z.object({
+      categorySlug: z.string(),
+      locale: z.enum(["nl", "en"]).default("nl"),
+    }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.product.findMany({
+        where: {
+          category: { slug: input.categorySlug },
+          isAvailable: true,
+        },
+        include: {
+          translations: { where: { locale: input.locale } },
+          category: {
+            include: {
+              translations: { where: { locale: input.locale } },
+            },
+          },
+        },
+        orderBy: { sortOrder: "asc" },
+      });
+    }),
+
+  create: superAdminProcedure
     .input(z.object({
       slug: z.string(),
-      category: z.enum(["BUBBLE_TEA", "MILK_TEA", "ICED_TEA", "ICED_COFFEE", "MOJITO", "SEASONAL"]),
+      categoryId: z.string(),
       price: z.number().positive(),
       imageUrl: z.string().optional(),
       isAvailable: z.boolean().default(true),
       isFeatured: z.boolean().default(false),
+      sortOrder: z.number().int().default(0),
+      caffeine: z.boolean().default(true),
+      vegan: z.boolean().default(false),
+      calories: z.number().int().optional(),
       translations: z.array(z.object({
         locale: z.enum(["nl", "en"]),
         name: z.string(),
@@ -71,7 +127,7 @@ export const productsRouter = router({
       const { translations, ...data } = input;
       return ctx.db.product.create({
         data: { ...data, translations: { create: translations } },
-        include: { translations: true },
+        include: { translations: true, category: true },
       });
     }),
 
@@ -79,16 +135,39 @@ export const productsRouter = router({
     .input(z.object({
       id: z.string(),
       slug: z.string().optional(),
+      categoryId: z.string().optional(),
       price: z.number().positive().optional(),
+      imageUrl: z.string().optional().nullable(),
       isAvailable: z.boolean().optional(),
       isFeatured: z.boolean().optional(),
+      sortOrder: z.number().int().optional(),
+      caffeine: z.boolean().optional(),
+      vegan: z.boolean().optional(),
+      calories: z.number().int().optional().nullable(),
+      translations: z.array(z.object({
+        locale: z.enum(["nl", "en"]),
+        name: z.string(),
+        description: z.string(),
+      })).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input;
-      return ctx.db.product.update({ where: { id }, data });
+      const { id, translations, ...data } = input;
+      return ctx.db.product.update({
+        where: { id },
+        data: {
+          ...data,
+          ...(translations && {
+            translations: {
+              deleteMany: {},
+              create: translations,
+            },
+          }),
+        },
+        include: { translations: true, category: true },
+      });
     }),
 
-  delete: adminProcedure
+  delete: superAdminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.product.delete({ where: { id: input.id } });

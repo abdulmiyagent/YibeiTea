@@ -57,6 +57,7 @@ export default function LoginPage() {
       }
     }
 
+    // First, try to sign in to verify credentials
     const result = await signIn("credentials", {
       email: formData.email,
       password: formData.password,
@@ -64,6 +65,28 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
+      // Handle different error types
+      if (result.error === "2FA_REQUIRED" || result.error === "Error: 2FA_REQUIRED") {
+        // Store password temporarily in sessionStorage for 2FA verification
+        sessionStorage.setItem("2fa_pending_password", formData.password);
+        // Redirect to 2FA verification page
+        router.push(`/login/verify?email=${encodeURIComponent(formData.email)}&callbackUrl=/account`);
+        return;
+      }
+
+      if (result.error === "2FA_SETUP_REQUIRED" || result.error === "Error: 2FA_SETUP_REQUIRED") {
+        // SUPER_ADMIN needs to set up 2FA first
+        setError("Je moet eerst twee-factor authenticatie instellen voordat je kunt inloggen.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.error === "INVALID_2FA_CODE" || result.error === "Error: INVALID_2FA_CODE") {
+        setError("Ongeldige verificatiecode. Probeer opnieuw.");
+        setIsLoading(false);
+        return;
+      }
+
       setError("Ongeldige inloggegevens");
       setIsLoading(false);
       return;

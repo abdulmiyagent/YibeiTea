@@ -17,6 +17,9 @@ import {
   Settings,
   ChevronRight,
   Coffee,
+  Cherry,
+  Shield,
+  FolderOpen,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -98,7 +101,11 @@ export default function AdminDashboardPage() {
     );
   }
 
-  if (status === "unauthenticated" || session?.user?.role !== "ADMIN") {
+  const userRole = session?.user?.role;
+  const isSuperAdmin = userRole === "SUPER_ADMIN";
+  const isAdmin = userRole === "ADMIN" || isSuperAdmin;
+
+  if (status === "unauthenticated" || !isAdmin) {
     router.push("/");
     return null;
   }
@@ -295,7 +302,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Link href="/admin/products">
             <Card className="cursor-pointer transition-colors hover:bg-muted/50">
               <CardContent className="flex items-center gap-4 pt-6">
@@ -306,6 +313,42 @@ export default function AdminDashboardPage() {
                   <p className="font-medium">Producten Beheren</p>
                   <p className="text-sm text-muted-foreground">
                     Voeg toe, bewerk of verwijder
+                  </p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+          </Link>
+
+          {isSuperAdmin && (
+            <Link href="/admin/categories">
+              <Card className="cursor-pointer transition-colors hover:bg-muted/50">
+                <CardContent className="flex items-center gap-4 pt-6">
+                  <div className="rounded-full bg-matcha-100 p-3">
+                    <FolderOpen className="h-6 w-6 text-matcha-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Categorieën</p>
+                    <p className="text-sm text-muted-foreground">
+                      Beheer productcategorieën
+                    </p>
+                  </div>
+                  <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
+                </CardContent>
+              </Card>
+            </Link>
+          )}
+
+          <Link href="/admin/toppings">
+            <Card className="cursor-pointer transition-colors hover:bg-muted/50">
+              <CardContent className="flex items-center gap-4 pt-6">
+                <div className="rounded-full bg-taro-100 p-3">
+                  <Cherry className="h-6 w-6 text-taro-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Toppings Beheren</p>
+                  <p className="text-sm text-muted-foreground">
+                    Tapioca, boba en meer
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -333,13 +376,33 @@ export default function AdminDashboardPage() {
           <Link href="/admin/settings">
             <Card className="cursor-pointer transition-colors hover:bg-muted/50">
               <CardContent className="flex items-center gap-4 pt-6">
-                <div className="rounded-full bg-taro-100 p-3">
-                  <Settings className="h-6 w-6 text-taro-600" />
+                <div className="rounded-full bg-cream-100 p-3">
+                  <Settings className="h-6 w-6 text-cream-600" />
                 </div>
                 <div>
                   <p className="font-medium">Instellingen</p>
                   <p className="text-sm text-muted-foreground">
-                    Winkel en loyaliteit instellingen
+                    Winkel en loyaliteit
+                  </p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+
+        {/* Security Section */}
+        <div className="mt-4">
+          <Link href="/admin/security">
+            <Card className="cursor-pointer border-tea-200 transition-colors hover:bg-tea-50">
+              <CardContent className="flex items-center gap-4 pt-6">
+                <div className="rounded-full bg-tea-100 p-3">
+                  <Shield className="h-6 w-6 text-tea-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Beveiliging</p>
+                  <p className="text-sm text-muted-foreground">
+                    Twee-factor authenticatie en account beveiliging
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />

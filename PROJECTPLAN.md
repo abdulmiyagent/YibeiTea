@@ -363,16 +363,18 @@ yibei-tea/
 
 #### Assets & Afbeeldingen
 - [x] Logo geïmporteerd (/images/logo.png)
-- [x] 9 productafbeeldingen van yibeitea.be (/images/products/)
-  - cream-cheese-taro-milk.png
-  - caramel-vanilla-latte.png
-  - hazelnut-nutella.png
-  - green-apple.png
-  - strawberry.png
-  - taro.png
-  - blue-ocean.png
-  - peach-garden.png
-  - tokyo-kiwi.png
+- [x] 45 product SVG illustraties (/images/products/)
+  - **Milk Tea (6):** boba-milk-tea, boba-coffee, matcha-milk, chocolate-milk, fresh-milk, indian-chai
+  - **Classic Tea (4):** thai-tea, singapore-tea, honey-milk-tea, caramel-milk-tea
+  - **Flavored Milk Tea (4):** hazelnut-milk-tea, vanilla-milk-tea, coconut-milk-tea, salted-caramel-milk-tea
+  - **Cream Cheese (4):** cream-cheese-green-tea, cream-cheese-salted-caramel, cream-cheese-ovomaltine, cream-cheese-matcha
+  - **Ice Tea (5):** ice-tea-passion-fruit, ice-tea-lemon, ice-tea-mango, ice-tea-lychee, ice-tea-peach
+  - **Mojitos (6):** mojito-original, mojito-strawberry, mojito-passion-fruit, mojito-mango, mojito-lychee, mojito-peach
+  - **Iced Coffee (3):** iced-americano, iced-latte, iced-mocha
+  - **Hot Coffee (4):** hot-americano, hot-latte, hot-mocha, hot-cappuccino
+  - **Kids (3):** kids-strawberry, kids-chocolate, kids-vanilla
+  - **Lattes (2):** latte-caramel-vanilla, latte-hazelnut-nutella
+  - **Frappuccino (4):** frappuccino-caramel, frappuccino-mocha, frappuccino-matcha, frappuccino-strawberry
 
 #### Ontwikkelomgeving
 - [x] npm dependencies geïnstalleerd (598 packages)
@@ -404,7 +406,7 @@ yibei-tea/
 - [ ] Privacy & Terms pagina's
 
 #### Functionaliteit
-- [x] Echte product afbeeldingen toevoegen (8 top picks van yibeitea.be)
+- [x] 45 product SVG illustraties toegevoegd (alle categorieën)
 - [ ] Email notificaties bij bestelling
 - [ ] Real-time order status updates
 - [ ] Loyaliteitspunten uitwisselen voor beloningen
@@ -490,16 +492,15 @@ prisma/
 public/
 ├── images/
 │   ├── logo.png
-│   └── products/
-│       ├── cream-cheese-taro-milk.png
-│       ├── caramel-vanilla-latte.png
-│       ├── hazelnut-nutella.png
-│       ├── green-apple.png
-│       ├── strawberry.png
-│       ├── taro.png
-│       ├── blue-ocean.png
-│       ├── peach-garden.png
-│       └── tokyo-kiwi.png
+│   └── products/           # 45 SVG product illustraties
+│       ├── boba-milk-tea.svg, boba-coffee.svg, matcha-milk.svg, ...
+│       ├── cream-cheese-*.svg (4 varianten)
+│       ├── ice-tea-*.svg (5 varianten)
+│       ├── mojito-*.svg (6 varianten)
+│       ├── iced-*.svg, hot-*.svg (7 koffie varianten)
+│       ├── kids-*.svg (3 varianten)
+│       ├── latte-*.svg (2 varianten)
+│       └── frappuccino-*.svg (4 varianten)
 
 Root files:
 ├── package.json

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="strawberryMojito" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B"/>
+      <stop offset="100%" style="stop-color:#DC143C"/>
+    </linearGradient>
+  </defs>
+  <!-- Cup -->
+  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
+  <!-- Drink -->
+  <path d="M48 80 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 80 Z" fill="url(#strawberryMojito)"/>
+  <!-- Strawberry slice -->
+  <path d="M90 130 L100 110 L110 130 Q100 145 90 130" fill="#FF4444"/>
+  <circle cx="95" cy="125" r="1.5" fill="#FFE4B5"/>
+  <circle cx="105" cy="125" r="1.5" fill="#FFE4B5"/>
+  <circle cx="100" cy="132" r="1.5" fill="#FFE4B5"/>
+  <!-- Mint leaves -->
+  <ellipse cx="70" cy="115" rx="6" ry="10" fill="#228B22" transform="rotate(-15 70 115)"/>
+  <ellipse cx="130" cy="120" rx="5" ry="8" fill="#228B22" transform="rotate(20 130 120)"/>
+  <!-- Ice cubes -->
+  <rect x="65" y="160" width="22" height="18" fill="#FFFFFF" opacity="0.4" rx="3"/>
+  <rect x="115" y="155" width="20" height="16" fill="#FFFFFF" opacity="0.4" rx="3"/>
+  <!-- Bubbles -->
+  <circle cx="80" cy="190" r="3" fill="#FFFFFF" opacity="0.5"/>
+  <circle cx="125" cy="185" r="2" fill="#FFFFFF" opacity="0.5"/>
+  <!-- Foam top -->
+  <ellipse cx="100" cy="75" rx="55" ry="15" fill="#FFE4E1"/>
+  <ellipse cx="100" cy="72" rx="50" ry="12" fill="#FFF0F5"/>
+  <!-- Tapioca pearls -->
+  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
+  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
+  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
+  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
+  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <!-- Lid -->
+  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#DC143C"/>
+  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#FF6B6B"/>
+  <!-- Straw hole -->
+  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#8B0000"/>
+  <!-- Straw -->
+  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+</svg>

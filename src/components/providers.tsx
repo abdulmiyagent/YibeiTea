@@ -3,6 +3,7 @@
 import { SessionProvider } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import { api, createTRPCClient } from "@/lib/trpc";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -21,9 +22,13 @@ export function Providers({ children }: ProvidersProps) {
       })
   );
 
+  const [trpcClient] = useState(() => createTRPCClient());
+
   return (
     <SessionProvider>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <api.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      </api.Provider>
     </SessionProvider>
   );
 }

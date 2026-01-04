@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="strawberryFrap" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFB6C1"/>
+      <stop offset="50%" style="stop-color:#FF69B4"/>
+      <stop offset="100%" style="stop-color:#DC143C"/>
+    </linearGradient>
+  </defs>
+  <!-- Cup -->
+  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
+  <!-- Drink (blended/icy texture) -->
+  <path d="M48 95 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 95 Z" fill="url(#strawberryFrap)"/>
+  <!-- Ice crystal texture -->
+  <polygon points="70,120 75,130 65,130" fill="#FFFFFF" opacity="0.3"/>
+  <polygon points="110,145 115,155 105,155" fill="#FFFFFF" opacity="0.3"/>
+  <polygon points="90,170 95,180 85,180" fill="#FFFFFF" opacity="0.3"/>
+  <polygon points="125,135 130,145 120,145" fill="#FFFFFF" opacity="0.3"/>
+  <!-- Strawberry pieces -->
+  <path d="M75 130 L80 120 L85 130 Q80 138 75 130" fill="#FF4444"/>
+  <path d="M115 155 L120 145 L125 155 Q120 163 115 155" fill="#FF4444"/>
+  <!-- Large whipped cream dome -->
+  <ellipse cx="100" cy="88" rx="55" ry="22" fill="#FFFEF5"/>
+  <ellipse cx="85" cy="78" rx="22" ry="14" fill="#FFFFFF"/>
+  <ellipse cx="115" cy="80" rx="20" ry="12" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="70" rx="18" ry="10" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="62" rx="12" ry="7" fill="#FFFFFF"/>
+  <!-- Strawberry drizzle on cream -->
+  <path d="M70 78 Q80 88 90 78" stroke="#DC143C" stroke-width="3" fill="none"/>
+  <path d="M110 80 Q120 90 130 80" stroke="#DC143C" stroke-width="3" fill="none"/>
+  <!-- Fresh strawberry on top -->
+  <path d="M95 55 L100 45 L105 55 Q100 62 95 55" fill="#DC143C"/>
+  <path d="M100 45 Q102 40 105 42" stroke="#228B22" stroke-width="2" fill="none"/>
+  <!-- Tapioca pearls -->
+  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
+  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
+  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
+  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
+  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <!-- Lid -->
+  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#DC143C"/>
+  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#FF69B4"/>
+  <!-- Straw hole -->
+  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#8B0000"/>
+  <!-- Straw -->
+  <rect x="96" y="10" width="8" height="50" fill="#FF69B4" rx="2"/>
+</svg>

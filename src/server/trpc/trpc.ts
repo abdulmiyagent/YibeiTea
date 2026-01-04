@@ -21,7 +21,19 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 });
 
 const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session?.user || ctx.session.user.role !== "ADMIN") {
+  const role = ctx.session?.user?.role;
+  if (!ctx.session?.user || (role !== "ADMIN" && role !== "SUPER_ADMIN")) {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({
+    ctx: {
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
+const enforceUserIsSuperAdmin = t.middleware(({ ctx, next }) => {
+  if (!ctx.session?.user || ctx.session.user.role !== "SUPER_ADMIN") {
     throw new TRPCError({ code: "FORBIDDEN" });
   }
   return next({
@@ -33,3 +45,4 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
 
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
+export const superAdminProcedure = t.procedure.use(enforceUserIsSuperAdmin);

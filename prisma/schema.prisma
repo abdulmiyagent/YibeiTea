@@ -56,6 +56,7 @@ enum LoyaltyTier {
 enum UserRole {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
 model User {
@@ -67,6 +68,11 @@ model User {
   phone         String?
   dateOfBirth   DateTime?
   role          UserRole  @default(USER)
+
+  // Two-Factor Authentication (required for SUPER_ADMIN)
+  twoFactorSecret   String?   // TOTP secret (encrypted)
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorVerified DateTime? // When 2FA was last verified
 
   // Loyalty
   loyaltyPoints Int         @default(0)
@@ -106,23 +112,44 @@ model Address {
 
 // ============ PRODUCT MODELS ============
 
-enum ProductCategory {
-  BUBBLE_TEA
-  MILK_TEA
-  ICED_TEA
-  ICED_COFFEE
-  MOJITO
-  SEASONAL
+model Category {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+  imageUrl    String?
+
+  // Translations
+  translations CategoryTranslation[]
+
+  // Products in this category
+  products    Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CategoryTranslation {
+  id          String @id @default(cuid())
+  categoryId  String
+  locale      String // 'nl' or 'en'
+  name        String
+  description String? @db.Text
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
 }
 
 model Product {
-  id          String          @id @default(cuid())
-  slug        String          @unique
-  category    ProductCategory
-  price       Decimal         @db.Decimal(10, 2)
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  categoryId  String
+  price       Decimal  @db.Decimal(10, 2)
   imageUrl    String?
-  isAvailable Boolean         @default(true)
-  isFeatured  Boolean         @default(false)
+  isAvailable Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
+  sortOrder   Int      @default(0)
 
   // Nutritional info
   calories    Int?
@@ -139,6 +166,7 @@ model Product {
   updatedAt DateTime @updatedAt
 
   // Relations
+  category   Category    @relation(fields: [categoryId], references: [id])
   orderItems OrderItem[]
   favorites  Favorite[]
   allergens  ProductAllergen[]
@@ -185,12 +213,37 @@ model ProductAllergen {
   @@id([productId, allergenId])
 }
 
+// ============ TOPPING MODEL ============
+
+model Topping {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  price       Decimal @db.Decimal(10, 2)
+  isAvailable Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  translations ToppingTranslation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ToppingTranslation {
+  id        String @id @default(cuid())
+  toppingId String
+  locale    String
+  name      String
+
+  topping Topping @relation(fields: [toppingId], references: [id], onDelete: Cascade)
+
+  @@unique([toppingId, locale])
+}
+
 // ============ CUSTOMIZATION MODELS ============
 
 enum CustomizationType {
   SUGAR_LEVEL
   ICE_LEVEL
-  TOPPING
   SIZE
   MILK_TYPE
 }

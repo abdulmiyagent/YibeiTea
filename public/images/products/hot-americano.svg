@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="hotAmericano" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A3728"/>
+      <stop offset="100%" style="stop-color:#1A0A05"/>
+    </linearGradient>
+  </defs>
+  <!-- Steam -->
+  <path d="M70 25 Q65 15 70 5" stroke="#E8E8E8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <path d="M100 20 Q95 10 100 0" stroke="#E8E8E8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <path d="M130 25 Q125 15 130 5" stroke="#E8E8E8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <!-- Cup -->
+  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
+  <!-- Drink -->
+  <path d="M48 70 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 70 Z" fill="url(#hotAmericano)"/>
+  <!-- Crema top -->
+  <ellipse cx="100" cy="68" rx="53" ry="12" fill="#C9A66B"/>
+  <ellipse cx="100" cy="65" rx="48" ry="10" fill="#D4B896"/>
+  <!-- Handle -->
+  <path d="M160 100 Q185 100 185 150 Q185 200 160 200" stroke="#E8DCC8" stroke-width="8" fill="none"/>
+  <path d="M160 100 Q180 100 180 150 Q180 200 160 200" stroke="#FFF5E6" stroke-width="4" fill="none"/>
+  <!-- Tapioca pearls -->
+  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
+  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
+  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
+  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
+  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <!-- Lid -->
+  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#3E2723"/>
+  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#4E342E"/>
+  <!-- Drink hole -->
+  <ellipse cx="100" cy="52" rx="12" ry="5" fill="#1A0A05"/>
+</svg>
