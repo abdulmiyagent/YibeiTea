@@ -161,7 +161,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold">Adres</h3>
                   <p className="text-muted-foreground">
-                    Sint-Niklaasstraat 36
+                    Brabantdam 24
                     <br />
                     9000 Gent, België
                   </p>
