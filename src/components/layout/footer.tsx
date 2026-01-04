@@ -67,7 +67,7 @@ export function Footer() {
               <li className="flex items-start space-x-2">
                 <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <span>
-                  Brabantdam 24<br />
+                  Sint-Niklaasstraat 36<br />
                   9000 Gent, België
                 </span>
               </li>
