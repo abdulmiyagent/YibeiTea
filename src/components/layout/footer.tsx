@@ -32,7 +32,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-sm text-muted-foreground">
-              Premium bubble tea in Gent. Vers bereid met de beste ingrediënten.
+              {t("tagline")}
             </p>
             <div className="flex space-x-4">
               <a
@@ -92,11 +92,11 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center space-x-2">
                 <Clock className="h-4 w-4" />
-                <span>Ma - Za: 11:00 - 20:00</span>
+                <span>{t("weekdayHours")}</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Clock className="h-4 w-4" />
-                <span>Zo: 10:00 - 19:00</span>
+                <span>{t("sundayHours")}</span>
               </li>
             </ul>
           </div>
@@ -105,7 +105,7 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="font-semibold">{t("newsletter.title")}</h3>
             <p className="text-sm text-muted-foreground">
-              Ontvang exclusieve aanbiedingen en nieuws over seizoensspecials.
+              {t("newsletter.description")}
             </p>
             <form className="flex space-x-2">
               <Input

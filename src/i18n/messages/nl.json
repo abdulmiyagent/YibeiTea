@@ -50,6 +50,7 @@
       "label": "Ons Verhaal",
       "title": "Van Droom naar Werkelijkheid",
       "description": "Yibei Tea werd opgericht door Naim, die zag hoe bubble tea ongelooflijk populair was geworden in grote steden in Europa. 'In grote steden staan mensen in de rij voor bubble tea,' merkte hij op. Vastberaden om deze trend naar Gent te brengen, opende hij de eerste authentieke bubble tea bar op de Brabantdam. Elk drankje wordt vers bereid met premium ingrediënten, net zoals in de beste bubble tea shops in Azië.",
+      "readMore": "Lees Meer",
       "highlight1": {
         "value": "100%",
         "label": "Verse ingrediënten"
@@ -241,7 +242,9 @@
       "title": "Bedankt voor je bestelling!",
       "orderNumber": "Bestelnummer",
       "pickupTime": "Afhaaltijd",
-      "emailSent": "Een bevestiging is verzonden naar {email}"
+      "emailSent": "Een bevestiging is verzonden naar {email}",
+      "placeAnother": "Nog een bestelling plaatsen",
+      "viewOrders": "Bekijk mijn bestellingen"
     },
     "status": {
       "pending": "In afwachting",
@@ -315,10 +318,14 @@
     "hours": "Openingsuren",
     "contact": "Contact",
     "followUs": "Volg Ons",
+    "tagline": "Premium bubble tea in Gent. Vers bereid met de beste ingrediënten.",
+    "weekdayHours": "Ma - Za: 11:00 - 20:00",
+    "sundayHours": "Zo: 10:00 - 19:00",
     "newsletter": {
       "title": "Blijf op de hoogte",
       "placeholder": "Je e-mailadres",
-      "subscribe": "Inschrijven"
+      "subscribe": "Inschrijven",
+      "description": "Ontvang exclusieve aanbiedingen en nieuws over seizoensspecials."
     },
     "legal": {
       "privacy": "Privacybeleid",

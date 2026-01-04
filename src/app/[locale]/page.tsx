@@ -433,7 +433,7 @@ export default function HomePage() {
                     size="lg"
                     className="group rounded-full bg-tea-600 px-8 font-medium shadow-glow transition-all hover:bg-tea-700"
                   >
-                    Lees Meer
+                    {t("story.readMore")}
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </Link>

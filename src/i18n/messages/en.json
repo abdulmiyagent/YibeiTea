@@ -50,6 +50,7 @@
       "label": "Our Story",
       "title": "From Dream to Reality",
       "description": "Yibei Tea was founded by Naim, who saw how bubble tea had become incredibly popular in major cities across Europe. 'In big cities, people queue for bubble tea,' he noticed. Determined to bring this trend to Ghent, he opened the first authentic bubble tea bar on Brabantdam. Every drink is freshly prepared with premium ingredients, just like in the best bubble tea shops in Asia.",
+      "readMore": "Read More",
       "highlight1": {
         "value": "100%",
         "label": "Fresh ingredients"
@@ -241,7 +242,9 @@
       "title": "Thank you for your order!",
       "orderNumber": "Order Number",
       "pickupTime": "Pickup Time",
-      "emailSent": "A confirmation has been sent to {email}"
+      "emailSent": "A confirmation has been sent to {email}",
+      "placeAnother": "Place another order",
+      "viewOrders": "View my orders"
     },
     "status": {
       "pending": "Pending",
@@ -315,10 +318,14 @@
     "hours": "Opening Hours",
     "contact": "Contact",
     "followUs": "Follow Us",
+    "tagline": "Premium bubble tea in Ghent. Freshly prepared with the finest ingredients.",
+    "weekdayHours": "Mon - Sat: 11:00 - 20:00",
+    "sundayHours": "Sun: 10:00 - 19:00",
     "newsletter": {
       "title": "Stay Updated",
       "placeholder": "Your email address",
-      "subscribe": "Subscribe"
+      "subscribe": "Subscribe",
+      "description": "Receive exclusive offers and news about seasonal specials."
     },
     "legal": {
       "privacy": "Privacy Policy",

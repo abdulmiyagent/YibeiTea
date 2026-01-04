@@ -64,13 +64,13 @@ export default function OrderConfirmationPage() {
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Link href="/menu">
               <Button variant="tea" size="lg">
-                Nog een bestelling plaatsen
+                {t("placeAnother")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/account/orders">
               <Button variant="outline" size="lg">
-                Bekijk mijn bestellingen
+                {t("viewOrders")}
               </Button>
             </Link>
           </div>
