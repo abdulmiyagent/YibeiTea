@@ -1,0 +1,361 @@
+{
+  "common": {
+    "brandName": "Yibei Tea",
+    "tagline": "Premium Bubble Tea in Ghent",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "about": "About Us",
+    "contact": "Contact",
+    "cart": "Cart",
+    "account": "My Account",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "admin": "Admin"
+  },
+  "home": {
+    "hero": {
+      "title": "The Art of Bubble Tea",
+      "titleAccent": "Perfected",
+      "subtitle": "Handcrafted beverages with premium ingredients, freshly prepared in the heart of Ghent",
+      "cta": "Explore Our Menu",
+      "orderNow": "Order Now",
+      "scrollHint": "Scroll to discover"
+    },
+    "featured": {
+      "title": "Our Favorites",
+      "subtitle": "The most beloved drinks, carefully curated for the ultimate taste experience",
+      "viewAll": "View full menu"
+    },
+    "story": {
+      "label": "Our Story",
+      "title": "A Passion for Perfection",
+      "description": "At Yibei Tea, we believe every sip should be a moment of pure enjoyment. Our journey began with a simple mission: to bring authentic Asian tea beverages to Ghent, crafted with the highest quality ingredients.",
+      "highlight1": {
+        "value": "100%",
+        "label": "Fresh ingredients"
+      },
+      "highlight2": {
+        "value": "15+",
+        "label": "Unique flavors"
+      },
+      "highlight3": {
+        "value": "5000+",
+        "label": "Happy customers"
+      }
+    },
+    "categories": {
+      "title": "Discover Our Collection",
+      "subtitle": "From classic milk teas to refreshing fruit infusions",
+      "bubbleTea": "Bubble Tea",
+      "bubbleTeaDesc": "Classic pearl tea with fresh tapioca",
+      "milkTea": "Milk Tea",
+      "milkTeaDesc": "Creamy tea with premium milk",
+      "icedTea": "Iced Tea",
+      "icedTeaDesc": "Refreshing fruit infusions",
+      "icedCoffee": "Iced Coffee",
+      "icedCoffeeDesc": "Cold coffee creations",
+      "mojito": "Mojitos",
+      "mojitoDesc": "Alcohol-free cocktails",
+      "seasonal": "Seasonal Specials"
+    },
+    "whyUs": {
+      "title": "Why Yibei Tea?",
+      "subtitle": "What sets us apart from the rest",
+      "quality": {
+        "title": "Premium Quality",
+        "description": "Only the finest tea leaves and fresh ingredients, directly imported"
+      },
+      "fresh": {
+        "title": "Daily Fresh",
+        "description": "Every drink is made to order, never pre-made"
+      },
+      "customize": {
+        "title": "Your Choice",
+        "description": "Customize sugar, ice, and toppings to your perfect taste"
+      },
+      "loyalty": {
+        "title": "Earn Rewards",
+        "description": "Collect points with every order and get free drinks"
+      }
+    },
+    "reviews": {
+      "title": "What Our Customers Say",
+      "subtitle": "Read the experiences of our satisfied visitors"
+    },
+    "loyalty": {
+      "title": "Join Our Tea Family",
+      "subtitle": "Sign up for our loyalty program and receive exclusive benefits",
+      "benefit1": "Earn 10 points per euro",
+      "benefit2": "Free drink on your birthday",
+      "benefit3": "Exclusive seasonal offers",
+      "cta": "Create Free Account"
+    },
+    "location": {
+      "title": "Visit Us",
+      "subtitle": "Stop by for the authentic bubble tea experience",
+      "address": "Veldstraat 123, 9000 Ghent",
+      "hours": "Opening Hours",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday",
+      "closed": "Closed",
+      "directions": "Get Directions"
+    },
+    "cta": {
+      "title": "Ready for Your Next Favorite Drink?",
+      "subtitle": "Order online and pick up when it suits you. No queues, just pure enjoyment.",
+      "button": "Start Your Order"
+    }
+  },
+  "menu": {
+    "title": "Our Menu",
+    "filter": {
+      "all": "All Drinks",
+      "vegan": "Vegan",
+      "caffeineFree": "Caffeine Free"
+    },
+    "sort": {
+      "default": "Default",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low",
+      "nameAsc": "Name: A-Z"
+    },
+    "addToCart": "Add to Cart",
+    "customize": "Customize",
+    "outOfStock": "Out of Stock",
+    "calories": "calories"
+  },
+  "product": {
+    "customize": {
+      "title": "Customize your drink",
+      "sugarLevel": "Sugar Level",
+      "iceLevel": "Ice Level",
+      "toppings": "Toppings",
+      "milkType": "Milk Type",
+      "size": "Size"
+    },
+    "sugarLevels": {
+      "0": "No sugar",
+      "25": "25% sugar",
+      "50": "50% sugar",
+      "75": "75% sugar",
+      "100": "100% sugar"
+    },
+    "iceLevels": {
+      "none": "No ice",
+      "less": "Less ice",
+      "normal": "Normal",
+      "extra": "Extra ice"
+    },
+    "allergens": "Allergens",
+    "nutritionalInfo": "Nutritional Information"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "continueShopping": "Continue Shopping",
+    "item": "item",
+    "items": "items",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "total": "Total",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "updateQuantity": "Update quantity",
+    "promoCode": {
+      "label": "Promo Code",
+      "placeholder": "Enter code",
+      "apply": "Apply",
+      "applied": "Code applied!",
+      "invalid": "Invalid code"
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "steps": {
+      "details": "Details",
+      "pickup": "Pickup",
+      "payment": "Payment"
+    },
+    "contact": {
+      "title": "Contact Details",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone Number"
+    },
+    "pickup": {
+      "title": "Pickup Time",
+      "selectDate": "Select date",
+      "selectTime": "Select time",
+      "asap": "As soon as possible",
+      "schedule": "Schedule ahead"
+    },
+    "payment": {
+      "title": "Payment Method",
+      "methods": {
+        "bancontact": "Bancontact",
+        "ideal": "iDEAL",
+        "creditcard": "Credit Card",
+        "paypal": "PayPal"
+      }
+    },
+    "loyalty": {
+      "title": "Loyalty Points",
+      "available": "Available points",
+      "use": "Use points",
+      "earn": "You'll earn {points} points with this order"
+    },
+    "notes": {
+      "label": "Notes",
+      "placeholder": "Special requests or allergies..."
+    },
+    "placeOrder": "Place Order",
+    "processing": "Processing..."
+  },
+  "order": {
+    "confirmation": {
+      "title": "Thank you for your order!",
+      "orderNumber": "Order Number",
+      "pickupTime": "Pickup Time",
+      "emailSent": "A confirmation has been sent to {email}"
+    },
+    "status": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "preparing": "Preparing",
+      "ready": "Ready for Pickup",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "track": "Track Order"
+  },
+  "account": {
+    "title": "My Account",
+    "welcome": "Welcome, {name}!",
+    "orders": {
+      "title": "My Orders",
+      "empty": "You haven't placed any orders yet",
+      "viewDetails": "View details"
+    },
+    "loyalty": {
+      "title": "Loyalty Program",
+      "points": "Points",
+      "tier": "Tier",
+      "nextTier": "{points} more points until {tier}",
+      "rewards": "Available Rewards",
+      "history": "Points History"
+    },
+    "favorites": {
+      "title": "Favorites",
+      "empty": "You don't have any favorites yet"
+    },
+    "settings": {
+      "title": "Settings",
+      "profile": "Profile",
+      "language": "Language",
+      "notifications": "Notifications"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email address",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Login",
+      "noAccount": "Don't have an account?",
+      "register": "Register here",
+      "orContinueWith": "Or continue with"
+    },
+    "register": {
+      "title": "Create Account",
+      "name": "Name",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "terms": "I agree to the terms and conditions",
+      "submit": "Register",
+      "hasAccount": "Already have an account?",
+      "login": "Login here"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid credentials",
+      "emailExists": "This email is already registered",
+      "weakPassword": "Password is too weak",
+      "passwordMismatch": "Passwords don't match"
+    }
+  },
+  "footer": {
+    "address": "Address",
+    "hours": "Opening Hours",
+    "contact": "Contact",
+    "followUs": "Follow Us",
+    "newsletter": {
+      "title": "Stay Updated",
+      "placeholder": "Your email address",
+      "subscribe": "Subscribe"
+    },
+    "legal": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions"
+    },
+    "copyright": "© {year} Yibei Tea. All rights reserved."
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "todayOrders": "Orders Today",
+      "todayRevenue": "Revenue Today",
+      "pendingOrders": "Pending Orders",
+      "totalCustomers": "Total Customers"
+    },
+    "orders": {
+      "title": "Orders",
+      "new": "New",
+      "updateStatus": "Update Status"
+    },
+    "products": {
+      "title": "Products",
+      "add": "Add Product",
+      "edit": "Edit Product"
+    },
+    "customers": {
+      "title": "Customers"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "popularProducts": "Popular Products"
+    },
+    "settings": {
+      "title": "Settings",
+      "store": "Store Settings",
+      "openingHours": "Opening Hours",
+      "loyalty": "Loyalty Settings"
+    }
+  }
+}

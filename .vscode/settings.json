@@ -1,0 +1,6 @@
+{
+    "claudeCode.useTerminal": true,
+    "claudeCode.autosave": false,
+    "claudeCode.initialPermissionMode": "bypassPermissions",
+    "claudeCode.allowDangerouslySkipPermissions": true
+}

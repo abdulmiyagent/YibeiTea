@@ -1,0 +1,361 @@
+{
+  "common": {
+    "brandName": "Yibei Tea",
+    "tagline": "Premium Bubble Tea in Gent",
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "retry": "Opnieuw proberen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "close": "Sluiten",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige",
+    "search": "Zoeken",
+    "all": "Alle",
+    "yes": "Ja",
+    "no": "Nee"
+  },
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "about": "Over ons",
+    "contact": "Contact",
+    "cart": "Winkelwagen",
+    "account": "Mijn account",
+    "login": "Inloggen",
+    "logout": "Uitloggen",
+    "register": "Registreren",
+    "admin": "Beheer"
+  },
+  "home": {
+    "hero": {
+      "title": "De Kunst van Bubble Tea",
+      "titleAccent": "Perfectioneren",
+      "subtitle": "Handgemaakte drankjes met premium ingrediënten, vers bereid in het hart van Gent",
+      "cta": "Ontdek ons Menu",
+      "orderNow": "Bestel Nu",
+      "scrollHint": "Scroll om te ontdekken"
+    },
+    "featured": {
+      "title": "Onze Favorieten",
+      "subtitle": "De meest geliefde drankjes, zorgvuldig samengesteld voor het ultieme smaakgevoel",
+      "viewAll": "Bekijk volledig menu"
+    },
+    "story": {
+      "label": "Ons Verhaal",
+      "title": "Een Passie voor Perfectie",
+      "description": "Bij Yibei Tea geloven we dat elke slok een moment van genot moet zijn. Onze reis begon met een simpele missie: authentieke Aziatische theedrankjes naar Gent brengen, bereid met de hoogste kwaliteit ingrediënten.",
+      "highlight1": {
+        "value": "100%",
+        "label": "Verse ingrediënten"
+      },
+      "highlight2": {
+        "value": "15+",
+        "label": "Unieke smaken"
+      },
+      "highlight3": {
+        "value": "5000+",
+        "label": "Tevreden klanten"
+      }
+    },
+    "categories": {
+      "title": "Ontdek Onze Collectie",
+      "subtitle": "Van klassieke milk teas tot verfrissende fruit infusies",
+      "bubbleTea": "Bubble Tea",
+      "bubbleTeaDesc": "Klassieke parelthee met verse tapioca",
+      "milkTea": "Milk Tea",
+      "milkTeaDesc": "Romige thee met premium melk",
+      "icedTea": "Iced Tea",
+      "icedTeaDesc": "Verfrissende fruit infusies",
+      "icedCoffee": "Iced Coffee",
+      "icedCoffeeDesc": "Koude koffie creaties",
+      "mojito": "Mojitos",
+      "mojitoDesc": "Alcohol-vrije cocktails",
+      "seasonal": "Seizoensspecials"
+    },
+    "whyUs": {
+      "title": "Waarom Yibei Tea?",
+      "subtitle": "Wat ons onderscheidt van de rest",
+      "quality": {
+        "title": "Premium Kwaliteit",
+        "description": "Alleen de beste theebladeren en verse ingrediënten, direct geïmporteerd"
+      },
+      "fresh": {
+        "title": "Dagelijks Vers",
+        "description": "Elke drankje wordt op bestelling bereid, nooit vooraf gemaakt"
+      },
+      "customize": {
+        "title": "Jouw Keuze",
+        "description": "Pas suiker, ijs en toppings aan naar jouw perfecte smaak"
+      },
+      "loyalty": {
+        "title": "Verdien Beloningen",
+        "description": "Spaar punten bij elke bestelling en ontvang gratis drankjes"
+      }
+    },
+    "reviews": {
+      "title": "Wat Onze Klanten Zeggen",
+      "subtitle": "Lees de ervaringen van onze tevreden bezoekers"
+    },
+    "loyalty": {
+      "title": "Word Lid van Onze Tea Family",
+      "subtitle": "Meld je aan voor ons loyaliteitsprogramma en ontvang exclusieve voordelen",
+      "benefit1": "Verdien 10 punten per euro",
+      "benefit2": "Gratis drankje op je verjaardag",
+      "benefit3": "Exclusieve seizoensaanbiedingen",
+      "cta": "Maak Gratis Account Aan"
+    },
+    "location": {
+      "title": "Bezoek Ons",
+      "subtitle": "Kom langs voor de authentieke bubble tea ervaring",
+      "address": "Veldstraat 123, 9000 Gent",
+      "hours": "Openingsuren",
+      "monday": "Maandag",
+      "tuesday": "Dinsdag",
+      "wednesday": "Woensdag",
+      "thursday": "Donderdag",
+      "friday": "Vrijdag",
+      "saturday": "Zaterdag",
+      "sunday": "Zondag",
+      "closed": "Gesloten",
+      "directions": "Routebeschrijving"
+    },
+    "cta": {
+      "title": "Klaar voor Jouw Volgende Favoriete Drankje?",
+      "subtitle": "Bestel online en haal af wanneer het jou uitkomt. Geen wachtrijen, alleen puur genot.",
+      "button": "Begin Jouw Bestelling"
+    }
+  },
+  "menu": {
+    "title": "Ons Menu",
+    "filter": {
+      "all": "Alle Drankjes",
+      "vegan": "Vegan",
+      "caffeineFree": "Cafeïnevrij"
+    },
+    "sort": {
+      "default": "Standaard",
+      "priceAsc": "Prijs: laag naar hoog",
+      "priceDesc": "Prijs: hoog naar laag",
+      "nameAsc": "Naam: A-Z"
+    },
+    "addToCart": "Toevoegen",
+    "customize": "Aanpassen",
+    "outOfStock": "Uitverkocht",
+    "calories": "calorieën"
+  },
+  "product": {
+    "customize": {
+      "title": "Pas je drankje aan",
+      "sugarLevel": "Suikerniveau",
+      "iceLevel": "IJsniveau",
+      "toppings": "Toppings",
+      "milkType": "Soort melk",
+      "size": "Formaat"
+    },
+    "sugarLevels": {
+      "0": "Geen suiker",
+      "25": "25% suiker",
+      "50": "50% suiker",
+      "75": "75% suiker",
+      "100": "100% suiker"
+    },
+    "iceLevels": {
+      "none": "Geen ijs",
+      "less": "Weinig ijs",
+      "normal": "Normaal",
+      "extra": "Extra ijs"
+    },
+    "allergens": "Allergenen",
+    "nutritionalInfo": "Voedingswaarden"
+  },
+  "cart": {
+    "title": "Winkelwagen",
+    "empty": "Je winkelwagen is leeg",
+    "continueShopping": "Verder winkelen",
+    "item": "artikel",
+    "items": "artikelen",
+    "subtotal": "Subtotaal",
+    "discount": "Korting",
+    "total": "Totaal",
+    "checkout": "Afrekenen",
+    "remove": "Verwijderen",
+    "updateQuantity": "Aantal aanpassen",
+    "promoCode": {
+      "label": "Promocode",
+      "placeholder": "Voer code in",
+      "apply": "Toepassen",
+      "applied": "Code toegepast!",
+      "invalid": "Ongeldige code"
+    }
+  },
+  "checkout": {
+    "title": "Afrekenen",
+    "steps": {
+      "details": "Gegevens",
+      "pickup": "Afhalen",
+      "payment": "Betaling"
+    },
+    "contact": {
+      "title": "Contactgegevens",
+      "name": "Naam",
+      "email": "E-mail",
+      "phone": "Telefoonnummer"
+    },
+    "pickup": {
+      "title": "Afhaaltijd",
+      "selectDate": "Selecteer datum",
+      "selectTime": "Selecteer tijd",
+      "asap": "Zo snel mogelijk",
+      "schedule": "Plan vooruit"
+    },
+    "payment": {
+      "title": "Betaalmethode",
+      "methods": {
+        "bancontact": "Bancontact",
+        "ideal": "iDEAL",
+        "creditcard": "Creditcard",
+        "paypal": "PayPal"
+      }
+    },
+    "loyalty": {
+      "title": "Loyaliteitspunten",
+      "available": "Beschikbare punten",
+      "use": "Punten gebruiken",
+      "earn": "Je verdient {points} punten met deze bestelling"
+    },
+    "notes": {
+      "label": "Opmerkingen",
+      "placeholder": "Speciale verzoeken of allergieën..."
+    },
+    "placeOrder": "Bestelling Plaatsen",
+    "processing": "Verwerken..."
+  },
+  "order": {
+    "confirmation": {
+      "title": "Bedankt voor je bestelling!",
+      "orderNumber": "Bestelnummer",
+      "pickupTime": "Afhaaltijd",
+      "emailSent": "Een bevestiging is verzonden naar {email}"
+    },
+    "status": {
+      "pending": "In afwachting",
+      "paid": "Betaald",
+      "preparing": "In bereiding",
+      "ready": "Klaar voor afhalen",
+      "completed": "Afgehaald",
+      "cancelled": "Geannuleerd"
+    },
+    "track": "Volg Bestelling"
+  },
+  "account": {
+    "title": "Mijn Account",
+    "welcome": "Welkom, {name}!",
+    "orders": {
+      "title": "Mijn Bestellingen",
+      "empty": "Je hebt nog geen bestellingen",
+      "viewDetails": "Bekijk details"
+    },
+    "loyalty": {
+      "title": "Loyaliteitsprogramma",
+      "points": "Punten",
+      "tier": "Niveau",
+      "nextTier": "Nog {points} punten voor {tier}",
+      "rewards": "Beschikbare Beloningen",
+      "history": "Puntengeschiedenis"
+    },
+    "favorites": {
+      "title": "Favorieten",
+      "empty": "Je hebt nog geen favorieten"
+    },
+    "settings": {
+      "title": "Instellingen",
+      "profile": "Profiel",
+      "language": "Taal",
+      "notifications": "Notificaties"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Inloggen",
+      "email": "E-mailadres",
+      "password": "Wachtwoord",
+      "rememberMe": "Onthoud mij",
+      "forgotPassword": "Wachtwoord vergeten?",
+      "submit": "Inloggen",
+      "noAccount": "Nog geen account?",
+      "register": "Registreer hier",
+      "orContinueWith": "Of ga verder met"
+    },
+    "register": {
+      "title": "Account Aanmaken",
+      "name": "Naam",
+      "email": "E-mailadres",
+      "password": "Wachtwoord",
+      "confirmPassword": "Bevestig wachtwoord",
+      "terms": "Ik ga akkoord met de algemene voorwaarden",
+      "submit": "Registreren",
+      "hasAccount": "Al een account?",
+      "login": "Log hier in"
+    },
+    "errors": {
+      "invalidCredentials": "Ongeldige inloggegevens",
+      "emailExists": "Dit e-mailadres is al geregistreerd",
+      "weakPassword": "Wachtwoord is te zwak",
+      "passwordMismatch": "Wachtwoorden komen niet overeen"
+    }
+  },
+  "footer": {
+    "address": "Adres",
+    "hours": "Openingsuren",
+    "contact": "Contact",
+    "followUs": "Volg Ons",
+    "newsletter": {
+      "title": "Blijf op de hoogte",
+      "placeholder": "Je e-mailadres",
+      "subscribe": "Inschrijven"
+    },
+    "legal": {
+      "privacy": "Privacybeleid",
+      "terms": "Algemene Voorwaarden"
+    },
+    "copyright": "© {year} Yibei Tea. Alle rechten voorbehouden."
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "todayOrders": "Bestellingen Vandaag",
+      "todayRevenue": "Omzet Vandaag",
+      "pendingOrders": "Wachtende Bestellingen",
+      "totalCustomers": "Totaal Klanten"
+    },
+    "orders": {
+      "title": "Bestellingen",
+      "new": "Nieuw",
+      "updateStatus": "Status Bijwerken"
+    },
+    "products": {
+      "title": "Producten",
+      "add": "Product Toevoegen",
+      "edit": "Product Bewerken"
+    },
+    "customers": {
+      "title": "Klanten"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "revenue": "Omzet",
+      "orders": "Bestellingen",
+      "popularProducts": "Populaire Producten"
+    },
+    "settings": {
+      "title": "Instellingen",
+      "store": "Winkel Instellingen",
+      "openingHours": "Openingsuren",
+      "loyalty": "Loyaliteit Instellingen"
+    }
+  }
+}
