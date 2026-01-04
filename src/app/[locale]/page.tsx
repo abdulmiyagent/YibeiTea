@@ -703,7 +703,7 @@ export default function HomePage() {
                     <div key={day} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">{t(`location.${day}`)}</span>
                       <span className="font-medium text-tea-900">
-                        {day === "sunday" ? "12:00 - 19:00" : day === "friday" || day === "saturday" ? "11:00 - 21:00" : "11:00 - 20:00"}
+                        {day === "sunday" ? "10:00 - 19:00" : "11:00 - 20:00"}
                       </span>
                     </div>
                   ))}
