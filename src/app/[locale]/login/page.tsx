@@ -37,8 +37,24 @@ export default function LoginPage() {
         return;
       }
 
-      // Register logic would go here
-      // For now, just sign in
+      // Register the user first
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Er is een fout opgetreden");
+        setIsLoading(false);
+        return;
+      }
     }
 
     const result = await signIn("credentials", {

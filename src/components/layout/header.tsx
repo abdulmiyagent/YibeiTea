@@ -48,11 +48,12 @@ export function Header() {
       <div className="container-custom">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tea-600">
-              <span className="text-lg font-bold text-white">Y</span>
-            </div>
-            <span className="text-xl font-bold text-tea-700">Yibei Tea</span>
+          <Link href="/" className="flex items-center">
+            <img
+              src="/images/logo.png"
+              alt="Yibei Tea"
+              className="h-14 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -129,7 +130,7 @@ export function Header() {
                         onClick={() => setUserMenuOpen(false)}
                       >
                         <Package className="mr-2 h-4 w-4" />
-                        Bestellingen
+                        {t("orders")}
                       </Link>
                       <Link
                         href="/account/favorites"
@@ -137,7 +138,7 @@ export function Header() {
                         onClick={() => setUserMenuOpen(false)}
                       >
                         <Heart className="mr-2 h-4 w-4" />
-                        Favorieten
+                        {t("favorites")}
                       </Link>
                       {session.user?.role === "ADMIN" && (
                         <Link

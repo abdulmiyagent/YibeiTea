@@ -24,12 +24,13 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand & About */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tea-600">
-                <span className="text-lg font-bold text-white">Y</span>
-              </div>
-              <span className="text-xl font-bold text-tea-700">Yibei Tea</span>
-            </div>
+            <Link href="/" className="flex items-center">
+              <img
+                src="/images/logo.png"
+                alt="Yibei Tea"
+                className="h-12 w-auto"
+              />
+            </Link>
             <p className="text-sm text-muted-foreground">
               Premium bubble tea in Gent. Vers bereid met de beste ingrediënten.
             </p>

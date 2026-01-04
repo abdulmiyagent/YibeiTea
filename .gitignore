@@ -42,3 +42,7 @@ prisma/migrations
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Misc
+_ul
+nul

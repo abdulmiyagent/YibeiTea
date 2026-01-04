@@ -34,17 +34,30 @@ export const authOptions: NextAuthOptions = {
 
         const user = await db.user.findUnique({
           where: { email: credentials.email },
+          include: {
+            accounts: {
+              where: { provider: "credentials" },
+            },
+          },
         });
 
-        if (!user || !user.emailVerified) {
+        if (!user) {
           return null;
         }
 
-        // For now, we'll use a simple password check
-        // In production, you'd store hashed passwords
+        // Get the credentials account which stores the hashed password
+        const credentialsAccount = user.accounts.find(
+          (acc) => acc.provider === "credentials"
+        );
+
+        if (!credentialsAccount?.access_token) {
+          return null;
+        }
+
+        // Verify password against stored hash
         const isValid = await compare(
           credentials.password,
-          (user as any).password || ""
+          credentialsAccount.access_token
         );
 
         if (!isValid) {

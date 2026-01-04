@@ -1,7 +1,7 @@
 {
   "common": {
     "brandName": "Yibei Tea",
-    "tagline": "Premium Bubble Tea in Gent",
+    "tagline": "De Beste Bubble Tea In Gent",
     "loading": "Laden...",
     "error": "Er is een fout opgetreden",
     "retry": "Opnieuw proberen",
@@ -28,12 +28,14 @@
     "login": "Inloggen",
     "logout": "Uitloggen",
     "register": "Registreren",
-    "admin": "Beheer"
+    "admin": "Beheer",
+    "orders": "Bestellingen",
+    "favorites": "Favorieten"
   },
   "home": {
     "hero": {
-      "title": "De Kunst van Bubble Tea",
-      "titleAccent": "Perfectioneren",
+      "title": "De Beste Bubble Tea",
+      "titleAccent": "In Gent",
       "subtitle": "Handgemaakte drankjes met premium ingrediënten, vers bereid in het hart van Gent",
       "cta": "Ontdek ons Menu",
       "orderNow": "Bestel Nu",
@@ -46,8 +48,8 @@
     },
     "story": {
       "label": "Ons Verhaal",
-      "title": "Een Passie voor Perfectie",
-      "description": "Bij Yibei Tea geloven we dat elke slok een moment van genot moet zijn. Onze reis begon met een simpele missie: authentieke Aziatische theedrankjes naar Gent brengen, bereid met de hoogste kwaliteit ingrediënten.",
+      "title": "Van Droom naar Werkelijkheid",
+      "description": "Yibei Tea werd opgericht door Naim, die zag hoe bubble tea ongelooflijk populair was geworden in grote steden in Europa. 'In grote steden staan mensen in de rij voor bubble tea,' merkte hij op. Vastberaden om deze trend naar Gent te brengen, opende hij de eerste authentieke bubble tea bar op de Brabantdam. Elk drankje wordt vers bereid met premium ingrediënten, net zoals in de beste bubble tea shops in Azië.",
       "highlight1": {
         "value": "100%",
         "label": "Verse ingrediënten"
