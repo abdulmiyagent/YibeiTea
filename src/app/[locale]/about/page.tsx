@@ -7,6 +7,7 @@ import { MapPin, Clock, Phone, Mail } from "lucide-react";
 export default function AboutPage() {
   const t = useTranslations("home");
   const tLocation = useTranslations("home.location");
+  const tFooter = useTranslations("footer");
 
   return (
     <div className="min-h-screen">
@@ -159,7 +160,7 @@ export default function AboutPage() {
                   <MapPin className="h-5 w-5 text-tea-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Adres</h3>
+                  <h3 className="font-semibold">{tFooter("address")}</h3>
                   <p className="text-muted-foreground">
                     Sint-Niklaasstraat 36
                     <br />
@@ -173,7 +174,7 @@ export default function AboutPage() {
                   <Phone className="h-5 w-5 text-tea-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Telefoon</h3>
+                  <h3 className="font-semibold">{tFooter("phone")}</h3>
                   <a
                     href="tel:+32484240611"
                     className="text-muted-foreground hover:text-tea-600"
@@ -188,7 +189,7 @@ export default function AboutPage() {
                   <Mail className="h-5 w-5 text-tea-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Email</h3>
+                  <h3 className="font-semibold">{tFooter("email")}</h3>
                   <a
                     href="mailto:info@yibeitea.be"
                     className="text-muted-foreground hover:text-tea-600"
@@ -203,10 +204,10 @@ export default function AboutPage() {
                   <Clock className="h-5 w-5 text-tea-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">{tLocation("hours")}</h3>
+                  <h3 className="font-semibold">{tFooter("hours")}</h3>
                   <div className="text-sm text-muted-foreground">
-                    <p>Ma - Za: 11:00 - 20:00</p>
-                    <p>Zo: 10:00 - 19:00</p>
+                    <p>{tFooter("weekdayHours")}</p>
+                    <p>{tFooter("sundayHours")}</p>
                   </div>
                 </div>
               </div>

@@ -32,6 +32,28 @@
     "orders": "Bestellingen",
     "favorites": "Favorieten"
   },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Heb je een vraag of suggestie? Neem gerust contact met ons op!",
+    "visitUs": "Bezoek ons",
+    "form": {
+      "name": "Naam",
+      "namePlaceholder": "Je naam",
+      "email": "Email",
+      "emailPlaceholder": "je@email.be",
+      "subject": "Onderwerp",
+      "subjectPlaceholder": "Waar gaat je bericht over?",
+      "message": "Bericht",
+      "messagePlaceholder": "Je bericht...",
+      "submit": "Verstuur bericht",
+      "submitting": "Verzenden..."
+    },
+    "success": {
+      "title": "Bericht verzonden!",
+      "message": "Bedankt voor je bericht. We nemen zo snel mogelijk contact met je op.",
+      "newMessage": "Nieuw bericht"
+    }
+  },
   "home": {
     "hero": {
       "title": "De Beste Bubble Tea",
@@ -321,6 +343,8 @@
     "tagline": "Premium bubble tea in Gent. Vers bereid met de beste ingrediënten.",
     "weekdayHours": "Ma - Za: 11:00 - 20:00",
     "sundayHours": "Zo: 10:00 - 19:00",
+    "phone": "Telefoon",
+    "email": "Email",
     "newsletter": {
       "title": "Blijf op de hoogte",
       "placeholder": "Je e-mailadres",

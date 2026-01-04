@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function ContactPage() {
-  const t = useTranslations("home.location");
+  const t = useTranslations("contact");
+  const tFooter = useTranslations("footer");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -41,10 +42,10 @@ export default function ContactPage() {
             className="mx-auto max-w-3xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-5xl">
-              Contact
+              {t("title")}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Heb je een vraag of suggestie? Neem gerust contact met ons op!
+              {t("subtitle")}
             </p>
           </motion.div>
         </div>
@@ -64,11 +65,10 @@ export default function ContactPage() {
                 <div className="rounded-2xl bg-tea-50 p-8 text-center">
                   <div className="mb-4 text-5xl">✅</div>
                   <h3 className="mb-2 text-xl font-semibold">
-                    Bericht verzonden!
+                    {t("success.title")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Bedankt voor je bericht. We nemen zo snel mogelijk contact
-                    met je op.
+                    {t("success.message")}
                   </p>
                   <Button
                     variant="tea"
@@ -78,17 +78,17 @@ export default function ContactPage() {
                       setFormData({ name: "", email: "", subject: "", message: "" });
                     }}
                   >
-                    Nieuw bericht
+                    {t("success.newMessage")}
                   </Button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Naam</Label>
+                      <Label htmlFor="name">{t("form.name")}</Label>
                       <Input
                         id="name"
-                        placeholder="Je naam"
+                        placeholder={t("form.namePlaceholder")}
                         value={formData.name}
                         onChange={(e) =>
                           setFormData({ ...formData, name: e.target.value })
@@ -97,11 +97,11 @@ export default function ContactPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{t("form.email")}</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="je@email.be"
+                        placeholder={t("form.emailPlaceholder")}
                         value={formData.email}
                         onChange={(e) =>
                           setFormData({ ...formData, email: e.target.value })
@@ -112,10 +112,10 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Onderwerp</Label>
+                    <Label htmlFor="subject">{t("form.subject")}</Label>
                     <Input
                       id="subject"
-                      placeholder="Waar gaat je bericht over?"
+                      placeholder={t("form.subjectPlaceholder")}
                       value={formData.subject}
                       onChange={(e) =>
                         setFormData({ ...formData, subject: e.target.value })
@@ -125,10 +125,10 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Bericht</Label>
+                    <Label htmlFor="message">{t("form.message")}</Label>
                     <Textarea
                       id="message"
-                      placeholder="Je bericht..."
+                      placeholder={t("form.messagePlaceholder")}
                       rows={5}
                       value={formData.message}
                       onChange={(e) =>
@@ -145,11 +145,11 @@ export default function ContactPage() {
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
-                      "Verzenden..."
+                      t("form.submitting")
                     ) : (
                       <>
                         <Send className="mr-2 h-4 w-4" />
-                        Verstuur bericht
+                        {t("form.submit")}
                       </>
                     )}
                   </Button>
@@ -165,14 +165,14 @@ export default function ContactPage() {
               className="space-y-8"
             >
               <div>
-                <h2 className="mb-6 text-2xl font-bold">Bezoek ons</h2>
+                <h2 className="mb-6 text-2xl font-bold">{t("visitUs")}</h2>
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
                     <div className="rounded-full bg-tea-100 p-3">
                       <MapPin className="h-5 w-5 text-tea-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Adres</h3>
+                      <h3 className="font-semibold">{tFooter("address")}</h3>
                       <p className="text-muted-foreground">
                         Sint-Niklaasstraat 36
                         <br />
@@ -186,7 +186,7 @@ export default function ContactPage() {
                       <Phone className="h-5 w-5 text-tea-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Telefoon</h3>
+                      <h3 className="font-semibold">{tFooter("phone")}</h3>
                       <a
                         href="tel:+32484240611"
                         className="text-muted-foreground hover:text-tea-600"
@@ -201,7 +201,7 @@ export default function ContactPage() {
                       <Mail className="h-5 w-5 text-tea-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Email</h3>
+                      <h3 className="font-semibold">{tFooter("email")}</h3>
                       <a
                         href="mailto:info@yibeitea.be"
                         className="text-muted-foreground hover:text-tea-600"
@@ -216,10 +216,10 @@ export default function ContactPage() {
                       <Clock className="h-5 w-5 text-tea-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{t("hours")}</h3>
+                      <h3 className="font-semibold">{tFooter("hours")}</h3>
                       <div className="text-sm text-muted-foreground">
-                        <p>Ma - Za: 11:00 - 20:00</p>
-                        <p>Zo: 10:00 - 19:00</p>
+                        <p>{tFooter("weekdayHours")}</p>
+                        <p>{tFooter("sundayHours")}</p>
                       </div>
                     </div>
                   </div>
