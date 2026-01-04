@@ -46,7 +46,7 @@ export default function OrderConfirmationPage() {
                   <div>
                     <p className="font-medium">Yibei Tea</p>
                     <p className="text-muted-foreground">
-                      Veldstraat 123<br />
+                      Sint-Niklaasstraat 36<br />
                       9000 Gent
                     </p>
                   </div>

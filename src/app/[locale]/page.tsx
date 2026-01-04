@@ -673,7 +673,7 @@ export default function HomePage() {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <MapPin className="mx-auto h-16 w-16 text-tea-400" />
-                  <p className="mt-4 font-medium text-tea-600">Veldstraat 123</p>
+                  <p className="mt-4 font-medium text-tea-600">Sint-Niklaasstraat 36</p>
                   <p className="text-muted-foreground">9000 Gent</p>
                 </div>
               </div>
