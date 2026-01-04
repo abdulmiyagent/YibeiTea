@@ -22,43 +22,79 @@ import {
   GlassWater,
 } from "lucide-react";
 
-// Featured products data
+// Featured products data - Top Picks from Yibei Tea
 const featuredProducts = [
   {
     id: "1",
-    slug: "classic-taro",
-    name: "Classic Taro",
+    slug: "cream-cheese-taro-milk",
+    name: "Cream Cheese Taro Milk",
     price: 5.5,
     category: "MILK_TEA",
+    image: "/images/products/cream-cheese-taro-milk.png",
     gradient: "from-taro-200 via-taro-100 to-cream-100",
-    accent: "taro",
   },
   {
     id: "2",
-    slug: "matcha-latte",
-    name: "Matcha Latte",
+    slug: "caramel-vanilla-latte",
+    name: "Caramel Vanilla Latte",
     price: 5.5,
-    category: "MILK_TEA",
-    gradient: "from-matcha-200 via-matcha-100 to-cream-100",
-    accent: "matcha",
+    category: "ICED_COFFEE",
+    image: "/images/products/caramel-vanilla-latte.png",
+    gradient: "from-tea-200 via-cream-100 to-cream-50",
   },
   {
     id: "3",
-    slug: "brown-sugar-boba",
-    name: "Brown Sugar Boba",
+    slug: "hazelnut-nutella",
+    name: "Hazelnut Nutella",
     price: 5.5,
-    category: "BUBBLE_TEA",
-    gradient: "from-tea-200 via-tea-100 to-cream-100",
-    accent: "tea",
+    category: "ICED_COFFEE",
+    image: "/images/products/hazelnut-nutella.png",
+    gradient: "from-tea-300 via-tea-100 to-cream-100",
   },
   {
     id: "4",
-    slug: "strawberry-ice",
-    name: "Strawberry Ice Tea",
+    slug: "green-apple",
+    name: "Green Apple",
     price: 5.5,
-    category: "ICED_TEA",
+    category: "ICE_TEA",
+    image: "/images/products/green-apple.png",
+    gradient: "from-matcha-200 via-matcha-100 to-cream-100",
+  },
+  {
+    id: "5",
+    slug: "strawberry",
+    name: "Strawberry",
+    price: 5.5,
+    category: "ICE_TEA",
+    image: "/images/products/strawberry.png",
     gradient: "from-rose-200 via-rose-100 to-cream-100",
-    accent: "rose",
+  },
+  {
+    id: "6",
+    slug: "taro",
+    name: "Taro",
+    price: 5.5,
+    category: "MILK_TEA",
+    image: "/images/products/taro.png",
+    gradient: "from-taro-200 via-taro-100 to-cream-100",
+  },
+  {
+    id: "7",
+    slug: "blue-ocean",
+    name: "Blue Ocean",
+    price: 6.0,
+    category: "MOJITO",
+    image: "/images/products/blue-ocean.png",
+    gradient: "from-sky-200 via-sky-100 to-cream-100",
+  },
+  {
+    id: "8",
+    slug: "peach-garden",
+    name: "Peach Garden",
+    price: 6.0,
+    category: "MOJITO",
+    image: "/images/products/peach-garden.png",
+    gradient: "from-orange-200 via-orange-100 to-cream-100",
   },
 ];
 
@@ -303,8 +339,12 @@ export default function HomePage() {
                 <Link href={`/menu/${product.slug}`}>
                   <div className="product-card group cursor-pointer overflow-hidden rounded-3xl border border-cream-200 bg-white">
                     <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${product.gradient}`}>
-                      <div className="product-image absolute inset-0 flex items-center justify-center">
-                        <span className="text-8xl drop-shadow-lg">🧋</span>
+                      <div className="product-image absolute inset-0 flex items-center justify-center p-4">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                        />
                       </div>
                       {/* Price tag */}
                       <div className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">

@@ -54,6 +54,52 @@
       "newMessage": "New message"
     }
   },
+  "about": {
+    "title": "About Us",
+    "hero": {
+      "title": "Welcome to Yibei Tea",
+      "subtitle": "Your bubble tea destination in Ghent!"
+    },
+    "intro": "At Yibei Tea, we bring authentic bubbles, rich flavors and a warm, personal atmosphere to Sint-Niklaasstraat in the heart of Ghent. What once started as a small bubble tea shop has grown into a beloved place where visitors of all ages come together for a refreshing drink and a cozy moment.",
+    "mission": {
+      "title": "What drives us",
+      "description": "Our mission is simple: serving bubble tea the way it should be — with real milk, strong tea and chewy tapioca pearls, inspired by the origins of this drink in Asia. While some shops opt for gel toppings and trends, we consciously focus on authenticity and quality. That's why our classic bubble teas and milk teas take center stage, complemented by an extensive range of iced coffees — a nod to the coffee lovers in Ghent.",
+      "growth": "As the demand for bubble tea in Ghent continued to grow, we searched for a place where customers could not only pick up their orders, but also sit down, enjoy and meet each other. Today we welcome our guests in a cozy shop where experience and taste go hand in hand."
+    },
+    "values": {
+      "title": "Our values",
+      "authenticity": {
+        "title": "Authenticity",
+        "description": "We stay true to traditional Asian bubble tea culture, with pure flavors and recognizable textures."
+      },
+      "quality": {
+        "title": "Quality",
+        "description": "We work with fresh ingredients: strong tea, creamy milk and perfectly prepared tapioca."
+      },
+      "warmth": {
+        "title": "Warmth & connection",
+        "description": "At Yibei Tea, it's not just about the drink, but about the moment. Enjoying together, catching up and slowing down."
+      }
+    },
+    "menu": {
+      "title": "What you can taste",
+      "description": "At Yibei Tea you'll find an extensive menu including:",
+      "items": {
+        "classic": "Classic bubble teas with milk and tapioca",
+        "icedCoffee": "Creative iced coffee varieties",
+        "icedTea": "Refreshing fruity iced teas and mojito-style drinks",
+        "warmCoffee": "Warm coffees and lattes",
+        "kids": "Special kids drinks"
+      },
+      "closing": "Whether you choose a trusted classic or feel like discovering something new, there's something for everyone.",
+      "viewMenu": "View Menu"
+    },
+    "visit": {
+      "title": "Visit us",
+      "description": "You can find Yibei Tea at Sint-Niklaasstraat 36, 9000 Ghent. Stop by, taste our bubbles and make every sip a moment to remember.",
+      "tagline": "Yibei Tea — authentic bubbles, warm encounters."
+    }
+  },
   "home": {
     "hero": {
       "title": "The Best Bubble Tea",

@@ -54,6 +54,52 @@
       "newMessage": "Nieuw bericht"
     }
   },
+  "about": {
+    "title": "Over Ons",
+    "hero": {
+      "title": "Welkom bij Yibei Tea",
+      "subtitle": "Jouw bubbelthee-adres in Gent!"
+    },
+    "intro": "Bij Yibei Tea brengen we authentieke bubbels, rijke smaken en een warme, persoonlijke sfeer naar de Sint-Niklaasstraat in het hart van Gent. Wat ooit begon als een kleine bubbeltheezaak groeide uit tot een geliefde plek waar bezoekers van alle leeftijden samenkomen voor een verfrissend drankje en een gezellig moment.",
+    "mission": {
+      "title": "Wat ons drijft",
+      "description": "Onze missie is simpel: bubbelthee serveren zoals het hoort — met echte melk, sterke thee en kleverige tapiocaparels, geïnspireerd door de oorsprong van deze drank in Azië. Terwijl sommige zaken kiezen voor gel-toppings en trends, focussen wij bewust op authenticiteit en kwaliteit. Daarom staan onze klassieke bubbelthee's en melk-thees centraal, aangevuld met een uitgebreid assortiment ijskoffies — een knipoog naar de koffieliefhebbers in Gent.",
+      "growth": "Toen de vraag naar bubbelthee in Gent bleef groeien, gingen we op zoek naar een plek waar klanten niet alleen konden afhalen, maar ook rustig konden zitten, genieten en elkaar ontmoeten. Vandaag verwelkomen we onze gasten in een gezellige zaak waar beleving en smaak hand in hand gaan."
+    },
+    "values": {
+      "title": "Onze waarden",
+      "authenticity": {
+        "title": "Authenticiteit",
+        "description": "We blijven trouw aan de traditionele Aziatische bubbelthee-cultuur, met pure smaken en herkenbare texturen."
+      },
+      "quality": {
+        "title": "Kwaliteit",
+        "description": "We werken met verse ingrediënten: sterke thee, romige melk en perfect bereide tapioca."
+      },
+      "warmth": {
+        "title": "Warmte & contact",
+        "description": "Bij Yibei Tea draait het niet alleen om het drankje, maar om het moment. Samen genieten, bijpraten en even vertragen."
+      }
+    },
+    "menu": {
+      "title": "Wat je bij ons kunt proeven",
+      "description": "Bij Yibei Tea vind je een uitgebreide menukaart met onder andere:",
+      "items": {
+        "classic": "Klassieke bubbelthee's met melk en tapioca",
+        "icedCoffee": "Creatieve ijskoffievarianten",
+        "icedTea": "Verfrissende fruitige ijstheeën en mojito-achtige drankjes",
+        "warmCoffee": "Warme koffies en latte's",
+        "kids": "Speciale kids-drankjes"
+      },
+      "closing": "Of je nu kiest voor een vertrouwde klassieker of zin hebt om iets nieuws te ontdekken, er is voor ieder wat wils.",
+      "viewMenu": "Bekijk Menu"
+    },
+    "visit": {
+      "title": "Bezoek ons",
+      "description": "Je vindt Yibei Tea op Sint-Niklaasstraat 36, 9000 Gent. Kom langs, proef onze bubbels en maak van elke slok een moment om te onthouden.",
+      "tagline": "Yibei Tea — authentieke bubbels, warme ontmoetingen."
+    }
+  },
   "home": {
     "hero": {
       "title": "De Beste Bubble Tea",

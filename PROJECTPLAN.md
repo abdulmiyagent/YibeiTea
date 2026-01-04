@@ -6,8 +6,9 @@
 - **Type bedrijf:** Bubble tea shop in Gent, België
 - **Producten:** Bubble teas, milk teas, iced teas, iced coffees, mojitos
 - **Prijsklasse:** €5.50 - €6.00
-- **Locatie:** Gent (fysieke winkel)
-- **Contact:** 0484/24.06.11
+- **Locatie:** Sint-Niklaasstraat 36, 9000 Gent
+- **Openingsuren:** Ma-Za 11:00-20:00, Zo 10:00-19:00
+- **Contact:** 0484/24.06.11 | info@yibeitea.be
 
 ### Huidige Website (yibeitea.be)
 De huidige website is een eenvoudige single-page informatiewebsite met:
@@ -330,12 +331,15 @@ yibei-tea/
 
 #### Fase 2: Klant Features
 - [x] Homepage met hero, features, producten en reviews
+- [x] Homepage "Onze Favorieten" met echte productafbeeldingen van yibeitea.be
 - [x] Menu pagina met filters (vegan, cafeïnevrij, categorie)
 - [x] Winkelwagen pagina met promo codes
 - [x] Checkout flow (3 stappen: gegevens, afhalen, betaling)
 - [x] Login/Registratie pagina
 - [x] Account pagina met loyaliteitspunten overzicht
 - [x] Bestelbevestiging pagina
+- [x] Over Ons pagina met complete merkverhaal (missie, waarden, menu preview)
+- [x] Contact pagina met formulier en locatie-info
 
 #### Fase 3: Backend & API
 - [x] tRPC setup met type-safe API routes
@@ -348,6 +352,27 @@ yibei-tea/
 #### Fase 4: Admin Dashboard
 - [x] Admin dashboard met statistieken
 - [x] Bestellingen beheer pagina met status updates
+
+#### Internationalisatie (i18n)
+- [x] Volledige NL/EN vertalingen voor alle pagina's
+- [x] About pagina vertalingen (missie, waarden, menu preview, bezoek info)
+- [x] Contact pagina vertalingen (formulier, succes berichten)
+- [x] Footer vertalingen (openingsuren, nieuwsbrief, tagline)
+- [x] Homepage vertalingen (alle secties)
+- [x] Bestelbevestiging vertalingen
+
+#### Assets & Afbeeldingen
+- [x] Logo geïmporteerd (/images/logo.png)
+- [x] 9 productafbeeldingen van yibeitea.be (/images/products/)
+  - cream-cheese-taro-milk.png
+  - caramel-vanilla-latte.png
+  - hazelnut-nutella.png
+  - green-apple.png
+  - strawberry.png
+  - taro.png
+  - blue-ocean.png
+  - peach-garden.png
+  - tokyo-kiwi.png
 
 #### Ontwikkelomgeving
 - [x] npm dependencies geïnstalleerd (598 packages)
@@ -379,7 +404,7 @@ yibei-tea/
 - [ ] Privacy & Terms pagina's
 
 #### Functionaliteit
-- [ ] Echte product afbeeldingen toevoegen
+- [x] Echte product afbeeldingen toevoegen (8 top picks van yibeitea.be)
 - [ ] Email notificaties bij bestelling
 - [ ] Real-time order status updates
 - [ ] Loyaliteitspunten uitwisselen voor beloningen
@@ -394,7 +419,7 @@ yibei-tea/
 
 ---
 
-### Gemaakte Bestanden (40+)
+### Gemaakte Bestanden (50+)
 
 ```
 src/
@@ -407,6 +432,8 @@ src/
 │   └── [locale]/
 │       ├── layout.tsx
 │       ├── page.tsx (Homepage)
+│       ├── about/page.tsx (Over Ons - compleet merkverhaal)
+│       ├── contact/page.tsx (Contact met formulier)
 │       ├── menu/page.tsx
 │       ├── cart/page.tsx
 │       ├── checkout/page.tsx
@@ -429,7 +456,8 @@ src/
 │       ├── label.tsx
 │       ├── badge.tsx
 │       ├── separator.tsx
-│       └── skeleton.tsx
+│       ├── skeleton.tsx
+│       └── textarea.tsx
 ├── lib/
 │   ├── db.ts
 │   ├── auth.ts
@@ -458,6 +486,20 @@ src/
 prisma/
 ├── schema.prisma
 └── seed.ts
+
+public/
+├── images/
+│   ├── logo.png
+│   └── products/
+│       ├── cream-cheese-taro-milk.png
+│       ├── caramel-vanilla-latte.png
+│       ├── hazelnut-nutella.png
+│       ├── green-apple.png
+│       ├── strawberry.png
+│       ├── taro.png
+│       ├── blue-ocean.png
+│       ├── peach-garden.png
+│       └── tokyo-kiwi.png
 
 Root files:
 ├── package.json
