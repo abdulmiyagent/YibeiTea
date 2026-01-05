@@ -48,6 +48,27 @@ export const usersRouter = router({
       });
     }),
 
+  getFavorites: protectedProcedure
+    .input(z.object({ locale: z.enum(["nl", "en"]) }))
+    .query(async ({ ctx, input }) => {
+      const favorites = await ctx.db.favorite.findMany({
+        where: { userId: ctx.session.user.id },
+        include: {
+          product: {
+            include: {
+              translations: { where: { locale: input.locale } },
+              category: {
+                include: { translations: { where: { locale: input.locale } } },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      return favorites.map((fav) => fav.product);
+    }),
+
   getLoyaltyInfo: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },

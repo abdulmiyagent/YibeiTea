@@ -117,6 +117,31 @@ const toppings = [
   },
 ];
 
+// ============ CUSTOMIZATION GROUPS ============
+const customizationGroups = [
+  {
+    type: "SUGAR_LEVEL" as const,
+    sortOrder: 1,
+    values: [
+      { value: "0", sortOrder: 1, isDefault: false, translations: { nl: "Geen suiker", en: "No sugar" } },
+      { value: "25", sortOrder: 2, isDefault: false, translations: { nl: "25% suiker", en: "25% sugar" } },
+      { value: "50", sortOrder: 3, isDefault: false, translations: { nl: "50% suiker", en: "50% sugar" } },
+      { value: "75", sortOrder: 4, isDefault: false, translations: { nl: "75% suiker", en: "75% sugar" } },
+      { value: "100", sortOrder: 5, isDefault: true, translations: { nl: "100% suiker", en: "100% sugar" } },
+    ],
+  },
+  {
+    type: "ICE_LEVEL" as const,
+    sortOrder: 2,
+    values: [
+      { value: "none", sortOrder: 1, isDefault: false, translations: { nl: "Geen ijs", en: "No ice" } },
+      { value: "less", sortOrder: 2, isDefault: false, translations: { nl: "Weinig ijs", en: "Less ice" } },
+      { value: "normal", sortOrder: 3, isDefault: true, translations: { nl: "Normaal", en: "Normal" } },
+      { value: "extra", sortOrder: 4, isDefault: false, translations: { nl: "Extra ijs", en: "Extra ice" } },
+    ],
+  },
+];
+
 // ============ PRODUCTS ============
 // Using category slugs that will be resolved to IDs
 const products = [
@@ -1042,6 +1067,9 @@ async function main() {
 
   // Clear existing data
   console.log("Clearing existing data...");
+  await prisma.customizationValueTranslation.deleteMany();
+  await prisma.customizationValue.deleteMany();
+  await prisma.customizationGroup.deleteMany();
   await prisma.productTranslation.deleteMany();
   await prisma.toppingTranslation.deleteMany();
   await prisma.categoryTranslation.deleteMany();
@@ -1090,6 +1118,40 @@ async function main() {
     });
 
     console.log(`Created topping: ${data.slug}`);
+  }
+
+  // Create customization groups
+  console.log("Creating customization groups...");
+  for (const group of customizationGroups) {
+    const createdGroup = await prisma.customizationGroup.create({
+      data: {
+        type: group.type,
+        sortOrder: group.sortOrder,
+        isActive: true,
+      },
+    });
+
+    // Create values for this group
+    for (const value of group.values) {
+      await prisma.customizationValue.create({
+        data: {
+          groupId: createdGroup.id,
+          value: value.value,
+          sortOrder: value.sortOrder,
+          isDefault: value.isDefault,
+          isAvailable: true,
+          priceModifier: 0,
+          translations: {
+            create: [
+              { locale: "nl", label: value.translations.nl },
+              { locale: "en", label: value.translations.en },
+            ],
+          },
+        },
+      });
+    }
+
+    console.log(`Created customization group: ${group.type} with ${group.values.length} values`);
   }
 
   // Create products
@@ -1154,6 +1216,7 @@ async function main() {
   console.log(`\nSeeding completed!`);
   console.log(`- ${categories.length} categories created`);
   console.log(`- ${toppings.length} toppings created`);
+  console.log(`- ${customizationGroups.length} customization groups created`);
   console.log(`- ${products.length} products created`);
 }
 

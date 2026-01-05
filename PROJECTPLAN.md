@@ -137,47 +137,72 @@ De huidige website is een eenvoudige single-page informatiewebsite met:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Database Schema (Conceptueel)
+### Database Schema (Geïmplementeerd)
+
+Het Prisma schema is uitgebreid met de volgende modellen:
 
 ```
 Users
-├── id, email, name, phone
-├── password_hash
-├── loyalty_points
-├── loyalty_tier
-└── created_at
+├── id, email, name, phone, dateOfBirth
+├── role (USER, ADMIN, SUPER_ADMIN)
+├── loyaltyPoints, loyaltyTier (BRONZE, SILVER, GOLD)
+├── preferredLanguage
+├── twoFactorSecret, twoFactorEnabled  (2FA ondersteuning)
+└── relations: accounts, sessions, orders, reviews, favorites, addresses
+
+Address (nieuw)
+├── id, userId, name
+├── street, city, postalCode, country
+└── isDefault
 
 Products
-├── id, name, description
-├── category, price
-├── image_url
-├── customization_options (JSON)
-├── is_available
-└── nutritional_info
+├── id, slug, categoryId, price
+├── imageUrl, isAvailable, isFeatured
+├── calories, caffeine, vegan
+└── relations: translations, customizationOptions, customizationConfigs
+
+CustomizationGroup (nieuw - data-driven)
+├── id, type (SUGAR_LEVEL, ICE_LEVEL, SIZE, MILK_TYPE)
+├── isActive, sortOrder
+└── values: CustomizationValue[]
+
+CustomizationValue (nieuw)
+├── id, groupId, value
+├── priceModifier, isDefault, isAvailable
+└── translations: CustomizationValueTranslation[]
 
 Orders
-├── id, user_id
-├── status (pending/preparing/ready/completed)
-├── pickup_time
-├── total_amount
-├── payment_status
-└── created_at
+├── id, orderNumber, userId
+├── status, paymentStatus
+├── subtotal, discount, total
+├── pointsEarned, pointsRedeemed
+├── pickupTime, notes
+└── items: OrderItem[]
 
-OrderItems
-├── id, order_id, product_id
-├── quantity
-├── customizations (JSON)
-└── price
+OrderItem
+├── id, orderId, productId, quantity
+├── unitPrice, totalPrice
+└── customizations (JSON)
 
-LoyaltyTransactions
-├── id, user_id
-├── points, type (earn/redeem)
-└── order_id
+LoyaltyTransaction
+├── id, userId, orderId
+├── type (EARN, REDEEM, BONUS, EXPIRE, ADJUSTMENT)
+├── points, description
 
-Reviews
-├── id, user_id, rating
-├── comment
-└── is_approved
+Reward (nieuw)
+├── id, slug, pointsCost
+├── rewardType, rewardValue
+└── translations
+
+PromoCode (nieuw)
+├── id, code, discountType, discountValue
+├── minOrderAmount, maxUses, usedCount
+└── validFrom, validUntil, isActive
+
+StoreSettings (nieuw)
+├── openingHours (JSON)
+├── minPickupMinutes, maxAdvanceOrderDays
+└── pointsPerEuro
 ```
 
 ---
@@ -233,44 +258,44 @@ Reviews
 
 ## 5. Project Fasen
 
-### Fase 1: Foundation
+### Fase 1: Foundation ✅
 - Project setup (Next.js, TypeScript, Tailwind)
 - Database schema & Prisma setup
 - Internationalisatie setup (next-intl, NL/EN)
 - Basis authenticatie
 - UI component library setup (shadcn/ui)
 
-### Fase 2: Klant Features
-- Homepage redesign
-- Interactief menu met filters
-- Drink customization interface
-- Winkelwagen functionaliteit
-- Checkout flow
+### Fase 2: Klant Features 🔄
+- Homepage redesign ✅
+- Interactief menu met filters ✅
+- Drink customization interface ✅
+- Winkelwagen functionaliteit ✅
+- Checkout flow ✅
 
-### Fase 3: Betalingen & Bestellingen
-- Mollie integratie (Bancontact, iDEAL, creditcard)
-- Order management systeem
-- Email notificaties (Resend)
-- Bestelling tracking (real-time status updates)
+### Fase 3: Betalingen & Bestellingen 🔄
+- Mollie integratie (Bancontact, iDEAL, creditcard) ✅
+- Order management systeem ✅
+- Email notificaties (Resend) ⏳
+- Bestelling tracking (real-time status updates) ⏳
 
-### Fase 4: Admin Dashboard
-- Dashboard layout
-- Bestelbeheer interface
-- Product management
-- Basis analytics
+### Fase 4: Admin Dashboard 🔄
+- Dashboard layout ✅
+- Bestelbeheer interface ✅
+- Product management ⏳
+- Basis analytics ⏳
 
-### Fase 5: Loyaliteitsprogramma
-- Puntensysteem
-- Beloningen catalog
-- Tier systeem
-- Verjaardagsbeloningen
+### Fase 5: Loyaliteitsprogramma ⏳
+- Puntensysteem ⏳
+- Beloningen catalog ⏳
+- Tier systeem ⏳
+- Verjaardagsbeloningen ⏳
 
-### Fase 6: Polish & Launch
-- Performance optimalisatie
-- SEO optimalisatie
-- Mobile responsiveness
-- Testing & bug fixes
-- Deployment
+### Fase 6: Polish & Launch ⏳
+- Performance optimalisatie ⏳
+- SEO optimalisatie ⏳
+- Mobile responsiveness ⏳
+- Testing & bug fixes ⏳
+- Deployment ⏳
 
 ---
 
@@ -294,8 +319,11 @@ yibei-tea/
 │   │           └── analytics/  # Rapportages
 │   ├── components/             # React componenten
 │   │   ├── ui/                 # shadcn/ui componenten
+│   │   ├── products/           # Product componenten (NIEUW)
 │   │   ├── shop/               # Shop-specifieke componenten
 │   │   └── admin/              # Admin componenten
+│   ├── hooks/                  # Custom React hooks (NIEUW)
+│   ├── stores/                 # Zustand stores (NIEUW)
 │   ├── lib/                    # Utilities
 │   │   ├── db.ts               # Prisma client
 │   │   ├── auth.ts             # NextAuth config
@@ -317,9 +345,9 @@ yibei-tea/
 
 ## 7. Implementatie Status
 
-### Voltooide Taken
+### ✅ Gedane Wijzigingen / Beslissingen
 
-#### Fase 1: Foundation
+#### Fase 1: Foundation (VOLTOOID)
 - [x] Node.js v24.12.0 LTS geïnstalleerd via winget
 - [x] Next.js 14 project setup met TypeScript
 - [x] Tailwind CSS configuratie met Yibei Tea branding kleuren
@@ -329,7 +357,7 @@ yibei-tea/
 - [x] shadcn/ui componenten (Button, Card, Input, Badge, etc.)
 - [x] Zustand cart store voor winkelwagen state
 
-#### Fase 2: Klant Features
+#### Fase 2: Klant Features (VOLTOOID)
 - [x] Homepage met hero, features, producten en reviews
 - [x] Homepage "Onze Favorieten" met echte productafbeeldingen van yibeitea.be
 - [x] Menu pagina met filters (vegan, cafeïnevrij, categorie)
@@ -341,7 +369,7 @@ yibei-tea/
 - [x] Over Ons pagina met complete merkverhaal (missie, waarden, menu preview)
 - [x] Contact pagina met formulier en locatie-info
 
-#### Fase 3: Backend & API
+#### Fase 3: Backend & API (VOLTOOID)
 - [x] tRPC setup met type-safe API routes
 - [x] Products router (CRUD operaties)
 - [x] Orders router (aanmaken, ophalen, status updates)
@@ -349,11 +377,11 @@ yibei-tea/
 - [x] Mollie betaalintegratie
 - [x] Mollie webhook handler
 
-#### Fase 4: Admin Dashboard
+#### Fase 4: Admin Dashboard (DEELS)
 - [x] Admin dashboard met statistieken
 - [x] Bestellingen beheer pagina met status updates
 
-#### Internationalisatie (i18n)
+#### Internationalisatie (i18n) (VOLTOOID)
 - [x] Volledige NL/EN vertalingen voor alle pagina's
 - [x] About pagina vertalingen (missie, waarden, menu preview, bezoek info)
 - [x] Contact pagina vertalingen (formulier, succes berichten)
@@ -361,22 +389,12 @@ yibei-tea/
 - [x] Homepage vertalingen (alle secties)
 - [x] Bestelbevestiging vertalingen
 
-#### Assets & Afbeeldingen
+#### Assets & Afbeeldingen (VOLTOOID)
 - [x] Logo geïmporteerd (/images/logo.png)
 - [x] 45 product SVG illustraties (/images/products/)
-  - **Milk Tea (6):** boba-milk-tea, boba-coffee, matcha-milk, chocolate-milk, fresh-milk, indian-chai
-  - **Classic Tea (4):** thai-tea, singapore-tea, honey-milk-tea, caramel-milk-tea
-  - **Flavored Milk Tea (4):** hazelnut-milk-tea, vanilla-milk-tea, coconut-milk-tea, salted-caramel-milk-tea
-  - **Cream Cheese (4):** cream-cheese-green-tea, cream-cheese-salted-caramel, cream-cheese-ovomaltine, cream-cheese-matcha
-  - **Ice Tea (5):** ice-tea-passion-fruit, ice-tea-lemon, ice-tea-mango, ice-tea-lychee, ice-tea-peach
-  - **Mojitos (6):** mojito-original, mojito-strawberry, mojito-passion-fruit, mojito-mango, mojito-lychee, mojito-peach
-  - **Iced Coffee (3):** iced-americano, iced-latte, iced-mocha
-  - **Hot Coffee (4):** hot-americano, hot-latte, hot-mocha, hot-cappuccino
-  - **Kids (3):** kids-strawberry, kids-chocolate, kids-vanilla
-  - **Lattes (2):** latte-caramel-vanilla, latte-hazelnut-nutella
-  - **Frappuccino (4):** frappuccino-caramel, frappuccino-mocha, frappuccino-matcha, frappuccino-strawberry
+- [x] Placeholder images toegevoegd aan alle 64 producten in seed.ts
 
-#### Ontwikkelomgeving
+#### Ontwikkelomgeving (VOLTOOID)
 - [x] npm dependencies geïnstalleerd (598 packages)
 - [x] Prisma client gegenereerd
 - [x] .env bestand aangemaakt
@@ -384,44 +402,215 @@ yibei-tea/
 
 ---
 
-### Nog Uit Te Voeren
+### 🆕 Recente Wijzigingen (Uncommitted)
 
-#### Database & Externe Services
-- [ ] Supabase project aanmaken
-- [ ] DATABASE_URL configureren in .env
-- [ ] `npm run db:push` - Database schema pushen
-- [ ] `npm run db:seed` - Producten seeden
-- [ ] Mollie account aanmaken en API key configureren
-- [ ] Google OAuth credentials configureren (optioneel)
-- [ ] Resend API key configureren voor emails
+#### Database Schema Uitbreidingen
+> **📱 App-ready:** Het uitgebreide data model is platform-agnostisch ontworpen. Dezelfde API en data-structuren kunnen hergebruikt worden voor iOS/Android apps via de bestaande tRPC endpoints.
 
-#### Ontbrekende Pagina's
-- [ ] Product detail pagina met customization
-- [ ] Account bestellingen overzicht
-- [ ] Account favorieten pagina
-- [ ] Account instellingen pagina
-- [ ] Admin producten beheer pagina
-- [ ] Admin klanten pagina
-- [ ] Admin analytics pagina
-- [ ] Privacy & Terms pagina's
+- [x] **User model uitgebreid:**
+  - `role` enum (USER, ADMIN, SUPER_ADMIN)
+  - `loyaltyTier` enum (BRONZE, SILVER, GOLD)
+  - 2FA ondersteuning (`twoFactorSecret`, `twoFactorEnabled`, `twoFactorVerified`)
+  - `dateOfBirth` voor verjaardagsbeloningen
+  - `preferredLanguage` voor i18n voorkeuren
 
-#### Functionaliteit
-- [x] 45 product SVG illustraties toegevoegd (alle categorieën)
-- [ ] Email notificaties bij bestelling
-- [ ] Real-time order status updates
-- [ ] Loyaliteitspunten uitwisselen voor beloningen
-- [ ] Reviews systeem voltooien
+- [x] **Address model (nieuw):** Meerdere afleveradressen per gebruiker
 
-#### Fase 6: Polish & Launch
-- [ ] Performance optimalisatie
-- [ ] SEO meta tags per pagina
-- [ ] Mobile testing en fixes
-- [ ] Vercel deployment setup
-- [ ] Custom domein configureren
+- [x] **Data-driven Customization System (nieuw):**
+  - `CustomizationGroup` - Groepen (suiker, ijs, maat, melktype)
+  - `CustomizationValue` - Opties per groep met prijsmodifier
+  - `CustomizationValueTranslation` - NL/EN vertalingen
+  - `ProductCustomizationConfig` - Per-product configuratie
+  > **📱 App-ready:** Customization opties komen uit de database, niet hardcoded. Dit maakt het eenvoudig om dezelfde opties in een native app te tonen.
+
+- [x] **Loyalty & Rewards (nieuw):**
+  - `LoyaltyTransaction` - Punten verdienen/inwisselen tracking
+  - `Reward` model met vertalingen
+
+- [x] **E-commerce uitbreidingen (nieuw):**
+  - `PromoCode` - Kortingscodes met validatie
+  - `StoreSettings` - Openingsuren, pickup instellingen, punten per euro
+  - `Order` uitgebreid met `pointsEarned`, `pointsRedeemed`
+
+#### Nieuwe Componenten
+> **📱 App-ready:** Componenten zijn gebouwd met Zustand stores en tRPC queries. De business logic in stores en API calls kan 1-op-1 hergebruikt worden in React Native.
+
+- [x] **ProductModal** (`src/components/products/product-modal.tsx`)
+  - Volledige customization dialog (suiker, ijs, toppings)
+  - Dynamische prijsberekening met modifiers
+  - Quantity selector
+  - Add to cart integratie
+
+- [x] **ProductQuickCustomize** (`src/components/products/product-quick-customize.tsx`)
+  - Compacte popover voor snelle customization
+  - Geïntegreerd op menu pagina
+  > **📱 App-ready:** Op mobile apps zou dit een bottom sheet worden - de state logic blijft identiek.
+
+- [x] **UI Componenten (shadcn/ui):**
+  - Dialog component
+  - Popover component
+
+#### Nieuwe Hooks
+> **📱 App-ready:** Zustand stores werken ook in React Native. De `useProductModal` en `useCartStore` kunnen direct hergebruikt worden.
+
+- [x] **useProductModal** (`src/hooks/use-product-modal.ts`)
+  - Zustand store voor modal state
+  - `openModal(slug)`, `closeModal()` actions
+
+- [x] **useLongPress** (`src/hooks/use-long-press.ts`)
+  - Touch gesture support voor mobile
+  > **📱 App-ready:** Long press is een standaard mobile interactie pattern.
+
+#### Nieuwe Stores
+- [x] **Cart Store** (`src/stores/cart-store.ts`)
+  - Zustand met localStorage persistence
+  - Items met customizations (sugarLevel, iceLevel, toppings)
+  - Promo code ondersteuning
+  - `addItem`, `removeItem`, `updateQuantity`, `clearCart`
+  - Computed: `getItemCount()`, `getSubtotal()`, `getTotal()`
+  > **📱 App-ready:** Voor native apps kan AsyncStorage i.p.v. localStorage gebruikt worden met dezelfde API.
+
+#### Nieuwe tRPC Routers
+- [x] **Customizations Router** (`src/server/trpc/routers/customizations.ts`)
+  - `getAll` - Publieke endpoint voor customization opties
+  - `getAllAdmin` - Admin view inclusief inactieve
+  - `updateGroup` - Admin: groep instellingen wijzigen
+  - `createValue` / `updateValue` / `deleteValue` - Admin CRUD
+  - `reorderValues` - Admin: volgorde aanpassen
+  > **📱 App-ready:** tRPC endpoints zijn ook bereikbaar vanuit React Native via `@trpc/react-query`.
+
+#### Seed Data Uitbreidingen
+- [x] Customization groups toegevoegd:
+  - SUGAR_LEVEL: 0%, 25%, 50%, 75%, 100% (default)
+  - ICE_LEVEL: Geen, Weinig, Normaal (default), Extra
+- [x] Vertalingen voor alle customization waarden (NL/EN)
+- [x] StoreSettings met openingsuren
 
 ---
 
-### Gemaakte Bestanden (50+)
+### ⏳ Openstaande To-Do's
+
+#### Prioriteit 1: Database & Infrastructuur
+> Deze stappen zijn vereist voordat nieuwe features getest kunnen worden.
+
+- [ ] **Database migratie uitvoeren**
+  - `npx prisma db push` om schema wijzigingen door te voeren
+  - Of `npx prisma migrate dev` voor productie-ready migraties
+
+- [ ] **Database opnieuw seeden**
+  - `npm run db:seed` om customization groups en store settings te laden
+
+- [ ] **Supabase project aanmaken** (indien nog niet gedaan)
+  - DATABASE_URL configureren in .env
+
+- [ ] **Mollie account configureren**
+  - API key in .env voor test/live modus
+
+#### Prioriteit 2: Product Customization Flow Voltooien
+> **📱 App-ready:** Deze UI patterns zijn direct vertaalbaar naar native componenten.
+
+- [ ] **ProductModal renderen in app layout**
+  - Toevoegen aan `[locale]/layout.tsx` of providers
+  - Zodat modal overal geopend kan worden
+
+- [ ] **Menu pagina: klik op product opent modal**
+  - Huidige: alleen ProductQuickCustomize popover
+  - Toevoegen: klik op productkaart → open ProductModal
+
+- [ ] **Product detail pagina** (`/menu/[slug]`)
+  - Full-page customization voor directe links
+  - SEO-vriendelijk voor Google indexering
+
+#### Prioriteit 3: Cart & Checkout Verbeteren
+- [ ] **Cart drawer/sidebar implementeren**
+  - Slide-in panel vanuit header cart icon
+  - Snelle toegang zonder pagina navigatie
+  > **📱 App-ready:** In native apps wordt dit een bottom sheet of modal.
+
+- [ ] **Cart items tonen met customizations**
+  - Suikerniveau, ijsniveau, toppings weergeven
+  - Edit mogelijkheid (terug naar customization)
+
+- [ ] **Checkout flow: customizations meesturen**
+  - OrderItem.customizations correct vullen bij bestelling
+
+#### Prioriteit 4: Admin Dashboard Uitbreiden
+- [ ] **Admin producten beheer pagina**
+  - CRUD voor producten
+  - Vertalingen beheren (NL/EN)
+  - Beschikbaarheid toggles
+
+- [ ] **Admin customizations beheer**
+  - UI voor CustomizationGroup/Value management
+  - Drag & drop reordering
+
+- [ ] **Admin klanten pagina**
+  - Klantenoverzicht met bestelgeschiedenis
+  - Loyaliteitspunten handmatig aanpassen
+
+- [ ] **Admin analytics pagina**
+  - Omzet grafieken
+  - Populaire producten
+  - Piekuren analyse
+
+#### Prioriteit 5: Loyaliteitsprogramma Activeren
+- [ ] **Punten verdienen bij bestelling**
+  - Na betaling: LoyaltyTransaction aanmaken
+  - pointsPerEuro uit StoreSettings gebruiken
+
+- [ ] **Punten inwisselen**
+  - UI voor rewards selectie
+  - Korting toepassen op checkout
+
+- [ ] **Tier upgrades**
+  - Automatische upgrade bij puntendrempel
+  - Notificatie aan gebruiker
+
+- [ ] **Verjaardagsbeloning**
+  - Cronjob/scheduled function voor automatische toekenning
+
+#### Prioriteit 6: Communicatie & Notificaties
+- [ ] **Resend API configureren**
+  - API key in .env
+
+- [ ] **Email templates maken:**
+  - Bestelbevestiging
+  - Bestelling klaar voor afhalen
+  - Wachtwoord reset
+  - Verjaardagsbeloning
+
+- [ ] **Push notificaties** (optioneel)
+  - Web push voor order status updates
+
+#### Prioriteit 7: Polish & Launch
+- [ ] **Performance optimalisatie**
+  - Image optimization
+  - Code splitting
+  - Lighthouse audit
+
+- [ ] **SEO optimalisatie**
+  - Meta tags per pagina
+  - Structured data (JSON-LD)
+  - Sitemap genereren
+
+- [ ] **Mobile testing**
+  - Touch targets
+  - Responsive breakpoints
+  - Gesture support
+
+- [ ] **Vercel deployment**
+  - Environment variables instellen
+  - Custom domein koppelen
+
+#### Nog Niet Gepland
+- [ ] Privacy & Terms pagina's
+- [ ] Reviews systeem voltooien
+- [ ] Cadeaubonnen functionaliteit
+- [ ] Social login (Google OAuth)
+
+---
+
+### Gemaakte Bestanden (60+)
 
 ```
 src/
@@ -451,6 +640,9 @@ src/
 │   │   ├── header.tsx
 │   │   ├── footer.tsx
 │   │   └── language-switcher.tsx
+│   ├── products/                          # NIEUW
+│   │   ├── product-modal.tsx
+│   │   └── product-quick-customize.tsx
 │   └── ui/
 │       ├── button.tsx
 │       ├── card.tsx
@@ -459,14 +651,19 @@ src/
 │       ├── badge.tsx
 │       ├── separator.tsx
 │       ├── skeleton.tsx
-│       └── textarea.tsx
+│       ├── textarea.tsx
+│       ├── dialog.tsx                     # NIEUW
+│       └── popover.tsx                    # NIEUW
+├── hooks/                                 # NIEUW
+│   ├── use-product-modal.ts
+│   └── use-long-press.ts
+├── stores/                                # NIEUW
+│   └── cart-store.ts
 ├── lib/
 │   ├── db.ts
 │   ├── auth.ts
 │   ├── utils.ts
 │   └── mollie.ts
-├── stores/
-│   └── cart-store.ts
 ├── server/trpc/
 │   ├── context.ts
 │   ├── trpc.ts
@@ -474,7 +671,11 @@ src/
 │       ├── index.ts
 │       ├── products.ts
 │       ├── orders.ts
-│       └── users.ts
+│       ├── users.ts
+│       ├── toppings.ts
+│       ├── categories.ts
+│       ├── two-factor.ts
+│       └── customizations.ts              # NIEUW
 ├── i18n/
 │   ├── request.ts
 │   ├── navigation.ts
@@ -486,8 +687,8 @@ src/
 └── middleware.ts
 
 prisma/
-├── schema.prisma
-└── seed.ts
+├── schema.prisma                          # UITGEBREID
+└── seed.ts                                # UITGEBREID
 
 public/
 ├── images/
@@ -511,12 +712,49 @@ Root files:
 ├── .eslintrc.json
 ├── .gitignore
 ├── .env.example
-└── .env
+├── .env
+└── PROJECTPLAN.md
 ```
 
 ---
 
-### Snelstart Commando's
+## 8. App-Readiness Overwegingen
+
+> De website is opgezet als **inspiratie én potentiële basis** voor toekomstige iOS/Android apps. De volgende architectuurkeuzes ondersteunen dit:
+
+### ✅ Wat al app-ready is
+
+| Aspect | Web Implementatie | App Herbruikbaarheid |
+|--------|-------------------|---------------------|
+| **API Layer** | tRPC endpoints | Direct bruikbaar via `@trpc/react-query` in React Native |
+| **State Management** | Zustand stores | Werkt identiek in React Native |
+| **Data Models** | Prisma schema | Platform-agnostisch, API responses zijn JSON |
+| **Customization Logic** | Data-driven (uit DB) | Geen hardcoded UI, flexibel voor native componenten |
+| **Cart Logic** | `cart-store.ts` | Kan AsyncStorage gebruiken i.p.v. localStorage |
+| **Auth Flow** | NextAuth.js | API sessions werken ook voor native clients |
+| **i18n** | `next-intl` messages | JSON bestanden herbruikbaar in `i18n-js` voor RN |
+
+### 🎯 Aandachtspunten voor App Ontwikkeling
+
+1. **Bottom Sheets**: Web popovers → native bottom sheets
+2. **Navigation**: Next.js routing → React Navigation
+3. **Push Notifications**: Web push → Firebase Cloud Messaging
+4. **Offline Support**: Zustand persist → MMKV/AsyncStorage met offline queue
+5. **Payment**: Mollie web → Mollie mobile SDK of deep links
+6. **Biometrics**: N/A → TouchID/FaceID voor 2FA
+
+### 📱 Componenten met App-Equivalent
+
+| Web Component | Potentieel Native Equivalent |
+|---------------|------------------------------|
+| `ProductModal` | Full-screen modal met gestures |
+| `ProductQuickCustomize` | Bottom sheet |
+| `CartDrawer` (nog te maken) | Tab navigator cart screen |
+| `LanguageSwitcher` | Settings screen picker |
+
+---
+
+## 9. Snelstart Commando's
 
 ```bash
 # Development server starten
@@ -540,7 +778,7 @@ npm start
 
 ---
 
-## 8. Bronnen
+## 10. Bronnen
 
 - [Bubble Tea Website Examples - Zarla](https://www.zarla.com/guides/bubble-tea-website-examples)
 - [Bubble Tea POS Systems - Lingaro](https://www.lingaros.com/pos-systems/restaurant/bubble-tea-pos/)

@@ -5,8 +5,10 @@ import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import { api } from "@/lib/trpc";
+import { useCartStore } from "@/stores/cart-store";
 import {
   Star,
   Leaf,
@@ -23,7 +25,11 @@ import {
   Citrus,
   GlassWater,
   Loader2,
+  ShoppingCart,
+  Check,
+  Heart,
 } from "lucide-react";
+import { ProductQuickCustomize } from "@/components/products/product-quick-customize";
 
 // Gradient mappings for categories
 const categoryGradients: Record<string, string> = {
@@ -101,6 +107,9 @@ export default function HomePage() {
   const tCommon = useTranslations("common");
   const locale = useLocale() as "nl" | "en";
   const heroRef = useRef<HTMLDivElement>(null);
+  const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
+  const addItem = useCartStore((state) => state.addItem);
+  const { data: session } = useSession();
 
   // Fetch featured products from database
   const { data: featuredProducts, isLoading: productsLoading } = api.products.getFeatured.useQuery({
@@ -112,6 +121,40 @@ export default function HomePage() {
   const { data: categories, isLoading: categoriesLoading } = api.categories.getAll.useQuery({
     locale,
   });
+
+  // Fetch user's favorites (only if logged in)
+  const { data: userFavorites, isLoading: favoritesLoading } = api.users.getFavorites.useQuery(
+    { locale },
+    { enabled: !!session?.user }
+  );
+
+  const handleAddToCart = (
+    product: { id: string; slug: string; price: unknown; imageUrl: string | null; translations: Array<{ name: string }> },
+    e: React.MouseEvent
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const translation = product.translations[0];
+
+    addItem({
+      productId: product.id,
+      name: translation?.name || product.slug,
+      price: Number(product.price),
+      quantity: 1,
+      imageUrl: product.imageUrl || undefined,
+    });
+
+    // Show added feedback
+    setAddedProducts((prev) => new Set(prev).add(product.id));
+    setTimeout(() => {
+      setAddedProducts((prev) => {
+        const next = new Set(prev);
+        next.delete(product.id);
+        return next;
+      });
+    }, 2000);
+  };
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -154,9 +197,37 @@ export default function HomePage() {
             >
               {/* Badge */}
               <motion.div variants={fadeInUp}>
-                <span className="inline-flex items-center gap-2 rounded-full border border-tea-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-tea-700 shadow-soft backdrop-blur-sm">
-                  <Sparkles className="h-3.5 w-3.5" />
+                <span className="inline-flex items-center gap-3 rounded-full border border-tea-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-tea-700 shadow-soft backdrop-blur-sm">
+                  {/* Animated Boba Pearls - Logo colors */}
+                  <span className="relative flex h-5 w-8 items-center justify-center">
+                    <motion.span
+                      animate={{ y: [-2, 2, -2], scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute left-0 h-2.5 w-2.5 rounded-full shadow-sm"
+                      style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
+                    />
+                    <motion.span
+                      animate={{ y: [2, -2, 2], scale: [1.1, 1, 1.1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                      className="absolute left-2.5 top-0 h-2 w-2 rounded-full shadow-sm"
+                      style={{ background: "linear-gradient(135deg, #FF9900 0%, #E68A00 100%)" }}
+                    />
+                    <motion.span
+                      animate={{ y: [-1, 3, -1], scale: [1, 1.15, 1] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                      className="absolute right-0 h-2.5 w-2.5 rounded-full shadow-sm"
+                      style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
+                    />
+                  </span>
                   {tCommon("tagline")}
+                  {/* Small tea leaf accent */}
+                  <motion.span
+                    animate={{ rotate: [-5, 5, -5] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    style={{ color: "#8B2635" }}
+                  >
+                    🍃
+                  </motion.span>
                 </span>
               </motion.div>
 
@@ -205,46 +276,197 @@ export default function HomePage() {
               </motion.div>
             </motion.div>
 
-            {/* Right - Featured drink visual */}
+            {/* Right - Yibei Tea Bubble Tea Visual */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
               className="relative hidden lg:block"
             >
               <div className="relative mx-auto aspect-square max-w-lg">
-                {/* Decorative rings */}
-                <div className="absolute inset-0 animate-gentle-pulse rounded-full border-2 border-tea-200/50" />
-                <div className="absolute inset-4 animate-gentle-pulse rounded-full border border-matcha-200/40" style={{ animationDelay: "0.5s" }} />
-                <div className="absolute inset-8 animate-gentle-pulse rounded-full border border-taro-200/30" style={{ animationDelay: "1s" }} />
+                {/* Outer glow rings - Logo Colors */}
+                <motion.div
+                  animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0 rounded-full blur-2xl"
+                  style={{ background: "radial-gradient(circle, rgba(139, 38, 53, 0.25) 0%, transparent 50%, rgba(255, 153, 0, 0.2) 100%)" }}
+                />
 
-                {/* Center circle with gradient */}
-                <div className="absolute inset-12 overflow-hidden rounded-full bg-gradient-to-br from-tea-100 via-cream-50 to-matcha-100 shadow-soft-lg">
-                  <div className="absolute inset-0 flex items-center justify-center">
+                {/* Stylized Bubble Tea Cup - Logo Colors with Gradients */}
+                <div className="absolute inset-8 flex items-center justify-center">
+                  <div className="relative">
+                    {/* Cup body */}
                     <motion.div
-                      animate={{ y: [-5, 5, -5] }}
+                      animate={{ y: [-3, 3, -3] }}
                       transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                      className="text-[120px]"
+                      className="relative"
                     >
-                      🧋
+                      {/* Lid/dome with gradient */}
+                      <div
+                        className="absolute -top-6 left-1/2 h-12 w-52 -translate-x-1/2 rounded-t-full shadow-md"
+                        style={{ background: "linear-gradient(180deg, #F5E6D3 0%, #E8D5C4 50%, #DBC4B0 100%)" }}
+                      />
+                      <div
+                        className="absolute -top-2 left-1/2 h-4 w-56 -translate-x-1/2 rounded-full shadow-sm"
+                        style={{ background: "linear-gradient(90deg, #8B2635 0%, #A03040 50%, #8B2635 100%)" }}
+                      />
+
+                      {/* Straw - Orange gradient */}
+                      <motion.div
+                        animate={{ rotate: [-2, 2, -2] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute -top-20 left-1/2 z-20 h-28 w-4 -translate-x-1/2 rounded-full shadow-md"
+                        style={{ background: "linear-gradient(180deg, #FFB340 0%, #FF9900 30%, #E68A00 70%, #CC7A00 100%)", transformOrigin: "bottom center" }}
+                      />
+
+                      {/* Main cup with beautiful gradient */}
+                      <div
+                        className="relative h-64 w-48 overflow-hidden rounded-b-[3rem] shadow-2xl"
+                        style={{
+                          clipPath: "polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%)",
+                          background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,230,211,0.9) 50%, rgba(232,213,196,0.85) 100%)"
+                        }}
+                      >
+                        {/* Tea liquid gradient - Bordeaux to Orange blend */}
+                        <div
+                          className="absolute inset-x-2 bottom-0 top-8 rounded-b-[2.5rem]"
+                          style={{
+                            background: "linear-gradient(180deg, rgba(160, 48, 64, 0.6) 0%, rgba(139, 38, 53, 0.75) 30%, rgba(139, 38, 53, 0.85) 60%, rgba(107, 29, 42, 0.95) 100%)"
+                          }}
+                        />
+
+                        {/* Animated Boba Pearls inside - Orange gradient */}
+                        <motion.div
+                          animate={{ y: [0, -8, 0] }}
+                          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                          className="absolute bottom-8 left-6 h-6 w-6 rounded-full shadow-lg"
+                          style={{ background: "radial-gradient(circle at 30% 30%, #FFD080 0%, #FF9900 40%, #CC7A00 100%)" }}
+                        />
+                        <motion.div
+                          animate={{ y: [0, -6, 0] }}
+                          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                          className="absolute bottom-6 left-14 h-5 w-5 rounded-full shadow-lg"
+                          style={{ background: "radial-gradient(circle at 30% 30%, #FFE0A0 0%, #FFB340 40%, #FF9900 100%)" }}
+                        />
+                        <motion.div
+                          animate={{ y: [0, -10, 0] }}
+                          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                          className="absolute bottom-10 right-8 h-6 w-6 rounded-full shadow-lg"
+                          style={{ background: "radial-gradient(circle at 30% 30%, #FFD080 0%, #FF9900 40%, #CC7A00 100%)" }}
+                        />
+                        <motion.div
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}
+                          className="absolute bottom-4 right-14 h-5 w-5 rounded-full shadow-lg"
+                          style={{ background: "radial-gradient(circle at 30% 30%, #FFE0A0 0%, #FFB340 40%, #FF9900 100%)" }}
+                        />
+                        <motion.div
+                          animate={{ y: [0, -7, 0] }}
+                          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+                          className="absolute bottom-12 left-10 h-4 w-4 rounded-full shadow-lg"
+                          style={{ background: "radial-gradient(circle at 30% 30%, #FFD080 0%, #FF9900 40%, #CC7A00 100%)" }}
+                        />
+
+                        {/* Multiple shine effects for glass look */}
+                        <div className="absolute left-2 top-10 h-32 w-6 rounded-full bg-white/40 blur-sm" />
+                        <div className="absolute left-4 top-16 h-20 w-3 rounded-full bg-white/25 blur-xs" />
+                        <div className="absolute right-4 top-12 h-16 w-2 rounded-full bg-white/20 blur-sm" />
+                      </div>
+
+                      {/* Cup bottom rim gradient */}
+                      <div
+                        className="absolute -bottom-1 left-1/2 h-3 w-32 -translate-x-1/2 rounded-full"
+                        style={{ background: "linear-gradient(90deg, transparent 0%, rgba(139, 38, 53, 0.3) 50%, transparent 100%)" }}
+                      />
                     </motion.div>
                   </div>
                 </div>
 
-                {/* Floating elements */}
+                {/* Floating Boba Pearls around - Logo Colors */}
                 <motion.div
-                  animate={{ y: [-10, 10, -10], rotate: [0, 5, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -right-4 top-1/4 rounded-2xl bg-white p-4 shadow-soft"
+                  animate={{ y: [-15, 15, -15], x: [-5, 5, -5], rotate: [0, 360] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -right-2 top-20 h-10 w-10 rounded-full shadow-lg"
+                  style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
+                />
+                <motion.div
+                  animate={{ y: [10, -15, 10], x: [5, -5, 5] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                  className="absolute -left-4 top-32 h-8 w-8 rounded-full shadow-lg"
+                  style={{ background: "linear-gradient(135deg, #FF9900 0%, #E68A00 100%)" }}
+                />
+                <motion.div
+                  animate={{ y: [-10, 20, -10], rotate: [0, -360] }}
+                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  className="absolute bottom-24 right-4 h-7 w-7 rounded-full shadow-lg"
+                  style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
+                />
+                <motion.div
+                  animate={{ y: [15, -10, 15], x: [-3, 3, -3] }}
+                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+                  className="absolute bottom-32 -left-6 h-6 w-6 rounded-full shadow-lg"
+                  style={{ background: "linear-gradient(135deg, #FF9900 0%, #CC7A00 100%)" }}
+                />
+
+                {/* Floating icons - slow irregular crossing movement */}
+                <motion.div
+                  animate={{
+                    y: [-60, 80, -30, 100, -80, 40, -60],
+                    x: [30, -90, 70, -40, 80, -70, 30],
+                    rotate: [0, 45, -30, 90, -60, 120, 0],
+                    scale: [1, 1.15, 0.95, 1.1, 1, 1.2, 1]
+                  }}
+                  transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute left-1/4 top-1/4"
                 >
-                  <span className="text-3xl">🍵</span>
+                  <span className="text-4xl drop-shadow-lg">🧋</span>
                 </motion.div>
                 <motion.div
-                  animate={{ y: [10, -10, 10], rotate: [0, -5, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                  className="absolute -left-4 bottom-1/4 rounded-2xl bg-white p-4 shadow-soft"
+                  animate={{
+                    y: [70, -50, 30, -90, 60, -40, 70],
+                    x: [-60, 80, -30, 100, -80, 50, -60],
+                    rotate: [0, -60, 45, -90, 30, -120, 0],
+                    scale: [1.1, 0.9, 1.2, 1, 1.15, 0.95, 1.1]
+                  }}
+                  transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                  className="absolute right-1/4 top-1/3"
                 >
-                  <span className="text-3xl">🫧</span>
+                  <span className="text-3xl drop-shadow-lg">🍃</span>
+                </motion.div>
+                <motion.div
+                  animate={{
+                    y: [-50, 70, -80, 50, -30, 90, -50],
+                    x: [80, -60, 40, -90, 70, -50, 80],
+                    rotate: [0, 75, -45, 100, -80, 60, 0],
+                    scale: [1, 1.25, 0.9, 1.1, 1, 1.15, 1]
+                  }}
+                  transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+                  className="absolute left-1/3 bottom-1/4"
+                >
+                  <span className="text-3xl drop-shadow-lg">✨</span>
+                </motion.div>
+                <motion.div
+                  animate={{
+                    y: [50, -80, 60, -40, 90, -70, 50],
+                    x: [-80, 50, -100, 70, -50, 90, -80],
+                    rotate: [0, -50, 80, -100, 45, -75, 0],
+                    scale: [1.1, 1, 1.2, 0.9, 1.15, 1, 1.1]
+                  }}
+                  transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 6 }}
+                  className="absolute right-1/3 bottom-1/3"
+                >
+                  {/* Custom Coffee Bean SVG */}
+                  <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-lg">
+                    <ellipse cx="16" cy="16" rx="10" ry="14" fill="url(#coffeeBeanGradient)" />
+                    <path d="M16 4 Q12 16 16 28" stroke="#3D1F0D" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+                    <defs>
+                      <linearGradient id="coffeeBeanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#8B5A2B" />
+                        <stop offset="50%" stopColor="#5D3A1A" />
+                        <stop offset="100%" stopColor="#3D1F0D" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
                 </motion.div>
               </div>
             </motion.div>
@@ -305,6 +527,8 @@ export default function HomePage() {
                 const gradient = categoryGradients[categorySlug] || "from-tea-200 via-cream-100 to-cream-50";
                 const categoryTranslation = product.category?.translations[0];
 
+                const isAdded = addedProducts.has(product.id);
+
                 return (
                   <motion.div key={product.id} variants={scaleIn}>
                     <Link href={`/menu/${product.slug}`}>
@@ -327,12 +551,42 @@ export default function HomePage() {
                           </div>
                         </div>
                         <div className="p-5">
-                          <h3 className="font-serif text-lg font-medium text-tea-900 transition-colors group-hover:text-tea-600">
-                            {translation?.name || product.slug}
-                          </h3>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {categoryTranslation?.name || categorySlug}
-                          </p>
+                          <div>
+                            <h3 className="font-serif text-lg font-medium text-tea-900 transition-colors group-hover:text-tea-600">
+                              {translation?.name || product.slug}
+                            </h3>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {categoryTranslation?.name || categorySlug}
+                            </p>
+                          </div>
+                          <div className="mt-3 flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={(e) => handleAddToCart(product, e)}
+                              className={`flex-1 rounded-full transition-all duration-300 ${
+                                isAdded
+                                  ? "bg-matcha-500 hover:bg-matcha-600"
+                                  : "bg-tea-600 hover:bg-tea-700"
+                              }`}
+                            >
+                              {isAdded ? (
+                                <>
+                                  <Check className="mr-1 h-4 w-4" />
+                                  {t("featured.added")}
+                                </>
+                              ) : (
+                                <>
+                                  <ShoppingCart className="mr-1 h-4 w-4" />
+                                  {t("featured.addToCart")}
+                                </>
+                              )}
+                            </Button>
+                            <ProductQuickCustomize
+                              product={product}
+                              showTriggerText={false}
+                              triggerClassName="rounded-full"
+                            />
+                          </div>
                         </div>
                       </div>
                     </Link>
@@ -362,6 +616,146 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* My Favorites Section - Only shown when logged in */}
+      {session?.user && (
+        <section className="section-padding relative overflow-hidden bg-gradient-to-b from-cream-50 to-white">
+          <div className="container-custom">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="text-center"
+            >
+              <motion.div variants={fadeInUp} className="flex items-center justify-center gap-2">
+                <Heart className="h-5 w-5 text-rose-500" />
+                <span className="decorative-line text-sm font-medium uppercase tracking-widest text-tea-600">
+                  {t("myFavorites.title")}
+                </span>
+              </motion.div>
+              <motion.h2 variants={fadeInUp} className="heading-2 mt-4 text-tea-900">
+                {t("myFavorites.subtitle")}
+              </motion.h2>
+            </motion.div>
+
+            {favoritesLoading ? (
+              <div className="mt-16 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
+              </div>
+            ) : userFavorites && userFavorites.length > 0 ? (
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+                variants={staggerContainer}
+                className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+              >
+                {userFavorites.slice(0, 4).map((product) => {
+                  const translation = product.translations[0];
+                  const categorySlug = product.category?.slug || "";
+                  const gradient = categoryGradients[categorySlug] || "from-tea-200 via-cream-100 to-cream-50";
+                  const categoryTranslation = product.category?.translations[0];
+                  const isAdded = addedProducts.has(product.id);
+
+                  return (
+                    <motion.div key={product.id} variants={scaleIn}>
+                      <Link href={`/menu/${product.slug}`}>
+                        <div className="product-card group cursor-pointer overflow-hidden rounded-3xl border border-rose-200 bg-white">
+                          <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${gradient}`}>
+                            <div className="product-image absolute inset-0 flex items-center justify-center p-4">
+                              {product.imageUrl ? (
+                                <img
+                                  src={product.imageUrl}
+                                  alt={translation?.name || product.slug}
+                                  className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                                />
+                              ) : (
+                                <span className="text-7xl transition-transform group-hover:scale-110">🧋</span>
+                              )}
+                            </div>
+                            {/* Favorite heart icon */}
+                            <div className="absolute left-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose-500 shadow-sm backdrop-blur-sm">
+                              <Heart className="h-4 w-4 fill-current" />
+                            </div>
+                            {/* Price tag */}
+                            <div className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
+                              €{Number(product.price).toFixed(2)}
+                            </div>
+                          </div>
+                          <div className="p-5">
+                            <div>
+                              <h3 className="font-serif text-lg font-medium text-tea-900 transition-colors group-hover:text-tea-600">
+                                {translation?.name || product.slug}
+                              </h3>
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                {categoryTranslation?.name || categorySlug}
+                              </p>
+                            </div>
+                            <div className="mt-3 flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={(e) => handleAddToCart(product, e)}
+                                className={`flex-1 rounded-full transition-all duration-300 ${
+                                  isAdded
+                                    ? "bg-matcha-500 hover:bg-matcha-600"
+                                    : "bg-tea-600 hover:bg-tea-700"
+                                }`}
+                              >
+                                {isAdded ? (
+                                  <>
+                                    <Check className="mr-1 h-4 w-4" />
+                                    {t("featured.added")}
+                                  </>
+                                ) : (
+                                  <>
+                                    <ShoppingCart className="mr-1 h-4 w-4" />
+                                    {t("featured.addToCart")}
+                                  </>
+                                )}
+                              </Button>
+                              <ProductQuickCustomize
+                                product={product}
+                                showTriggerText={false}
+                                triggerClassName="rounded-full"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mt-16 text-center"
+              >
+                <div className="mx-auto max-w-md rounded-3xl border border-cream-200 bg-white p-10">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
+                    <Heart className="h-8 w-8 text-rose-400" />
+                  </div>
+                  <h3 className="mt-6 font-serif text-xl font-medium text-tea-900">
+                    {t("myFavorites.empty")}
+                  </h3>
+                  <p className="mt-2 text-muted-foreground">
+                    {t("myFavorites.emptySubtitle")}
+                  </p>
+                  <Link href="/menu" className="mt-6 inline-block">
+                    <Button className="rounded-full bg-tea-600 px-8 hover:bg-tea-700">
+                      {t("myFavorites.browseMenu")}
+                      <ChevronRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Our Story Section */}
       <section className="section-padding relative overflow-hidden bg-gradient-to-b from-cream-50 to-white">

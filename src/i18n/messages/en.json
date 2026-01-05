@@ -112,7 +112,17 @@
     "featured": {
       "title": "Our Favorites",
       "subtitle": "The most beloved drinks, carefully curated for the ultimate taste experience",
-      "viewAll": "View full menu"
+      "viewAll": "View full menu",
+      "addToCart": "Add to Cart",
+      "added": "Added!"
+    },
+    "myFavorites": {
+      "title": "My Favorites",
+      "subtitle": "Your personal selection of favorite drinks",
+      "empty": "You don't have any favorites yet",
+      "emptySubtitle": "Add drinks to your favorites to see them here",
+      "browseMenu": "Explore our menu",
+      "loginRequired": "Log in to see your favorites"
     },
     "story": {
       "label": "Our Story",

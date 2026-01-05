@@ -3,7 +3,17 @@
     "allow": [
       "Bash(cd:*)",
       "Bash(git config:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 30 npm run dev:*)",
+      "Bash(ping:*)",
+      "Bash(start http://localhost:*)",
+      "Bash(npm run db:seed:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd product detail page with customization and placeholder images\n\n- Add product detail page at /menu/[slug] with sugar/ice level selection\n- Add toppings selection with dynamic pricing\n- Create toppings tRPC router for fetching available toppings\n- Add placeholder images to all 64 products in seed.ts\n- Add 45 SVG product illustrations\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)"
     ]
   }
 }

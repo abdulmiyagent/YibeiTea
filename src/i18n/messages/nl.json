@@ -112,7 +112,17 @@
     "featured": {
       "title": "Onze Favorieten",
       "subtitle": "De meest geliefde drankjes, zorgvuldig samengesteld voor het ultieme smaakgevoel",
-      "viewAll": "Bekijk volledig menu"
+      "viewAll": "Bekijk volledig menu",
+      "addToCart": "Toevoegen",
+      "added": "Toegevoegd!"
+    },
+    "myFavorites": {
+      "title": "Mijn Favorieten",
+      "subtitle": "Jouw persoonlijke selectie van favoriete drankjes",
+      "empty": "Je hebt nog geen favorieten",
+      "emptySubtitle": "Voeg drankjes toe aan je favorieten om ze hier te zien",
+      "browseMenu": "Ontdek ons menu",
+      "loginRequired": "Log in om je favorieten te zien"
     },
     "story": {
       "label": "Ons Verhaal",

@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/stores/cart-store";
+import { ProductQuickCustomize } from "@/components/products/product-quick-customize";
 import { api } from "@/lib/trpc";
 import {
   Search,
@@ -236,11 +236,7 @@ export default function MenuPage() {
                         <Plus className="mr-1 h-4 w-4" />
                         {t("addToCart")}
                       </Button>
-                      <Link href={`/menu/${product.slug}`}>
-                        <Button variant="outline" size="sm">
-                          {t("customize")}
-                        </Button>
-                      </Link>
+                      <ProductQuickCustomize product={product} />
                     </div>
                   </CardContent>
                 </Card>

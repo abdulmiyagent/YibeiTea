@@ -161,6 +161,7 @@ model Product {
 
   // Customization
   customizationOptions CustomizationOption[]
+  customizationConfigs ProductCustomizationConfig[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -248,6 +249,59 @@ enum CustomizationType {
   MILK_TYPE
 }
 
+// Global customization groups (admin-manageable)
+model CustomizationGroup {
+  id        String            @id @default(cuid())
+  type      CustomizationType @unique
+  isActive  Boolean           @default(true)
+  sortOrder Int               @default(0)
+
+  values CustomizationValue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Individual values within a customization group
+model CustomizationValue {
+  id            String  @id @default(cuid())
+  groupId       String
+  value         String  // e.g., "0", "25", "50", "75", "100" or "none", "less", "normal", "extra"
+  priceModifier Decimal @default(0) @db.Decimal(10, 2)
+  isDefault     Boolean @default(false)
+  isAvailable   Boolean @default(true)
+  sortOrder     Int     @default(0)
+
+  group        CustomizationGroup               @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  translations CustomizationValueTranslation[]
+
+  @@unique([groupId, value])
+}
+
+model CustomizationValueTranslation {
+  id      String @id @default(cuid())
+  valueId String
+  locale  String // "nl" | "en"
+  label   String // e.g., "Geen suiker", "No sugar"
+
+  value CustomizationValue @relation(fields: [valueId], references: [id], onDelete: Cascade)
+
+  @@unique([valueId, locale])
+}
+
+// Per-product customization config (which types are available for which products)
+model ProductCustomizationConfig {
+  id        String            @id @default(cuid())
+  productId String
+  type      CustomizationType
+  required  Boolean           @default(false)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, type])
+}
+
+// Legacy model - kept for backwards compatibility, can be removed later
 model CustomizationOption {
   id        String            @id @default(cuid())
   productId String
