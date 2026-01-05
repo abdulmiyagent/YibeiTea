@@ -1,19 +1,9 @@
-import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import {
-  ProductCustomization,
-  type ProductData,
-  type CustomizationGroup,
-  type ToppingData,
-} from "@/components/products/product-customization";
+import { ProductModalShell } from "./modal-shell";
 
 // =============================================================================
-// SERVER COMPONENT - Full product detail page
-// This is shown when:
-// 1. User navigates directly to /menu/[slug] (hard navigation)
-// 2. User refreshes the page while on /menu/[slug]
-// 3. User shares/bookmarks a product URL
+// SERVER COMPONENT - Data fetching happens here
 // =============================================================================
 
 interface Props {
@@ -23,11 +13,7 @@ interface Props {
   };
 }
 
-// -----------------------------------------------------------------------------
-// Data Fetching Functions (same as modal, could be extracted to shared lib)
-// -----------------------------------------------------------------------------
-
-async function getProductData(slug: string, locale: string): Promise<ProductData | null> {
+async function getProductData(slug: string, locale: string) {
   const product = await db.product.findUnique({
     where: { slug, isAvailable: true },
     include: {
@@ -65,7 +51,7 @@ async function getProductData(slug: string, locale: string): Promise<ProductData
   };
 }
 
-async function getCustomizationGroups(locale: string): Promise<CustomizationGroup[]> {
+async function getCustomizationGroups(locale: string) {
   const groups = await db.customizationGroup.findMany({
     where: { isActive: true },
     include: {
@@ -95,7 +81,7 @@ async function getCustomizationGroups(locale: string): Promise<CustomizationGrou
   }));
 }
 
-async function getToppings(locale: string): Promise<ToppingData[]> {
+async function getToppings(locale: string) {
   const toppings = await db.topping.findMany({
     where: { isAvailable: true },
     include: {
@@ -114,39 +100,7 @@ async function getToppings(locale: string): Promise<ToppingData[]> {
   }));
 }
 
-// -----------------------------------------------------------------------------
-// Dynamic Metadata for SEO
-// -----------------------------------------------------------------------------
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, slug } = params;
-  const product = await getProductData(slug, locale);
-
-  if (!product) {
-    return {
-      title: "Product niet gevonden",
-    };
-  }
-
-  const name = product.translations[0]?.name || slug;
-  const description = product.translations[0]?.description || "";
-
-  return {
-    title: name,
-    description: description || `Bestel ${name} bij Yibei Tea`,
-    openGraph: {
-      title: `${name} | Yibei Tea`,
-      description: description || `Bestel ${name} bij Yibei Tea`,
-      images: product.imageUrl ? [product.imageUrl] : [],
-    },
-  };
-}
-
-// -----------------------------------------------------------------------------
-// Page Component
-// -----------------------------------------------------------------------------
-
-export default async function ProductDetailPage({ params }: Props) {
+export default async function ProductModalPage({ params }: Props) {
   const { locale, slug } = params;
 
   // Parallel data fetching for performance
@@ -161,15 +115,10 @@ export default async function ProductDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="section-padding">
-      <div className="container-custom max-w-4xl">
-        <ProductCustomization
-          product={product}
-          customizationGroups={customizationGroups}
-          toppings={toppings}
-          variant="page"
-        />
-      </div>
-    </div>
+    <ProductModalShell
+      product={product}
+      customizationGroups={customizationGroups}
+      toppings={toppings}
+    />
   );
 }

@@ -51,6 +51,7 @@ export const metadata: Metadata = {
 
 interface RootLayoutProps {
   children: React.ReactNode;
+  modal: React.ReactNode; // Parallel route slot for intercepting routes
   params: { locale: string };
 }
 
@@ -60,6 +61,7 @@ export function generateStaticParams() {
 
 export default async function RootLayout({
   children,
+  modal,
   params: { locale },
 }: RootLayoutProps) {
   if (!locales.includes(locale as any)) {
@@ -80,6 +82,8 @@ export default async function RootLayout({
               <main className="flex-1">{children}</main>
               <Footer />
             </div>
+            {/* Parallel route slot for modal - rendered on top of content */}
+            {modal}
           </Providers>
         </NextIntlClientProvider>
       </body>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -27,9 +27,15 @@ export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const getItemCount = useCartStore((state) => state.getItemCount);
 
-  const cartItemCount = getItemCount();
+  // Prevent hydration mismatch: cart count from localStorage differs server vs client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const cartItemCount = mounted ? getItemCount() : 0;
 
   const navLinks = [
     { href: "/", label: t("home") },

@@ -488,40 +488,32 @@ yibei-tea/
 
 ---
 
+### ✅ Recent Voltooid (Sessie 5 jan 2026)
+
+#### Database & Infrastructuur
+- [x] **Database migratie uitvoeren** - Schema was al in sync
+- [x] **Database opnieuw seeden** - 64 producten, 10 categorieën, customization groups
+- [x] **Supabase project gekoppeld** - DATABASE_URL geconfigureerd
+- [x] **Favicon toegevoegd** - Logo als `src/app/icon.png`
+- [x] **Hydration error gefixed** - Cart count in header met mounted state
+
+#### Product Customization Flow (Intercepting Routes)
+- [x] **ProductCustomization shared component** - Alle business logic op één plek
+- [x] **Modal shell** - `@modal/(.)menu/[slug]` met server-side data fetching
+- [x] **Product detail page** - `/menu/[slug]` voor directe links & SEO
+- [x] **Menu pagina: klik opent modal** - Link navigatie i.p.v. direct add-to-cart
+- [x] **Layout updated** - `{modal}` parallel route slot toegevoegd
+
+---
+
 ### ⏳ Openstaande To-Do's
 
-#### Prioriteit 1: Database & Infrastructuur
-> Deze stappen zijn vereist voordat nieuwe features getest kunnen worden.
+#### Prioriteit 1: Mollie Betalingen Configureren
+- [ ] **Mollie account aanmaken** op mollie.com
+- [ ] **API key toevoegen** in `.env` (MOLLIE_API_KEY)
+- [ ] **Test betaling uitvoeren** via checkout flow
 
-- [ ] **Database migratie uitvoeren**
-  - `npx prisma db push` om schema wijzigingen door te voeren
-  - Of `npx prisma migrate dev` voor productie-ready migraties
-
-- [ ] **Database opnieuw seeden**
-  - `npm run db:seed` om customization groups en store settings te laden
-
-- [ ] **Supabase project aanmaken** (indien nog niet gedaan)
-  - DATABASE_URL configureren in .env
-
-- [ ] **Mollie account configureren**
-  - API key in .env voor test/live modus
-
-#### Prioriteit 2: Product Customization Flow Voltooien
-> **📱 App-ready:** Deze UI patterns zijn direct vertaalbaar naar native componenten.
-
-- [ ] **ProductModal renderen in app layout**
-  - Toevoegen aan `[locale]/layout.tsx` of providers
-  - Zodat modal overal geopend kan worden
-
-- [ ] **Menu pagina: klik op product opent modal**
-  - Huidige: alleen ProductQuickCustomize popover
-  - Toevoegen: klik op productkaart → open ProductModal
-
-- [ ] **Product detail pagina** (`/menu/[slug]`)
-  - Full-page customization voor directe links
-  - SEO-vriendelijk voor Google indexering
-
-#### Prioriteit 3: Cart & Checkout Verbeteren
+#### Prioriteit 2: Cart & Checkout Verbeteren
 - [ ] **Cart drawer/sidebar implementeren**
   - Slide-in panel vanuit header cart icon
   - Snelle toegang zonder pagina navigatie
@@ -534,7 +526,7 @@ yibei-tea/
 - [ ] **Checkout flow: customizations meesturen**
   - OrderItem.customizations correct vullen bij bestelling
 
-#### Prioriteit 4: Admin Dashboard Uitbreiden
+#### Prioriteit 3: Admin Dashboard Uitbreiden
 - [ ] **Admin producten beheer pagina**
   - CRUD voor producten
   - Vertalingen beheren (NL/EN)
@@ -553,7 +545,7 @@ yibei-tea/
   - Populaire producten
   - Piekuren analyse
 
-#### Prioriteit 5: Loyaliteitsprogramma Activeren
+#### Prioriteit 4: Loyaliteitsprogramma Activeren
 - [ ] **Punten verdienen bij bestelling**
   - Na betaling: LoyaltyTransaction aanmaken
   - pointsPerEuro uit StoreSettings gebruiken
@@ -569,7 +561,7 @@ yibei-tea/
 - [ ] **Verjaardagsbeloning**
   - Cronjob/scheduled function voor automatische toekenning
 
-#### Prioriteit 6: Communicatie & Notificaties
+#### Prioriteit 5: Communicatie & Notificaties
 - [ ] **Resend API configureren**
   - API key in .env
 
@@ -582,7 +574,7 @@ yibei-tea/
 - [ ] **Push notificaties** (optioneel)
   - Web push voor order status updates
 
-#### Prioriteit 7: Polish & Launch
+#### Prioriteit 6: Polish & Launch
 - [ ] **Performance optimalisatie**
   - Image optimization
   - Code splitting
