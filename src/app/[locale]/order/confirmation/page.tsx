@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
+  Crown,
 } from "lucide-react";
 
 export default function OrderConfirmationPage() {
@@ -132,6 +133,16 @@ export default function OrderConfirmationPage() {
                   <span>{locale === "nl" ? "Totaal" : "Total"}</span>
                   <span className="text-tea-600">{formatPrice(order.total)}</span>
                 </div>
+                {order.pointsEarned > 0 && (
+                  <div className="flex items-center justify-center gap-2 mt-3 rounded-lg bg-matcha-50 p-3">
+                    <Crown className="h-4 w-4 text-matcha-600" />
+                    <span className="text-sm font-medium text-matcha-700">
+                      {locale === "nl"
+                        ? `+${order.pointsEarned} loyaliteitspunten verdiend!`
+                        : `+${order.pointsEarned} loyalty points earned!`}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Pickup Info */}

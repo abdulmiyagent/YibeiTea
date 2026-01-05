@@ -6,29 +6,59 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { api } from "@/lib/trpc";
 import {
   Package,
   Heart,
   Gift,
   Settings,
   Crown,
-  TrendingUp,
   ChevronRight,
+  Loader2,
+  Coffee,
 } from "lucide-react";
+
+const statusColors = {
+  PENDING: "bg-yellow-100 text-yellow-800",
+  PAID: "bg-blue-100 text-blue-800",
+  PREPARING: "bg-orange-100 text-orange-800",
+  READY: "bg-green-100 text-green-800",
+  COMPLETED: "bg-gray-100 text-gray-800",
+  CANCELLED: "bg-red-100 text-red-800",
+};
+
+const statusLabels = {
+  PENDING: "In afwachting",
+  PAID: "Betaald",
+  PREPARING: "In bereiding",
+  READY: "Klaar",
+  COMPLETED: "Afgehaald",
+  CANCELLED: "Geannuleerd",
+};
 
 export default function AccountPage() {
   const t = useTranslations("account");
   const { data: session, status } = useSession();
   const router = useRouter();
 
+  // Fetch real loyalty data
+  const { data: loyaltyInfo, isLoading: loyaltyLoading } = api.users.getLoyaltyInfo.useQuery(
+    undefined,
+    { enabled: status === "authenticated" }
+  );
+
+  // Fetch real orders
+  const { data: orders, isLoading: ordersLoading } = api.orders.getMyOrders.useQuery(
+    undefined,
+    { enabled: status === "authenticated" }
+  );
+
   if (status === "loading") {
     return (
       <div className="section-padding">
         <div className="container-custom">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 w-48 rounded bg-muted" />
-            <div className="h-4 w-32 rounded bg-muted" />
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
           </div>
         </div>
       </div>
@@ -40,8 +70,8 @@ export default function AccountPage() {
     return null;
   }
 
-  const loyaltyPoints = session?.user?.loyaltyPoints || 0;
-  const loyaltyTier = session?.user?.loyaltyTier || "BRONZE";
+  const loyaltyPoints = loyaltyInfo?.loyaltyPoints ?? session?.user?.loyaltyPoints ?? 0;
+  const loyaltyTier = loyaltyInfo?.loyaltyTier ?? session?.user?.loyaltyTier ?? "BRONZE";
 
   const tierColors = {
     BRONZE: "bg-amber-100 text-amber-800",
@@ -56,10 +86,12 @@ export default function AccountPage() {
   };
 
   const pointsToNextTier = {
-    BRONZE: 500 - loyaltyPoints,
-    SILVER: 1000 - loyaltyPoints,
+    BRONZE: Math.max(0, 500 - loyaltyPoints),
+    SILVER: Math.max(0, 1000 - loyaltyPoints),
     GOLD: 0,
   };
+
+  const recentOrders = orders?.slice(0, 3) ?? [];
 
   return (
     <div className="section-padding">
@@ -84,47 +116,61 @@ export default function AccountPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-3xl font-bold text-tea-600">
-                    {loyaltyPoints}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {t("loyalty.points")}
-                  </p>
+              {loyaltyLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-6 w-6 animate-spin text-tea-600" />
                 </div>
-                <Badge
-                  className={tierColors[loyaltyTier as keyof typeof tierColors]}
-                >
-                  {tierLabels[loyaltyTier as keyof typeof tierLabels]}
-                </Badge>
-              </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-3xl font-bold text-tea-600">
+                        {loyaltyPoints}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t("loyalty.points")}
+                      </p>
+                    </div>
+                    <Badge
+                      className={tierColors[loyaltyTier as keyof typeof tierColors]}
+                    >
+                      {tierLabels[loyaltyTier as keyof typeof tierLabels]}
+                    </Badge>
+                  </div>
 
-              {loyaltyTier !== "GOLD" && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Volgende niveau
-                    </span>
-                    <span className="font-medium">
-                      {pointsToNextTier[loyaltyTier as keyof typeof pointsToNextTier]}{" "}
-                      punten
-                    </span>
-                  </div>
-                  <div className="h-2 rounded-full bg-muted">
-                    <div
-                      className="h-2 rounded-full bg-tea-500 transition-all"
-                      style={{
-                        width: `${Math.min(
-                          (loyaltyPoints /
-                            (loyaltyTier === "BRONZE" ? 500 : 1000)) *
-                            100,
-                          100
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                </div>
+                  {loyaltyTier !== "GOLD" && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          Volgende niveau
+                        </span>
+                        <span className="font-medium">
+                          {pointsToNextTier[loyaltyTier as keyof typeof pointsToNextTier]}{" "}
+                          punten
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted">
+                        <div
+                          className="h-2 rounded-full bg-tea-500 transition-all"
+                          style={{
+                            width: `${Math.min(
+                              (loyaltyPoints /
+                                (loyaltyTier === "BRONZE" ? 500 : 1000)) *
+                                100,
+                              100
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {loyaltyTier === "GOLD" && (
+                    <p className="text-sm text-matcha-600 font-medium">
+                      Je hebt het hoogste niveau bereikt!
+                    </p>
+                  )}
+                </>
               )}
 
               <Link href="/account/rewards">
@@ -191,44 +237,97 @@ export default function AccountPage() {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {/* Sample orders - would come from database */}
-              {[
-                {
-                  id: "YBT-ABC123",
-                  date: "2024-01-15",
-                  status: "COMPLETED",
-                  total: 16.5,
-                  items: ["Classic Taro", "Matcha Latte", "Brown Sugar Boba"],
-                },
-                {
-                  id: "YBT-DEF456",
-                  date: "2024-01-10",
-                  status: "COMPLETED",
-                  total: 11.0,
-                  items: ["Strawberry Iced Tea", "Peach Garden Mojito"],
-                },
-              ].map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
-                >
-                  <div>
-                    <p className="font-medium">{order.id}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {order.items.join(", ")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{order.date}</p>
+            {ordersLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-tea-600" />
+              </div>
+            ) : recentOrders.length > 0 ? (
+              <div className="space-y-4">
+                {recentOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tea-100">
+                        <Coffee className="h-5 w-5 text-tea-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{order.orderNumber}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {order.items
+                            .slice(0, 2)
+                            .map((item) => item.product?.slug || "Product")
+                            .join(", ")}
+                          {order.items.length > 2 && ` +${order.items.length - 2}`}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(order.createdAt).toLocaleDateString("nl-BE")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">€{Number(order.total).toFixed(2)}</p>
+                      <Badge
+                        className={
+                          statusColors[order.status as keyof typeof statusColors]
+                        }
+                      >
+                        {statusLabels[order.status as keyof typeof statusLabels]}
+                      </Badge>
+                      {order.pointsEarned > 0 && (
+                        <p className="text-xs text-matcha-600 mt-1">
+                          +{order.pointsEarned} punten
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">€{order.total.toFixed(2)}</p>
-                    <Badge variant="success">Afgehaald</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="py-8 text-center text-muted-foreground">
+                Je hebt nog geen bestellingen geplaatst
+              </p>
+            )}
           </CardContent>
         </Card>
+
+        {/* Loyalty Transactions */}
+        {loyaltyInfo?.transactions && loyaltyInfo.transactions.length > 0 && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="h-5 w-5 text-tea-600" />
+                Punten Geschiedenis
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {loyaltyInfo.transactions.slice(0, 5).map((tx) => (
+                  <div
+                    key={tx.id}
+                    className="flex items-center justify-between py-2 border-b last:border-0"
+                  >
+                    <div>
+                      <p className="text-sm font-medium">{tx.description || tx.type}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(tx.createdAt).toLocaleDateString("nl-BE")}
+                      </p>
+                    </div>
+                    <span
+                      className={`font-medium ${
+                        tx.points > 0 ? "text-matcha-600" : "text-red-600"
+                      }`}
+                    >
+                      {tx.points > 0 ? "+" : ""}
+                      {tx.points} punten
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Settings Link */}
         <div className="mt-6">

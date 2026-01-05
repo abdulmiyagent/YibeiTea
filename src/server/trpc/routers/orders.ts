@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc";
-import { generateOrderNumber } from "@/lib/utils";
+import { generateOrderNumber, calculateLoyaltyTier } from "@/lib/utils";
 
 export const ordersRouter = router({
   create: publicProcedure
@@ -24,6 +24,8 @@ export const ordersRouter = router({
         0
       );
 
+      const pointsEarned = Math.floor(subtotal * 10);
+
       const order = await ctx.db.order.create({
         data: {
           orderNumber: generateOrderNumber(),
@@ -35,7 +37,7 @@ export const ordersRouter = router({
           notes: input.notes,
           subtotal,
           total: subtotal,
-          pointsEarned: Math.floor(subtotal * 10),
+          pointsEarned,
           items: {
             create: input.items.map((item) => ({
               productId: item.productId,
@@ -48,6 +50,39 @@ export const ordersRouter = router({
         },
         include: { items: true },
       });
+
+      // Award loyalty points to logged-in users
+      if (ctx.session?.user?.id && pointsEarned > 0) {
+        const user = await ctx.db.user.findUnique({
+          where: { id: ctx.session.user.id },
+          select: { loyaltyPoints: true },
+        });
+
+        if (user) {
+          const newPoints = user.loyaltyPoints + pointsEarned;
+          const newTier = calculateLoyaltyTier(newPoints);
+
+          // Update user points and tier
+          await ctx.db.user.update({
+            where: { id: ctx.session.user.id },
+            data: {
+              loyaltyPoints: newPoints,
+              loyaltyTier: newTier,
+            },
+          });
+
+          // Create loyalty transaction record
+          await ctx.db.loyaltyTransaction.create({
+            data: {
+              userId: ctx.session.user.id,
+              points: pointsEarned,
+              type: "EARN",
+              description: `Bestelling ${order.orderNumber}`,
+              orderId: order.id,
+            },
+          });
+        }
+      }
 
       return order;
     }),
@@ -89,6 +124,7 @@ export const ordersRouter = router({
         customerName: order.customerName,
         customerEmail: order.customerEmail,
         total: Number(order.total),
+        pointsEarned: order.pointsEarned,
         items: order.items.map((item) => ({
           name: item.product.translations[0]?.name || item.product.slug,
           quantity: item.quantity,
