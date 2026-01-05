@@ -61,6 +61,43 @@ export const ordersRouter = router({
       });
     }),
 
+  // Public query for order confirmation page (by order number)
+  getByOrderNumber: publicProcedure
+    .input(z.object({ orderNumber: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const order = await ctx.db.order.findUnique({
+        where: { orderNumber: input.orderNumber },
+        include: {
+          items: {
+            include: {
+              product: {
+                include: {
+                  translations: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!order) return null;
+
+      return {
+        orderNumber: order.orderNumber,
+        status: order.status,
+        pickupTime: order.pickupTime,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        total: Number(order.total),
+        items: order.items.map((item) => ({
+          name: item.product.translations[0]?.name || item.product.slug,
+          quantity: item.quantity,
+          price: Number(item.unitPrice),
+          customizations: item.customizations as Record<string, unknown> | null,
+        })),
+      };
+    }),
+
   getMyOrders: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.order.findMany({
       where: { userId: ctx.session.user.id },
@@ -78,7 +115,16 @@ export const ordersRouter = router({
     .query(async ({ ctx, input }) => {
       return ctx.db.order.findMany({
         where: input?.status ? { status: input.status as any } : undefined,
-        include: { items: { include: { product: true } }, user: true },
+        include: {
+          items: {
+            include: {
+              product: {
+                include: { translations: true },
+              },
+            },
+          },
+          user: true,
+        },
         orderBy: { createdAt: "desc" },
         take: input?.limit || 50,
       });

@@ -7,82 +7,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { api } from "@/lib/trpc";
+import { formatPrice } from "@/lib/utils";
 import {
   Search,
-  Filter,
   Clock,
   CheckCircle,
   XCircle,
   ChefHat,
   Package,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// Sample orders data
-const ordersData = [
-  {
-    id: "YBT-XYZ789",
-    orderNumber: "YBT-XYZ789",
-    customer: "Emma Vermeer",
-    email: "emma@email.be",
-    phone: "0471 23 45 67",
-    items: [
-      { name: "Classic Taro", quantity: 1, customizations: "50% suiker, normaal ijs" },
-      { name: "Brown Sugar Boba", quantity: 2, customizations: "100% suiker, extra ijs" },
-    ],
-    total: 16.5,
-    status: "PREPARING",
-    pickupTime: "14:30",
-    createdAt: "2024-01-15T14:15:00",
-    notes: "Geen extra toppings a.u.b.",
-  },
-  {
-    id: "YBT-ABC123",
-    orderNumber: "YBT-ABC123",
-    customer: "Thomas De Smet",
-    email: "thomas@email.be",
-    phone: "0478 98 76 54",
-    items: [
-      { name: "Matcha Latte", quantity: 1, customizations: "25% suiker, geen ijs" },
-    ],
-    total: 5.5,
-    status: "READY",
-    pickupTime: "14:15",
-    createdAt: "2024-01-15T14:00:00",
-    notes: null,
-  },
-  {
-    id: "YBT-DEF456",
-    orderNumber: "YBT-DEF456",
-    customer: "Lisa Martens",
-    email: "lisa@email.be",
-    phone: "0495 12 34 56",
-    items: [
-      { name: "Peach Garden Mojito", quantity: 1, customizations: null },
-      { name: "Green Apple Ice Tea", quantity: 1, customizations: "0% suiker" },
-    ],
-    total: 11.5,
-    status: "PENDING",
-    pickupTime: "14:45",
-    createdAt: "2024-01-15T14:20:00",
-    notes: null,
-  },
-  {
-    id: "YBT-GHI789",
-    orderNumber: "YBT-GHI789",
-    customer: "Jan Peeters",
-    email: "jan@email.be",
-    phone: "0468 11 22 33",
-    items: [
-      { name: "Hazelnut Nutella Coffee", quantity: 2, customizations: "75% suiker" },
-    ],
-    total: 11.0,
-    status: "PAID",
-    pickupTime: "15:00",
-    createdAt: "2024-01-15T14:25:00",
-    notes: "Extra hazelnoottoppings indien mogelijk",
-  },
-];
 
 const statusConfig = {
   PENDING: {
@@ -117,52 +54,92 @@ const statusConfig = {
   },
 };
 
-const statusFlow = ["PENDING", "PAID", "PREPARING", "READY", "COMPLETED"];
+const statusFlow = ["PENDING", "PAID", "PREPARING", "READY", "COMPLETED"] as const;
+
+type OrderStatus = keyof typeof statusConfig;
+
+// Format customizations JSON to readable string
+function formatCustomizations(customizations: unknown): string | null {
+  if (!customizations || typeof customizations !== "object") return null;
+
+  const c = customizations as Record<string, unknown>;
+  const parts: string[] = [];
+
+  if (c.sugarLevel !== undefined) {
+    parts.push(`${c.sugarLevel}% suiker`);
+  }
+  if (c.iceLevel) {
+    parts.push(`${c.iceLevel} ijs`);
+  }
+  if (c.size) {
+    parts.push(`${c.size}`);
+  }
+  if (c.milkType) {
+    parts.push(`${c.milkType} melk`);
+  }
+  if (Array.isArray(c.toppings) && c.toppings.length > 0) {
+    parts.push(`+${c.toppings.join(", ")}`);
+  }
+
+  return parts.length > 0 ? parts.join(", ") : null;
+}
 
 export default function AdminOrdersPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status: authStatus } = useSession();
   const router = useRouter();
-  const [orders, setOrders] = useState(ordersData);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
-  if (status === "loading") {
+  // Fetch orders from database
+  const {
+    data: orders,
+    isLoading,
+    refetch,
+  } = api.orders.getAll.useQuery(
+    { limit: 100 },
+    { enabled: authStatus === "authenticated" && session?.user?.role === "ADMIN" }
+  );
+
+  // Update status mutation
+  const updateStatusMutation = api.orders.updateStatus.useMutation({
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
+  if (authStatus === "loading" || isLoading) {
     return (
       <div className="section-padding">
         <div className="container-custom">
-          <div className="animate-pulse">
-            <div className="h-8 w-48 rounded bg-muted" />
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
           </div>
         </div>
       </div>
     );
   }
 
-  if (status === "unauthenticated" || session?.user?.role !== "ADMIN") {
+  if (authStatus === "unauthenticated" || session?.user?.role !== "ADMIN") {
     router.push("/");
     return null;
   }
 
-  const filteredOrders = orders.filter((order) => {
+  const filteredOrders = (orders || []).filter((order) => {
     const matchesSearch =
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchQuery.toLowerCase());
+      (order.customerName || "").toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = !statusFilter || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const updateOrderStatus = (orderId: string, newStatus: string) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
+  const updateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
+    updateStatusMutation.mutate({ id: orderId, status: newStatus });
   };
 
-  const getNextStatus = (currentStatus: string) => {
-    const currentIndex = statusFlow.indexOf(currentStatus);
-    if (currentIndex < statusFlow.length - 1) {
+  const getNextStatus = (currentStatus: string): OrderStatus | null => {
+    const currentIndex = statusFlow.indexOf(currentStatus as typeof statusFlow[number]);
+    if (currentIndex >= 0 && currentIndex < statusFlow.length - 1) {
       return statusFlow[currentIndex + 1];
     }
     return null;
@@ -172,11 +149,22 @@ export default function AdminOrdersPage() {
     <div className="section-padding bg-muted/30">
       <div className="container-custom">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="heading-1">Bestellingen</h1>
-          <p className="mt-2 text-muted-foreground">
-            Beheer en volg alle bestellingen
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="heading-1">Bestellingen</h1>
+            <p className="mt-2 text-muted-foreground">
+              Beheer en volg alle bestellingen ({orders?.length || 0} totaal)
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isLoading}
+          >
+            <RefreshCw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
+            Vernieuwen
+          </Button>
         </div>
 
         {/* Filters */}
@@ -214,9 +202,15 @@ export default function AdminOrdersPage() {
         {/* Orders Grid */}
         <div className="grid gap-4 lg:grid-cols-2">
           {filteredOrders.map((order) => {
-            const config = statusConfig[order.status as keyof typeof statusConfig];
-            const StatusIcon = config.icon;
+            const config = statusConfig[order.status as OrderStatus];
+            const StatusIcon = config?.icon || Clock;
             const nextStatus = getNextStatus(order.status);
+            const pickupTime = order.pickupTime
+              ? new Date(order.pickupTime).toLocaleTimeString("nl-BE", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : null;
 
             return (
               <Card
@@ -235,13 +229,13 @@ export default function AdminOrdersPage() {
                       <CardTitle className="text-lg">
                         {order.orderNumber}
                       </CardTitle>
-                      <Badge className={config.color}>
+                      <Badge className={config?.color}>
                         <StatusIcon className="mr-1 h-3 w-3" />
-                        {config.label}
+                        {config?.label}
                       </Badge>
                     </div>
                     <span className="text-lg font-bold text-tea-600">
-                      €{order.total.toFixed(2)}
+                      {formatPrice(Number(order.total))}
                     </span>
                   </div>
                 </CardHeader>
@@ -249,29 +243,36 @@ export default function AdminOrdersPage() {
                   <div className="space-y-3">
                     {/* Customer Info */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">{order.customer}</span>
-                      <span className="text-muted-foreground">
-                        Afhalen: {order.pickupTime}
-                      </span>
+                      <span className="font-medium">{order.customerName || "Gast"}</span>
+                      {pickupTime && (
+                        <span className="text-muted-foreground">
+                          Afhalen: {pickupTime}
+                        </span>
+                      )}
                     </div>
 
                     {/* Items */}
                     <div className="space-y-1">
-                      {order.items.map((item, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between text-sm"
-                        >
-                          <span>
-                            {item.quantity}x {item.name}
-                          </span>
-                          {item.customizations && (
-                            <span className="text-muted-foreground">
-                              {item.customizations}
+                      {order.items.map((item, index) => {
+                        const customizationsStr = formatCustomizations(item.customizations);
+                        const productName =
+                          item.product?.translations?.[0]?.name ||
+                          item.product?.slug ||
+                          "Product";
+
+                        return (
+                          <div key={index} className="flex justify-between text-sm">
+                            <span>
+                              {item.quantity}x {productName}
                             </span>
-                          )}
-                        </div>
-                      ))}
+                            {customizationsStr && (
+                              <span className="text-muted-foreground text-xs">
+                                {customizationsStr}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
 
                     {order.notes && (
@@ -288,34 +289,25 @@ export default function AdminOrdersPage() {
                             variant="tea"
                             size="sm"
                             className="flex-1"
+                            disabled={updateStatusMutation.isPending}
                             onClick={(e) => {
                               e.stopPropagation();
                               updateOrderStatus(order.id, nextStatus);
                             }}
                           >
-                            Markeer als{" "}
-                            {
-                              statusConfig[nextStatus as keyof typeof statusConfig]
-                                .label
-                            }
+                            {updateStatusMutation.isPending ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : null}
+                            Markeer als {statusConfig[nextStatus]?.label}
                           </Button>
                         )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Would open details modal
-                          }}
-                        >
-                          Details
-                        </Button>
                         {order.status !== "COMPLETED" &&
                           order.status !== "CANCELLED" && (
                             <Button
                               variant="outline"
                               size="sm"
                               className="text-destructive"
+                              disabled={updateStatusMutation.isPending}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 updateOrderStatus(order.id, "CANCELLED");
@@ -333,10 +325,12 @@ export default function AdminOrdersPage() {
           })}
         </div>
 
-        {filteredOrders.length === 0 && (
+        {filteredOrders.length === 0 && !isLoading && (
           <div className="mt-12 text-center">
             <p className="text-muted-foreground">
-              Geen bestellingen gevonden met deze filters.
+              {orders?.length === 0
+                ? "Nog geen bestellingen ontvangen."
+                : "Geen bestellingen gevonden met deze filters."}
             </p>
           </div>
         )}

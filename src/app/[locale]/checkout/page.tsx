@@ -67,6 +67,7 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const createOrderMutation = api.orders.create.useMutation({
     onSuccess: (order) => {
@@ -95,10 +96,48 @@ export default function CheckoutPage() {
 
   const updateFormData = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear field error when user starts typing
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateStep = (step: number): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (step === 0) {
+      // Contact details validation
+      if (!formData.name.trim()) {
+        errors.name = t("validation.nameRequired") || "Naam is verplicht";
+      }
+      if (!formData.email.trim()) {
+        errors.email = t("validation.emailRequired") || "E-mail is verplicht";
+      } else if (!validateEmail(formData.email)) {
+        errors.email = t("validation.emailInvalid") || "Ongeldig e-mailadres";
+      }
+    }
+
+    if (step === 1) {
+      // Pickup time validation
+      const pickupDateTime = new Date(`${formData.pickupDate}T${formData.pickupTime}`);
+      const now = new Date();
+      if (pickupDateTime < now) {
+        errors.pickupTime = t("validation.pickupTimeInvalid") || "Kies een toekomstige afhaaltijd";
+      }
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+    if (validateStep(currentStep) && currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -110,6 +149,12 @@ export default function CheckoutPage() {
   };
 
   const handleSubmit = async () => {
+    // Validate all steps before submitting
+    if (!validateStep(0) || !validateStep(1)) {
+      setError(t("validation.fixErrors") || "Corrigeer de fouten voordat je bestelt");
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
 
@@ -124,11 +169,11 @@ export default function CheckoutPage() {
         unitPrice: item.price,
         customizations: item.customizations || undefined,
       })),
-      customerName: formData.name,
-      customerEmail: formData.email,
-      customerPhone: formData.phone || undefined,
+      customerName: formData.name.trim(),
+      customerEmail: formData.email.trim(),
+      customerPhone: formData.phone.trim() || undefined,
       pickupTime: pickupDateTime,
-      notes: formData.notes || undefined,
+      notes: formData.notes.trim() || undefined,
       promoCode: promoCode || undefined,
     });
   };
@@ -195,7 +240,7 @@ export default function CheckoutPage() {
                     <h2 className="heading-3">{t("contact.title")}</h2>
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="space-y-2">
-                        <Label htmlFor="name">{t("contact.name")}</Label>
+                        <Label htmlFor="name">{t("contact.name")} *</Label>
                         <Input
                           id="name"
                           value={formData.name}
@@ -203,7 +248,11 @@ export default function CheckoutPage() {
                             updateFormData("name", e.target.value)
                           }
                           placeholder="Jan Janssen"
+                          className={fieldErrors.name ? "border-red-500" : ""}
                         />
+                        {fieldErrors.name && (
+                          <p className="text-xs text-red-500">{fieldErrors.name}</p>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="phone">{t("contact.phone")}</Label>
@@ -219,7 +268,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">{t("contact.email")}</Label>
+                      <Label htmlFor="email">{t("contact.email")} *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -228,7 +277,11 @@ export default function CheckoutPage() {
                           updateFormData("email", e.target.value)
                         }
                         placeholder="jan@email.be"
+                        className={fieldErrors.email ? "border-red-500" : ""}
                       />
+                      {fieldErrors.email && (
+                        <p className="text-xs text-red-500">{fieldErrors.email}</p>
+                      )}
                     </div>
                   </div>
                 )}
