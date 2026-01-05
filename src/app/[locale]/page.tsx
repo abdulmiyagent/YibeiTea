@@ -5,10 +5,9 @@ import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "@/lib/trpc";
-import { useCartStore } from "@/stores/cart-store";
 import {
   Star,
   Leaf,
@@ -25,11 +24,12 @@ import {
   Citrus,
   GlassWater,
   Loader2,
+  Heart,
   ShoppingCart,
   Check,
-  Heart,
 } from "lucide-react";
-import { ProductQuickCustomize } from "@/components/products/product-quick-customize";
+import { useState } from "react";
+import { useCartStore } from "@/stores/cart-store";
 
 // Gradient mappings for categories
 const categoryGradients: Record<string, string> = {
@@ -107,8 +107,6 @@ export default function HomePage() {
   const tCommon = useTranslations("common");
   const locale = useLocale() as "nl" | "en";
   const heroRef = useRef<HTMLDivElement>(null);
-  const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
-  const addItem = useCartStore((state) => state.addItem);
   const { data: session } = useSession();
 
   // Fetch featured products from database
@@ -128,24 +126,37 @@ export default function HomePage() {
     { enabled: !!session?.user }
   );
 
-  const handleAddToCart = (
-    product: { id: string; slug: string; price: unknown; imageUrl: string | null; translations: Array<{ name: string }> },
-    e: React.MouseEvent
-  ) => {
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 50]);
+
+  // Quick add to cart functionality
+  const addItem = useCartStore((state) => state.addItem);
+  const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
+
+  const handleQuickAdd = (e: React.MouseEvent, product: NonNullable<typeof featuredProducts>[number]) => {
     e.preventDefault();
     e.stopPropagation();
 
     const translation = product.translations[0];
-
     addItem({
       productId: product.id,
       name: translation?.name || product.slug,
       price: Number(product.price),
       quantity: 1,
       imageUrl: product.imageUrl || undefined,
+      customizations: {
+        sugarLevel: 100,
+        iceLevel: "100%",
+        toppings: [],
+      },
     });
 
-    // Show added feedback
     setAddedProducts((prev) => new Set(prev).add(product.id));
     setTimeout(() => {
       setAddedProducts((prev) => {
@@ -155,15 +166,6 @@ export default function HomePage() {
       });
     }, 2000);
   };
-
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
-  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 50]);
 
   return (
     <>
@@ -532,61 +534,46 @@ export default function HomePage() {
                 return (
                   <motion.div key={product.id} variants={scaleIn}>
                     <Link href={`/menu/${product.slug}`}>
-                      <div className="product-card group cursor-pointer overflow-hidden rounded-3xl border border-cream-200 bg-white">
+                      <div className="product-card group cursor-pointer overflow-hidden rounded-2xl border border-cream-200 bg-white transition-all hover:shadow-lg hover:shadow-tea-500/10 hover:-translate-y-1">
                         <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${gradient}`}>
                           <div className="product-image absolute inset-0 flex items-center justify-center p-4">
                             {product.imageUrl ? (
                               <img
                                 src={product.imageUrl}
                                 alt={translation?.name || product.slug}
-                                className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                                className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
                               />
                             ) : (
-                              <span className="text-7xl transition-transform group-hover:scale-110">🧋</span>
+                              <span className="text-7xl transition-transform group-hover:scale-105">🧋</span>
                             )}
                           </div>
                           {/* Price tag */}
-                          <div className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
+                          <div className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
                             €{Number(product.price).toFixed(2)}
                           </div>
+                          {/* Quick add button */}
+                          <button
+                            onClick={(e) => handleQuickAdd(e, product)}
+                            className={`absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full shadow-md transition-all duration-200 ${
+                              isAdded
+                                ? "bg-matcha-500 text-white"
+                                : "bg-white/90 text-tea-600 opacity-0 group-hover:opacity-100 hover:bg-tea-600 hover:text-white"
+                            }`}
+                          >
+                            {isAdded ? (
+                              <Check className="h-4 w-4" />
+                            ) : (
+                              <ShoppingCart className="h-4 w-4" />
+                            )}
+                          </button>
                         </div>
-                        <div className="p-5">
-                          <div>
-                            <h3 className="font-serif text-lg font-medium text-tea-900 transition-colors group-hover:text-tea-600">
-                              {translation?.name || product.slug}
-                            </h3>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {categoryTranslation?.name || categorySlug}
-                            </p>
-                          </div>
-                          <div className="mt-3 flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={(e) => handleAddToCart(product, e)}
-                              className={`flex-1 rounded-full transition-all duration-300 ${
-                                isAdded
-                                  ? "bg-matcha-500 hover:bg-matcha-600"
-                                  : "bg-tea-600 hover:bg-tea-700"
-                              }`}
-                            >
-                              {isAdded ? (
-                                <>
-                                  <Check className="mr-1 h-4 w-4" />
-                                  {t("featured.added")}
-                                </>
-                              ) : (
-                                <>
-                                  <ShoppingCart className="mr-1 h-4 w-4" />
-                                  {t("featured.addToCart")}
-                                </>
-                              )}
-                            </Button>
-                            <ProductQuickCustomize
-                              product={product}
-                              showTriggerText={false}
-                              triggerClassName="rounded-full"
-                            />
-                          </div>
+                        <div className="p-4">
+                          <h3 className="font-serif text-base font-medium text-tea-900 transition-colors group-hover:text-tea-600">
+                            {translation?.name || product.slug}
+                          </h3>
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            {categoryTranslation?.name || categorySlug}
+                          </p>
                         </div>
                       </div>
                     </Link>
@@ -661,65 +648,50 @@ export default function HomePage() {
                   return (
                     <motion.div key={product.id} variants={scaleIn}>
                       <Link href={`/menu/${product.slug}`}>
-                        <div className="product-card group cursor-pointer overflow-hidden rounded-3xl border border-rose-200 bg-white">
+                        <div className="product-card group cursor-pointer overflow-hidden rounded-2xl border border-rose-200 bg-white transition-all hover:shadow-lg hover:shadow-rose-500/10 hover:-translate-y-1">
                           <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${gradient}`}>
                             <div className="product-image absolute inset-0 flex items-center justify-center p-4">
                               {product.imageUrl ? (
                                 <img
                                   src={product.imageUrl}
                                   alt={translation?.name || product.slug}
-                                  className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                                  className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
                                 />
                               ) : (
-                                <span className="text-7xl transition-transform group-hover:scale-110">🧋</span>
+                                <span className="text-7xl transition-transform group-hover:scale-105">🧋</span>
                               )}
                             </div>
                             {/* Favorite heart icon */}
-                            <div className="absolute left-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose-500 shadow-sm backdrop-blur-sm">
-                              <Heart className="h-4 w-4 fill-current" />
+                            <div className="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-rose-500 shadow-sm backdrop-blur-sm">
+                              <Heart className="h-3.5 w-3.5 fill-current" />
                             </div>
                             {/* Price tag */}
-                            <div className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
+                            <div className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
                               €{Number(product.price).toFixed(2)}
                             </div>
+                            {/* Quick add button */}
+                            <button
+                              onClick={(e) => handleQuickAdd(e, product as NonNullable<typeof featuredProducts>[number])}
+                              className={`absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full shadow-md transition-all duration-200 ${
+                                isAdded
+                                  ? "bg-matcha-500 text-white"
+                                  : "bg-white/90 text-tea-600 opacity-0 group-hover:opacity-100 hover:bg-tea-600 hover:text-white"
+                              }`}
+                            >
+                              {isAdded ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                <ShoppingCart className="h-4 w-4" />
+                              )}
+                            </button>
                           </div>
-                          <div className="p-5">
-                            <div>
-                              <h3 className="font-serif text-lg font-medium text-tea-900 transition-colors group-hover:text-tea-600">
-                                {translation?.name || product.slug}
-                              </h3>
-                              <p className="mt-1 text-sm text-muted-foreground">
-                                {categoryTranslation?.name || categorySlug}
-                              </p>
-                            </div>
-                            <div className="mt-3 flex gap-2">
-                              <Button
-                                size="sm"
-                                onClick={(e) => handleAddToCart(product, e)}
-                                className={`flex-1 rounded-full transition-all duration-300 ${
-                                  isAdded
-                                    ? "bg-matcha-500 hover:bg-matcha-600"
-                                    : "bg-tea-600 hover:bg-tea-700"
-                                }`}
-                              >
-                                {isAdded ? (
-                                  <>
-                                    <Check className="mr-1 h-4 w-4" />
-                                    {t("featured.added")}
-                                  </>
-                                ) : (
-                                  <>
-                                    <ShoppingCart className="mr-1 h-4 w-4" />
-                                    {t("featured.addToCart")}
-                                  </>
-                                )}
-                              </Button>
-                              <ProductQuickCustomize
-                                product={product}
-                                showTriggerText={false}
-                                triggerClassName="rounded-full"
-                              />
-                            </div>
+                          <div className="p-4">
+                            <h3 className="font-serif text-base font-medium text-tea-900 transition-colors group-hover:text-tea-600">
+                              {translation?.name || product.slug}
+                            </h3>
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                              {categoryTranslation?.name || categorySlug}
+                            </p>
                           </div>
                         </div>
                       </Link>

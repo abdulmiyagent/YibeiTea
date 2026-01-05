@@ -19,6 +19,7 @@ import {
   Package,
 } from "lucide-react";
 import { LanguageSwitcher } from "./language-switcher";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -27,15 +28,20 @@ export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const getItemCount = useCartStore((state) => state.getItemCount);
+
+  // Subscribe to items directly for reactivity
+  const cartItemCount = useCartStore((state) =>
+    state.items.reduce((total, item) => total + item.quantity, 0)
+  );
 
   // Prevent hydration mismatch: cart count from localStorage differs server vs client
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const cartItemCount = mounted ? getItemCount() : 0;
+  const displayCartCount = mounted ? cartItemCount : 0;
 
   const navLinks = [
     { href: "/", label: t("home") },
@@ -85,19 +91,22 @@ export function Header() {
             <LanguageSwitcher />
 
             {/* Cart */}
-            <Link href="/cart" className="relative">
-              <Button variant="ghost" size="icon">
-                <ShoppingBag className="h-5 w-5" />
-                {cartItemCount > 0 && (
-                  <Badge
-                    variant="tea"
-                    className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs"
-                  >
-                    {cartItemCount}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              onClick={() => setCartDrawerOpen(true)}
+            >
+              <ShoppingBag className="h-5 w-5" />
+              {displayCartCount > 0 && (
+                <Badge
+                  variant="tea"
+                  className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs"
+                >
+                  {displayCartCount}
+                </Badge>
+              )}
+            </Button>
 
             {/* User Menu */}
             {session ? (
@@ -218,6 +227,12 @@ export function Header() {
           </nav>
         )}
       </div>
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        isOpen={cartDrawerOpen}
+        onClose={() => setCartDrawerOpen(false)}
+      />
     </header>
   );
 }

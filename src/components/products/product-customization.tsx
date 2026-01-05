@@ -188,15 +188,15 @@ export function ProductCustomization({
   const productDescription = product.translations[0]?.description;
   const categoryName = product.category?.translations[0]?.name || product.category?.slug;
 
-  // Modal variant: compact floating card
-  // Small, glassmorphic, minimal design
+  // Modal variant: ultra-compact floating card
+  // Minimal, clean, non-intrusive
   if (variant === "modal") {
     return (
-      <div className="flex flex-col p-4">
+      <div className="flex flex-col p-3">
         {/* Compact Header */}
-        <div className="flex gap-3 pr-6">
-          {/* Small product image */}
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-tea-50 to-taro-50">
+        <div className="flex gap-2.5 pr-5">
+          {/* Tiny product image */}
+          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-tea-50 to-taro-50">
             {product.imageUrl ? (
               <img
                 src={product.imageUrl}
@@ -205,34 +205,29 @@ export function ProductCustomization({
               />
             ) : (
               <div className="flex h-full items-center justify-center">
-                <span className="text-2xl">🧋</span>
+                <span className="text-base">🧋</span>
               </div>
             )}
           </div>
 
           {/* Product Info */}
           <div className="flex flex-1 flex-col justify-center min-w-0">
-            <h2 className="text-base font-semibold leading-tight truncate">{productName}</h2>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-sm font-semibold text-tea-600">
-                €{Number(product.price).toFixed(2)}
-              </span>
-              {product.vegan && (
-                <span className="text-[10px] text-green-600 font-medium">• Vegan</span>
-              )}
-            </div>
+            <h2 className="text-sm font-semibold leading-tight truncate">{productName}</h2>
+            <span className="text-xs font-semibold text-tea-600">
+              €{Number(product.price).toFixed(2)}
+            </span>
           </div>
         </div>
 
-        {/* Customization Options - compact */}
+        {/* Customization Options - ultra compact */}
         {customizationGroups.length > 0 && (
-          <div className="mt-4 space-y-3">
+          <div className="mt-2.5 space-y-2">
             {customizationGroups.map((group) => (
               <div key={group.id}>
-                <label className="mb-1.5 block text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <label className="mb-1 block text-[10px] font-medium text-gray-400 uppercase tracking-wider">
                   {getGroupLabel(group.type)}
                 </label>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1">
                   {group.values.map((option) => {
                     const label = option.translations[0]?.label || option.value;
                     const isSelected = selectedOptions[group.type] === option.value;
@@ -247,10 +242,10 @@ export function ProductCustomization({
                           })
                         }
                         className={cn(
-                          "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                          "rounded-full px-2 py-0.5 text-[11px] font-medium transition-all",
                           isSelected
                             ? "bg-tea-500 text-white"
-                            : "bg-gray-100/80 text-gray-600 hover:bg-gray-200/80"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         )}
                       >
                         {label}
@@ -263,13 +258,13 @@ export function ProductCustomization({
           </div>
         )}
 
-        {/* Toppings - compact */}
+        {/* Toppings - ultra compact */}
         {toppings.length > 0 && (
-          <div className="mt-3">
-            <label className="mb-1.5 block text-xs font-medium text-gray-500 uppercase tracking-wide">
+          <div className="mt-2">
+            <label className="mb-1 block text-[10px] font-medium text-gray-400 uppercase tracking-wider">
               {t("customize.toppings")}
             </label>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1">
               {toppings.map((topping) => {
                 const isSelected = selectedToppings.includes(topping.id);
                 return (
@@ -283,15 +278,15 @@ export function ProductCustomization({
                       )
                     }
                     className={cn(
-                      "rounded-full px-2.5 py-1 text-xs font-medium transition-all flex items-center gap-1",
+                      "rounded-full px-2 py-0.5 text-[11px] font-medium transition-all flex items-center gap-0.5",
                       isSelected
                         ? "bg-tea-500 text-white"
-                        : "bg-gray-100/80 text-gray-600 hover:bg-gray-200/80"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     )}
                   >
-                    {isSelected && <Check className="h-2.5 w-2.5" />}
+                    {isSelected && <Check className="h-2 w-2" />}
                     {topping.translations[0]?.name || topping.slug}
-                    <span className="opacity-60">+€{Number(topping.price).toFixed(2)}</span>
+                    <span className="opacity-60 text-[10px]">+€{Number(topping.price).toFixed(2)}</span>
                   </button>
                 );
               })}
@@ -300,25 +295,25 @@ export function ProductCustomization({
         )}
 
         {/* Footer: Quantity + Add Button */}
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-2.5 flex items-center gap-2">
           {/* Quantity controls */}
-          <div className="flex items-center gap-2 rounded-full bg-gray-100/80 px-1">
+          <div className="flex items-center rounded-full bg-gray-100">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
               disabled={quantity <= 1}
               className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-full transition-all",
+                "flex h-6 w-6 items-center justify-center rounded-full transition-all",
                 quantity <= 1 ? "text-gray-300" : "text-gray-600 hover:bg-white"
               )}
             >
-              <Minus className="h-3.5 w-3.5" />
+              <Minus className="h-3 w-3" />
             </button>
-            <span className="w-5 text-center text-sm font-semibold">{quantity}</span>
+            <span className="w-4 text-center text-xs font-semibold">{quantity}</span>
             <button
               onClick={() => setQuantity(quantity + 1)}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-gray-600 transition-all hover:bg-white"
+              className="flex h-6 w-6 items-center justify-center rounded-full text-gray-600 transition-all hover:bg-white"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3 w-3" />
             </button>
           </div>
 
@@ -327,7 +322,7 @@ export function ProductCustomization({
             onClick={handleAddToCart}
             disabled={isAddedToCart}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-sm font-semibold transition-all",
+              "flex flex-1 items-center justify-center gap-1.5 rounded-full py-1.5 text-xs font-semibold transition-all",
               isAddedToCart
                 ? "bg-green-500 text-white"
                 : "bg-tea-500 text-white hover:bg-tea-600"
@@ -335,8 +330,8 @@ export function ProductCustomization({
           >
             {isAddedToCart ? (
               <>
-                <Check className="h-4 w-4" />
-                {locale === "nl" ? "Toegevoegd!" : "Added!"}
+                <Check className="h-3 w-3" />
+                <span>{locale === "nl" ? "Toegevoegd!" : "Added!"}</span>
               </>
             ) : (
               <>

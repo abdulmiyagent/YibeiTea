@@ -263,6 +263,7 @@
     "discount": "Discount",
     "total": "Total",
     "checkout": "Checkout",
+    "viewCart": "View cart",
     "remove": "Remove",
     "updateQuantity": "Update quantity",
     "promoCode": {

@@ -98,7 +98,15 @@ export default function CartPage() {
                   >
                     {/* Product Image */}
                     <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-tea-50 to-taro-50">
-                      <span className="text-4xl">🧋</span>
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          className="h-16 w-16 object-contain"
+                        />
+                      ) : (
+                        <span className="text-4xl">🧋</span>
+                      )}
                     </div>
 
                     {/* Product Info */}
@@ -107,14 +115,21 @@ export default function CartPage() {
                       {item.customizations && (
                         <div className="mt-1 flex flex-wrap gap-1">
                           {item.customizations.sugarLevel !== undefined && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs bg-cream-50 border-cream-200 text-cream-700">
                               {item.customizations.sugarLevel}% suiker
                             </Badge>
                           )}
                           {item.customizations.iceLevel && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs bg-sky-50 border-sky-200 text-sky-700">
                               {item.customizations.iceLevel} ijs
                             </Badge>
+                          )}
+                          {item.customizations.toppings && item.customizations.toppings.length > 0 && (
+                            item.customizations.toppings.map((topping, idx) => (
+                              <Badge key={idx} variant="outline" className="text-xs bg-taro-50 border-taro-200 text-taro-700">
+                                + {topping}
+                              </Badge>
+                            ))
                           )}
                         </div>
                       )}

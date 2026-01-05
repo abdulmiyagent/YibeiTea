@@ -52,23 +52,23 @@ export function ProductModalShell({
       {/* Floating glassmorphic card */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-3xl
-            border border-white/30 bg-white/85 backdrop-blur-xl
-            shadow-[0_8px_32px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.1)_inset]
+          className="pointer-events-auto w-full max-w-xs overflow-hidden rounded-2xl
+            border border-white/30 bg-white/90 backdrop-blur-xl
+            shadow-[0_8px_32px_rgba(0,0,0,0.1)]
             animate-in fade-in-0 zoom-in-95 duration-200"
         >
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center
-              rounded-full bg-gray-100/80 text-gray-500 transition-colors
-              hover:bg-gray-200/80 hover:text-gray-700"
+            className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center
+              rounded-full bg-gray-100/80 text-gray-400 transition-colors
+              hover:bg-gray-200/80 hover:text-gray-600"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
 
           {/* Content */}
-          <div className="max-h-[75vh] overflow-y-auto">
+          <div className="max-h-[70vh] overflow-y-auto">
             <ProductCustomization
               product={product}
               customizationGroups={customizationGroups}

@@ -514,6 +514,35 @@ yibei-tea/
 - [x] **Keyboard support** - Escape om te sluiten
 - [x] **Smooth animations** - `animate-in fade-in zoom-in-95`
 
+#### Cart Drawer
+- [x] **Cart drawer implementatie** - Slide-in panel vanuit header cart icon
+- [x] **Layout fix** - `h-screen` + `flex flex-col` + `min-h-0` voor proper overflow
+- [x] **Scroll lock** - Body scroll disabled wanneer drawer open
+- [x] **Escape key support** - Keyboard navigatie
+- [x] **Customizations weergave** - Sugar level, ice level, toppings badges
+- [x] **Quantity controls** - Inline stepper per item
+- [x] **Glassmorphic styling** - Consistent met modal design
+
+#### UX Research: Product Card Formaat (Menu Pagina)
+**Conclusie:** Huidige cards zijn te groot voor 64+ producten. Aanbevelingen:
+
+| Platform Benchmark | Items/Scherm (Mobile) |
+|-------------------|----------------------|
+| Uber Eats         | 2-3 items            |
+| Starbucks         | 4-5 items            |
+| Heytea/Gong Cha   | 3-4 items            |
+| **Yibei Tea (huidig)** | **1.5-2 items** |
+
+**Aanbevolen aanpassingen:**
+- [ ] `aspect-square` → `aspect-[4/3]` (25% hoogtebesparing)
+- [ ] Beschrijving verwijderen van card (toon in modal)
+- [ ] Full-width button → icon-only (+)
+- [ ] `gap-6` → `gap-4` (compacter)
+- [ ] Sticky category headers voor snelle navigatie
+- [ ] (Later) View toggle: grid/list voor power users
+
+**Bronnen:** Baymard Institute, NN/g, Cieden UX, Mobbin patterns
+
 ---
 
 ### ⏳ Openstaande To-Do's
@@ -523,18 +552,12 @@ yibei-tea/
 - [ ] **API key toevoegen** in `.env` (MOLLIE_API_KEY)
 - [ ] **Test betaling uitvoeren** via checkout flow
 
-#### Prioriteit 2: Cart & Checkout Verbeteren
-- [ ] **Cart drawer/sidebar implementeren**
-  - Slide-in panel vanuit header cart icon
-  - Snelle toegang zonder pagina navigatie
-  > **📱 App-ready:** In native apps wordt dit een bottom sheet of modal.
-
-- [ ] **Cart items tonen met customizations**
-  - Suikerniveau, ijsniveau, toppings weergeven
-  - Edit mogelijkheid (terug naar customization)
-
+#### Prioriteit 2: Checkout Flow Voltooien
+- [x] **Cart drawer/sidebar implementeren** ✅
+- [x] **Cart items tonen met customizations** ✅
 - [ ] **Checkout flow: customizations meesturen**
   - OrderItem.customizations correct vullen bij bestelling
+- [ ] **Menu page cards optimaliseren** (zie UX Research hierboven)
 
 #### Prioriteit 3: Admin Dashboard Uitbreiden
 - [ ] **Admin producten beheer pagina**
