@@ -1,8 +1,25 @@
 # Yibei Tea - Project Documentation
 
+> **Version:** 1.0.0
 > **Last Updated:** 2026-01-05
 > **Status:** Active Development
 > **Repository:** github.com/abdulmiyagent/YibeiTea
+
+---
+
+## TL;DR
+
+**Wat:** Online bestelplatform voor Yibei Tea, een bubble tea shop in Gent.
+
+**Stack:** Next.js 14 + TypeScript + Tailwind + tRPC + Prisma + Supabase
+
+**Status:** Menu, cart, checkout en admin dashboard zijn klaar. Betalingen (Mollie) en e-mail (Resend) nog te implementeren.
+
+**Key beslissingen:**
+- Horizontale compacte kaarten op menu (6-7 items zichtbaar per scherm)
+- Intercepting route modals voor product customization
+- Data-driven customization (database, niet hardcoded)
+- Zustand voor state (voorbereiding React Native app)
 
 ---
 
@@ -334,7 +351,36 @@ src/app/[locale]/
 
 ---
 
-## 9. Open Questions & Future Ideas
+## 9. Risks & Dependencies
+
+### External Dependencies
+
+| Dependency | Risk Level | Mitigation |
+|------------|------------|------------|
+| Supabase (Database) | Medium | Free tier limits; upgrade path available |
+| Vercel (Hosting) | Low | Standard Next.js deployment; easy to migrate |
+| Mollie (Payments) | Medium | Benelux-only; alternative: Stripe for expansion |
+| Resend (Email) | Low | Easy to replace with SendGrid/Mailgun |
+
+### Technical Risks
+
+| Risk | Impact | Likelihood | Mitigation |
+|------|--------|------------|------------|
+| Supabase free tier exceeded | High | Low | Monitor usage; upgrade plan if needed |
+| Next.js breaking changes | Medium | Medium | Pin versions; test before upgrading |
+| Browser compatibility (backdrop-blur) | Low | Low | Fallback solid backgrounds |
+
+### Business Risks
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Low adoption | High | Marketing plan; in-store promotion |
+| Payment failures | High | Comprehensive error handling; manual order option |
+| Peak time overload | Medium | Pickup time slot limits; queue management |
+
+---
+
+## 10. Open Questions & Future Ideas
 
 ### Open Questions
 - [ ] What are the exact loyalty point thresholds for tier upgrades?
@@ -355,7 +401,7 @@ src/app/[locale]/
 
 ---
 
-## 10. How to Work on This Project
+## 11. How to Work on This Project
 
 ### Development Setup
 
