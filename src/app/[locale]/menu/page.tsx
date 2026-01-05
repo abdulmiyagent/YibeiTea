@@ -135,7 +135,7 @@ export default function MenuPage() {
 
         {/* Products Grid */}
         {!isLoading && (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-8 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {filteredProducts.map((product) => {
               const translation = product.translations[0];
               const categoryTranslation = product.category?.translations[0];
@@ -146,86 +146,48 @@ export default function MenuPage() {
                   href={`/${locale}/menu/${product.slug}`}
                   className="block"
                 >
-                  <Card className="product-card group overflow-hidden cursor-pointer transition-shadow hover:shadow-lg">
-                    <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-tea-50 to-taro-50">
-                      {product.imageUrl ? (
-                        <img
-                          src={product.imageUrl}
-                          alt={translation?.name || product.slug}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-7xl transition-transform group-hover:scale-110">
-                            🧋
-                          </span>
-                        </div>
-                      )}
-                      {/* Badges */}
-                      <div className="absolute left-3 top-3 flex flex-col gap-1">
-                        {product.vegan && (
-                          <Badge variant="matcha" className="text-xs">
-                            <Leaf className="mr-1 h-3 w-3" />
-                            Vegan
-                          </Badge>
-                        )}
-                        {!product.caffeine && (
-                          <Badge variant="secondary" className="text-xs">
-                            {locale === "nl" ? "Cafeïnevrij" : "Caffeine-free"}
-                          </Badge>
+                  <Card className="product-card group overflow-hidden cursor-pointer transition-all hover:shadow-md hover:bg-tea-50/50">
+                    <div className="flex items-center gap-3 p-3">
+                      {/* Compact thumbnail */}
+                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-tea-50 to-taro-50">
+                        {product.imageUrl ? (
+                          <img
+                            src={product.imageUrl}
+                            alt={translation?.name || product.slug}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center">
+                            <span className="text-2xl">🧋</span>
+                          </div>
                         )}
                       </div>
-                      {/* Quick add button - navigates to modal */}
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-xs text-tea-600 font-medium">
+                            {categoryTranslation?.name || product.category?.slug}
+                          </p>
+                          {product.vegan && (
+                            <Leaf className="h-3 w-3 text-matcha-500" />
+                          )}
+                        </div>
+                        <h3 className="font-semibold text-sm mt-0.5 line-clamp-1">
+                          {translation?.name || product.slug}
+                        </h3>
+                        <span className="text-sm font-bold text-tea-600 mt-0.5 block">
+                          €{Number(product.price).toFixed(2)}
+                        </span>
+                      </div>
+                      {/* Add button */}
                       <Button
                         size="icon"
                         variant="tea"
-                        className="absolute bottom-3 right-3 opacity-0 transition-opacity group-hover:opacity-100"
+                        className="h-9 w-9 flex-shrink-0 rounded-full"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
-                      {/* Favorite button */}
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="absolute right-3 top-3 h-8 w-8 bg-white/80 backdrop-blur"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        <Heart className="h-4 w-4" />
-                      </Button>
                     </div>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="text-xs text-tea-600 font-medium mb-1">
-                            {categoryTranslation?.name || product.category?.slug}
-                          </p>
-                          <h3 className="font-semibold">{translation?.name || product.slug}</h3>
-                          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                            {translation?.description}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-3 flex items-center justify-between">
-                        <span className="text-lg font-bold text-tea-600">
-                          €{Number(product.price).toFixed(2)}
-                        </span>
-                        {product.calories && (
-                          <span className="text-xs text-muted-foreground">
-                            {product.calories} {t("calories")}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-3">
-                        <Button
-                          className="w-full"
-                          variant="tea"
-                          size="sm"
-                        >
-                          <Plus className="mr-1 h-4 w-4" />
-                          {t("addToCart")}
-                        </Button>
-                      </div>
-                    </CardContent>
                   </Card>
                 </Link>
               );

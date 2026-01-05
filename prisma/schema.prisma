@@ -8,33 +8,351 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ============ AUTH MODELS ============
-
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
+model Address {
+  id         String   @id
+  userId     String
+  name       String
+  street     String
+  city       String
+  postalCode String
+  country    String   @default("BE")
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Allergen {
+  id                  String                @id
+  code                String                @unique
+  AllergenTranslation AllergenTranslation[]
+  ProductAllergen     ProductAllergen[]
+}
+
+model AllergenTranslation {
+  id         String   @id
+  allergenId String
+  locale     String
+  name       String
+  Allergen   Allergen @relation(fields: [allergenId], references: [id], onDelete: Cascade)
+
+  @@unique([allergenId, locale])
+}
+
+model Category {
+  id                  String                @id
+  slug                String                @unique
+  sortOrder           Int                   @default(0)
+  isActive            Boolean               @default(true)
+  imageUrl            String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime
+  CategoryTranslation CategoryTranslation[]
+  Product             Product[]
+}
+
+model CategoryTranslation {
+  id          String   @id
+  categoryId  String
+  locale      String
+  name        String
+  description String?
+  Category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
+}
+
+model CustomizationGroup {
+  id                 String               @id
+  type               CustomizationType    @unique
+  isActive           Boolean              @default(true)
+  sortOrder          Int                  @default(0)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  CustomizationValue CustomizationValue[]
+}
+
+model CustomizationOption {
+  id                       String                     @id
+  productId                String
+  type                     CustomizationType
+  priceModifier            Decimal                    @default(0) @db.Decimal(10, 2)
+  Product                  Product                    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  CustomizationTranslation CustomizationTranslation[]
+}
+
+model CustomizationTranslation {
+  id                    String              @id
+  customizationOptionId String
+  locale                String
+  name                  String
+  CustomizationOption   CustomizationOption @relation(fields: [customizationOptionId], references: [id], onDelete: Cascade)
+
+  @@unique([customizationOptionId, locale])
+}
+
+model CustomizationValue {
+  id                            String                          @id
+  groupId                       String
+  value                         String
+  priceModifier                 Decimal                         @default(0) @db.Decimal(10, 2)
+  isDefault                     Boolean                         @default(false)
+  isAvailable                   Boolean                         @default(true)
+  sortOrder                     Int                             @default(0)
+  CustomizationGroup            CustomizationGroup              @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  CustomizationValueTranslation CustomizationValueTranslation[]
+
+  @@unique([groupId, value])
+}
+
+model CustomizationValueTranslation {
+  id                 String             @id
+  valueId            String
+  locale             String
+  label              String
+  CustomizationValue CustomizationValue @relation(fields: [valueId], references: [id], onDelete: Cascade)
+
+  @@unique([valueId, locale])
+}
+
+model Favorite {
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, productId])
+}
+
+model LoyaltyTransaction {
+  id          String                 @id
+  userId      String
+  orderId     String?
+  type        LoyaltyTransactionType
+  points      Int
+  description String?
+  createdAt   DateTime               @default(now())
+  User        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id              String        @id
+  orderNumber     String        @unique
+  userId          String?
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  molliePaymentId String?
+  subtotal        Decimal       @db.Decimal(10, 2)
+  discount        Decimal       @default(0) @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  pointsEarned    Int           @default(0)
+  pointsRedeemed  Int           @default(0)
+  pickupTime      DateTime?
+  customerName    String?
+  customerEmail   String?
+  customerPhone   String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime
+  User            User?         @relation(fields: [userId], references: [id])
+  OrderItem       OrderItem[]
+}
+
+model OrderItem {
+  id             String  @id
+  orderId        String
+  productId      String
+  quantity       Int
+  unitPrice      Decimal @db.Decimal(10, 2)
+  totalPrice     Decimal @db.Decimal(10, 2)
+  customizations Json?
+  Order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  Product        Product @relation(fields: [productId], references: [id])
+}
+
+model Product {
+  id                         String                       @id
+  slug                       String                       @unique
+  categoryId                 String
+  price                      Decimal                      @db.Decimal(10, 2)
+  imageUrl                   String?
+  isAvailable                Boolean                      @default(true)
+  isFeatured                 Boolean                      @default(false)
+  sortOrder                  Int                          @default(0)
+  calories                   Int?
+  caffeine                   Boolean                      @default(true)
+  vegan                      Boolean                      @default(false)
+  createdAt                  DateTime                     @default(now())
+  updatedAt                  DateTime
+  CustomizationOption        CustomizationOption[]
+  Favorite                   Favorite[]
+  OrderItem                  OrderItem[]
+  Category                   Category                     @relation(fields: [categoryId], references: [id])
+  ProductAllergen            ProductAllergen[]
+  ProductCustomizationConfig ProductCustomizationConfig[]
+  ProductTranslation         ProductTranslation[]
+}
+
+model ProductAllergen {
+  productId  String
+  allergenId String
+  Allergen   Allergen @relation(fields: [allergenId], references: [id], onDelete: Cascade)
+  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, allergenId])
+}
+
+model ProductCustomizationConfig {
+  id        String            @id
+  productId String
+  type      CustomizationType
+  required  Boolean           @default(false)
+  Product   Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, type])
+}
+
+model ProductTranslation {
+  id          String  @id
+  productId   String
+  locale      String
+  name        String
+  description String
+  Product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, locale])
+}
+
+model PromoCode {
+  id             String       @id
+  code           String       @unique
+  discountType   DiscountType
+  discountValue  Decimal      @db.Decimal(10, 2)
+  minOrderAmount Decimal?     @db.Decimal(10, 2)
+  maxUses        Int?
+  usedCount      Int          @default(0)
+  validFrom      DateTime
+  validUntil     DateTime
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime
+}
+
+model Review {
+  id         String   @id
+  userId     String
+  rating     Int
+  comment    String?
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Reward {
+  id                String              @id
+  slug              String              @unique
+  pointsCost        Int
+  isAvailable       Boolean             @default(true)
+  rewardType        String
+  rewardValue       Decimal             @db.Decimal(10, 2)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime
+  RewardTranslation RewardTranslation[]
+}
+
+model RewardTranslation {
+  id          String @id
+  rewardId    String
+  locale      String
+  name        String
+  description String
+  Reward      Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@unique([rewardId, locale])
+}
+
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StoreSettings {
+  id                  String   @id @default("default")
+  openingHours        Json
+  minPickupMinutes    Int      @default(15)
+  maxAdvanceOrderDays Int      @default(7)
+  pointsPerEuro       Int      @default(10)
+  updatedAt           DateTime
+}
+
+model Topping {
+  id                 String               @id
+  slug               String               @unique
+  price              Decimal              @db.Decimal(10, 2)
+  isAvailable        Boolean              @default(true)
+  sortOrder          Int                  @default(0)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  ToppingTranslation ToppingTranslation[]
+}
+
+model ToppingTranslation {
+  id        String  @id
+  toppingId String
+  locale    String
+  name      String
+  Topping   Topping @relation(fields: [toppingId], references: [id], onDelete: Cascade)
+
+  @@unique([toppingId, locale])
+}
+
+model User {
+  id                 String               @id
+  name               String?
+  email              String               @unique
+  emailVerified      DateTime?
+  image              String?
+  phone              String?
+  dateOfBirth        DateTime?
+  role               UserRole             @default(USER)
+  twoFactorSecret    String?
+  twoFactorEnabled   Boolean              @default(false)
+  twoFactorVerified  DateTime?
+  loyaltyPoints      Int                  @default(0)
+  loyaltyTier        LoyaltyTier          @default(BRONZE)
+  preferredLanguage  String               @default("nl")
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  Account            Account[]
+  Address            Address[]
+  Favorite           Favorite[]
+  LoyaltyTransaction LoyaltyTransaction[]
+  Order              Order[]
+  Review             Review[]
+  Session            Session[]
 }
 
 model VerificationToken {
@@ -45,203 +363,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ============ USER MODEL ============
-
-enum LoyaltyTier {
-  BRONZE
-  SILVER
-  GOLD
-}
-
-enum UserRole {
-  USER
-  ADMIN
-  SUPER_ADMIN
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  phone         String?
-  dateOfBirth   DateTime?
-  role          UserRole  @default(USER)
-
-  // Two-Factor Authentication (required for SUPER_ADMIN)
-  twoFactorSecret   String?   // TOTP secret (encrypted)
-  twoFactorEnabled  Boolean   @default(false)
-  twoFactorVerified DateTime? // When 2FA was last verified
-
-  // Loyalty
-  loyaltyPoints Int         @default(0)
-  loyaltyTier   LoyaltyTier @default(BRONZE)
-
-  // Preferences
-  preferredLanguage String @default("nl")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  accounts            Account[]
-  sessions            Session[]
-  orders              Order[]
-  reviews             Review[]
-  loyaltyTransactions LoyaltyTransaction[]
-  favorites           Favorite[]
-  addresses           Address[]
-}
-
-model Address {
-  id        String  @id @default(cuid())
-  userId    String
-  name      String
-  street    String
-  city      String
-  postalCode String
-  country   String @default("BE")
-  isDefault Boolean @default(false)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// ============ PRODUCT MODELS ============
-
-model Category {
-  id          String  @id @default(cuid())
-  slug        String  @unique
-  sortOrder   Int     @default(0)
-  isActive    Boolean @default(true)
-  imageUrl    String?
-
-  // Translations
-  translations CategoryTranslation[]
-
-  // Products in this category
-  products    Product[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model CategoryTranslation {
-  id          String @id @default(cuid())
-  categoryId  String
-  locale      String // 'nl' or 'en'
-  name        String
-  description String? @db.Text
-
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@unique([categoryId, locale])
-}
-
-model Product {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  categoryId  String
-  price       Decimal  @db.Decimal(10, 2)
-  imageUrl    String?
-  isAvailable Boolean  @default(true)
-  isFeatured  Boolean  @default(false)
-  sortOrder   Int      @default(0)
-
-  // Nutritional info
-  calories    Int?
-  caffeine    Boolean @default(true)
-  vegan       Boolean @default(false)
-
-  // Translations
-  translations ProductTranslation[]
-
-  // Customization
-  customizationOptions CustomizationOption[]
-  customizationConfigs ProductCustomizationConfig[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  category   Category    @relation(fields: [categoryId], references: [id])
-  orderItems OrderItem[]
-  favorites  Favorite[]
-  allergens  ProductAllergen[]
-}
-
-model ProductTranslation {
-  id          String @id @default(cuid())
-  productId   String
-  locale      String // 'nl' or 'en'
-  name        String
-  description String @db.Text
-
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@unique([productId, locale])
-}
-
-model Allergen {
-  id   String @id @default(cuid())
-  code String @unique // e.g., 'milk', 'nuts', 'soy'
-
-  translations AllergenTranslation[]
-  products     ProductAllergen[]
-}
-
-model AllergenTranslation {
-  id         String @id @default(cuid())
-  allergenId String
-  locale     String
-  name       String
-
-  allergen Allergen @relation(fields: [allergenId], references: [id], onDelete: Cascade)
-
-  @@unique([allergenId, locale])
-}
-
-model ProductAllergen {
-  productId  String
-  allergenId String
-
-  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  allergen Allergen @relation(fields: [allergenId], references: [id], onDelete: Cascade)
-
-  @@id([productId, allergenId])
-}
-
-// ============ TOPPING MODEL ============
-
-model Topping {
-  id          String  @id @default(cuid())
-  slug        String  @unique
-  price       Decimal @db.Decimal(10, 2)
-  isAvailable Boolean @default(true)
-  sortOrder   Int     @default(0)
-
-  translations ToppingTranslation[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ToppingTranslation {
-  id        String @id @default(cuid())
-  toppingId String
-  locale    String
-  name      String
-
-  topping Topping @relation(fields: [toppingId], references: [id], onDelete: Cascade)
-
-  @@unique([toppingId, locale])
-}
-
-// ============ CUSTOMIZATION MODELS ============
-
 enum CustomizationType {
   SUGAR_LEVEL
   ICE_LEVEL
@@ -249,84 +370,24 @@ enum CustomizationType {
   MILK_TYPE
 }
 
-// Global customization groups (admin-manageable)
-model CustomizationGroup {
-  id        String            @id @default(cuid())
-  type      CustomizationType @unique
-  isActive  Boolean           @default(true)
-  sortOrder Int               @default(0)
-
-  values CustomizationValue[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
 }
 
-// Individual values within a customization group
-model CustomizationValue {
-  id            String  @id @default(cuid())
-  groupId       String
-  value         String  // e.g., "0", "25", "50", "75", "100" or "none", "less", "normal", "extra"
-  priceModifier Decimal @default(0) @db.Decimal(10, 2)
-  isDefault     Boolean @default(false)
-  isAvailable   Boolean @default(true)
-  sortOrder     Int     @default(0)
-
-  group        CustomizationGroup               @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  translations CustomizationValueTranslation[]
-
-  @@unique([groupId, value])
+enum LoyaltyTier {
+  BRONZE
+  SILVER
+  GOLD
 }
 
-model CustomizationValueTranslation {
-  id      String @id @default(cuid())
-  valueId String
-  locale  String // "nl" | "en"
-  label   String // e.g., "Geen suiker", "No sugar"
-
-  value CustomizationValue @relation(fields: [valueId], references: [id], onDelete: Cascade)
-
-  @@unique([valueId, locale])
+enum LoyaltyTransactionType {
+  EARN
+  REDEEM
+  BONUS
+  EXPIRE
+  ADJUSTMENT
 }
-
-// Per-product customization config (which types are available for which products)
-model ProductCustomizationConfig {
-  id        String            @id @default(cuid())
-  productId String
-  type      CustomizationType
-  required  Boolean           @default(false)
-
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@unique([productId, type])
-}
-
-// Legacy model - kept for backwards compatibility, can be removed later
-model CustomizationOption {
-  id        String            @id @default(cuid())
-  productId String
-  type      CustomizationType
-
-  // Price modifier (can be 0 for no extra cost)
-  priceModifier Decimal @default(0) @db.Decimal(10, 2)
-
-  translations CustomizationTranslation[]
-
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-}
-
-model CustomizationTranslation {
-  id                    String @id @default(cuid())
-  customizationOptionId String
-  locale                String
-  name                  String
-
-  customizationOption CustomizationOption @relation(fields: [customizationOptionId], references: [id], onDelete: Cascade)
-
-  @@unique([customizationOptionId, locale])
-}
-
-// ============ ORDER MODELS ============
 
 enum OrderStatus {
   PENDING
@@ -344,179 +405,8 @@ enum PaymentStatus {
   REFUNDED
 }
 
-model Order {
-  id          String        @id @default(cuid())
-  orderNumber String        @unique
-  userId      String?
-
-  status        OrderStatus   @default(PENDING)
-  paymentStatus PaymentStatus @default(PENDING)
-
-  // Mollie
-  molliePaymentId String?
-
-  // Pricing
-  subtotal    Decimal @db.Decimal(10, 2)
-  discount    Decimal @default(0) @db.Decimal(10, 2)
-  total       Decimal @db.Decimal(10, 2)
-
-  // Points
-  pointsEarned  Int @default(0)
-  pointsRedeemed Int @default(0)
-
-  // Pickup
-  pickupTime DateTime?
-
-  // Customer info (for guest orders)
-  customerName  String?
-  customerEmail String?
-  customerPhone String?
-
-  // Notes
-  notes String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  user  User?       @relation(fields: [userId], references: [id])
-  items OrderItem[]
-}
-
-model OrderItem {
-  id        String @id @default(cuid())
-  orderId   String
-  productId String
-  quantity  Int
-  unitPrice Decimal @db.Decimal(10, 2)
-  totalPrice Decimal @db.Decimal(10, 2)
-
-  // Store customizations as JSON
-  customizations Json?
-
-  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
-}
-
-// ============ LOYALTY MODELS ============
-
-enum LoyaltyTransactionType {
-  EARN
-  REDEEM
-  BONUS
-  EXPIRE
-  ADJUSTMENT
-}
-
-model LoyaltyTransaction {
-  id      String                 @id @default(cuid())
-  userId  String
-  orderId String?
-  type    LoyaltyTransactionType
-  points  Int
-  description String?
-
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Reward {
-  id              String  @id @default(cuid())
-  slug            String  @unique
-  pointsCost      Int
-  isAvailable     Boolean @default(true)
-
-  // Can be product discount, free item, etc.
-  rewardType      String  // 'FREE_DRINK', 'DISCOUNT_PERCENT', 'DISCOUNT_AMOUNT'
-  rewardValue     Decimal @db.Decimal(10, 2)
-
-  translations RewardTranslation[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model RewardTranslation {
-  id          String @id @default(cuid())
-  rewardId    String
-  locale      String
-  name        String
-  description String @db.Text
-
-  reward Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
-
-  @@unique([rewardId, locale])
-}
-
-// ============ REVIEW MODEL ============
-
-model Review {
-  id        String  @id @default(cuid())
-  userId    String
-  rating    Int // 1-5
-  comment   String? @db.Text
-  isApproved Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// ============ FAVORITES ============
-
-model Favorite {
-  userId    String
-  productId String
-
-  createdAt DateTime @default(now())
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@id([userId, productId])
-}
-
-// ============ PROMO CODES ============
-
-enum DiscountType {
-  PERCENTAGE
-  FIXED_AMOUNT
-}
-
-model PromoCode {
-  id          String       @id @default(cuid())
-  code        String       @unique
-  discountType DiscountType
-  discountValue Decimal    @db.Decimal(10, 2)
-
-  minOrderAmount Decimal?  @db.Decimal(10, 2)
-  maxUses        Int?
-  usedCount      Int       @default(0)
-
-  validFrom DateTime
-  validUntil DateTime
-  isActive  Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// ============ STORE SETTINGS ============
-
-model StoreSettings {
-  id String @id @default("default")
-
-  // Opening hours (stored as JSON)
-  openingHours Json
-
-  // Order settings
-  minPickupMinutes Int @default(15)
-  maxAdvanceOrderDays Int @default(7)
-
-  // Loyalty settings
-  pointsPerEuro Int @default(10)
-
-  updatedAt DateTime @updatedAt
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
 }

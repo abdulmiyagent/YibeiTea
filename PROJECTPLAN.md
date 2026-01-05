@@ -524,20 +524,23 @@ yibei-tea/
 - [x] **Glassmorphic styling** - Consistent met modal design
 
 #### UX Research: Product Card Formaat (Menu Pagina)
-**Conclusie:** Huidige cards zijn te groot voor 64+ producten. Aanbevelingen:
+**Conclusie:** Originele cards waren te groot voor 64+ producten.
 
 | Platform Benchmark | Items/Scherm (Mobile) |
 |-------------------|----------------------|
 | Uber Eats         | 2-3 items            |
 | Starbucks         | 4-5 items            |
 | Heytea/Gong Cha   | 3-4 items            |
-| **Yibei Tea (huidig)** | **1.5-2 items** |
+| Yibei Tea (was)   | 1.5-2 items          |
+| **Yibei Tea (nu)** | **6-7 items** ✅     |
 
-**Aanbevolen aanpassingen:**
-- [ ] `aspect-square` → `aspect-[4/3]` (25% hoogtebesparing)
-- [ ] Beschrijving verwijderen van card (toon in modal)
-- [ ] Full-width button → icon-only (+)
-- [ ] `gap-6` → `gap-4` (compacter)
+**Geïmplementeerd: Horizontal Compact List**
+- [x] Layout: horizontal list (thumbnail links, info rechts)
+- [x] Thumbnail: 64x64px (`h-16 w-16`)
+- [x] Card hoogte: ~80px (was ~300px)
+- [x] Gap: 12px (`gap-3`)
+- [x] Icon-only add button (ronde `[+]`)
+- [x] Beschrijving verwijderd (toon in modal)
 - [ ] Sticky category headers voor snelle navigatie
 - [ ] (Later) View toggle: grid/list voor power users
 
@@ -555,9 +558,9 @@ yibei-tea/
 #### Prioriteit 2: Checkout Flow Voltooien
 - [x] **Cart drawer/sidebar implementeren** ✅
 - [x] **Cart items tonen met customizations** ✅
+- [x] **Menu page cards optimaliseren** ✅ (compact cards met icon-only button)
 - [ ] **Checkout flow: customizations meesturen**
   - OrderItem.customizations correct vullen bij bestelling
-- [ ] **Menu page cards optimaliseren** (zie UX Research hierboven)
 
 #### Prioriteit 3: Admin Dashboard Uitbreiden
 - [ ] **Admin producten beheer pagina**
