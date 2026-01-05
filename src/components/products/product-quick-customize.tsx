@@ -101,7 +101,9 @@ export function ProductQuickCustomize({
           ? parseInt(selectedOptions["SUGAR_LEVEL"])
           : undefined,
         iceLevel: selectedOptions["ICE_LEVEL"],
-        toppings: toppingNames,
+        size: selectedOptions["SIZE"],
+        milkType: selectedOptions["MILK_TYPE"],
+        toppings: toppingNames.length > 0 ? toppingNames : undefined,
       },
     });
 

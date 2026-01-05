@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/stores/cart-store";
 import { formatPrice } from "@/lib/utils";
+import { api } from "@/lib/trpc";
 import {
   User,
   Clock,
@@ -19,6 +20,7 @@ import {
   ChevronRight,
   Check,
   ArrowLeft,
+  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -60,10 +62,22 @@ export default function CheckoutPage() {
   const t = useTranslations("checkout");
   const router = useRouter();
   const { data: session } = useSession();
-  const { items, getSubtotal, getTotal, discount, clearCart } = useCartStore();
+  const { items, getSubtotal, getTotal, discount, promoCode, clearCart } = useCartStore();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const createOrderMutation = api.orders.create.useMutation({
+    onSuccess: (order) => {
+      clearCart();
+      router.push(`/order/confirmation?orderNumber=${order.orderNumber}`);
+    },
+    onError: (err) => {
+      setError(err.message || "Er is een fout opgetreden bij het plaatsen van je bestelling.");
+      setIsProcessing(false);
+    },
+  });
 
   // Form state
   const [formData, setFormData] = useState({
@@ -97,13 +111,26 @@ export default function CheckoutPage() {
 
   const handleSubmit = async () => {
     setIsProcessing(true);
+    setError(null);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Build pickup datetime
+    const pickupDateTime = `${formData.pickupDate}T${formData.pickupTime}:00`;
 
-    // Clear cart and redirect to confirmation
-    clearCart();
-    router.push("/order/confirmation?orderNumber=YBT-ABC123");
+    // Create order with cart items and customizations
+    createOrderMutation.mutate({
+      items: items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        customizations: item.customizations || undefined,
+      })),
+      customerName: formData.name,
+      customerEmail: formData.email,
+      customerPhone: formData.phone || undefined,
+      pickupTime: pickupDateTime,
+      notes: formData.notes || undefined,
+      promoCode: promoCode || undefined,
+    });
   };
 
   if (items.length === 0) {
@@ -279,6 +306,14 @@ export default function CheckoutPage() {
                         </button>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {error && (
+                  <div className="mt-4 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                    <span>{error}</span>
                   </div>
                 )}
 
