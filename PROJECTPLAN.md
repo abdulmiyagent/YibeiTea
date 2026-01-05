@@ -504,6 +504,16 @@ yibei-tea/
 - [x] **Menu pagina: klik opent modal** - Link navigatie i.p.v. direct add-to-cart
 - [x] **Layout updated** - `{modal}` parallel route slot toegevoegd
 
+#### UI/UX: Floating Card Modal (iOS Liquid Glass Design)
+- [x] **Bottom sheet → Floating card** - Kleiner, compacter, minder dominant
+- [x] **Glassmorphic styling** - `bg-white/85 backdrop-blur-xl border-white/30`
+- [x] **Subtiele backdrop** - `bg-black/20 backdrop-blur-[2px]`
+- [x] **Compact product header** - 56x56px thumbnail met inline info
+- [x] **Pill-style selectors** - Kleine rounded buttons voor customization opties
+- [x] **Inline footer** - Quantity stepper + Add knop naast elkaar
+- [x] **Keyboard support** - Escape om te sluiten
+- [x] **Smooth animations** - `animate-in fade-in zoom-in-95`
+
 ---
 
 ### ⏳ Openstaande To-Do's
