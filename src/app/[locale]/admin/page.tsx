@@ -6,12 +6,14 @@ import { useRouter } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/trpc";
 import {
   ShoppingBag,
   Euro,
   Clock,
   Users,
   TrendingUp,
+  TrendingDown,
   Package,
   BarChart3,
   Settings,
@@ -20,63 +22,26 @@ import {
   Cherry,
   Shield,
   FolderOpen,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 
-// Sample data - would come from database
-const stats = {
-  todayOrders: 24,
-  todayRevenue: 132.5,
-  pendingOrders: 3,
-  totalCustomers: 156,
-};
-
-const recentOrders = [
-  {
-    id: "YBT-XYZ789",
-    customer: "Emma V.",
-    items: ["Classic Taro", "Brown Sugar Boba"],
-    total: 11.0,
-    status: "PREPARING",
-    time: "14:30",
-  },
-  {
-    id: "YBT-ABC123",
-    customer: "Thomas D.",
-    items: ["Matcha Latte"],
-    total: 5.5,
-    status: "READY",
-    time: "14:15",
-  },
-  {
-    id: "YBT-DEF456",
-    customer: "Lisa M.",
-    items: ["Peach Garden Mojito", "Green Apple Ice Tea"],
-    total: 11.5,
-    status: "PENDING",
-    time: "14:45",
-  },
-];
-
-const popularProducts = [
-  { name: "Classic Taro", orders: 45 },
-  { name: "Brown Sugar Boba", orders: 38 },
-  { name: "Matcha Latte", orders: 32 },
-  { name: "Strawberry Ice Tea", orders: 28 },
-];
-
 const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-800",
-  PREPARING: "bg-blue-100 text-blue-800",
+  PAID: "bg-blue-100 text-blue-800",
+  PREPARING: "bg-orange-100 text-orange-800",
   READY: "bg-green-100 text-green-800",
   COMPLETED: "bg-gray-100 text-gray-800",
+  CANCELLED: "bg-red-100 text-red-800",
 };
 
 const statusLabels = {
   PENDING: "In afwachting",
+  PAID: "Betaald",
   PREPARING: "In bereiding",
   READY: "Klaar",
   COMPLETED: "Afgehaald",
+  CANCELLED: "Geannuleerd",
 };
 
 export default function AdminDashboardPage() {
@@ -84,17 +49,35 @@ export default function AdminDashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
+  // Fetch real data from database
+  const { data: todayStats, isLoading: statsLoading } = api.orders.getTodayStats.useQuery(
+    undefined,
+    { enabled: status === "authenticated" && (session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN") }
+  );
+
+  const { data: recentOrders, isLoading: ordersLoading } = api.orders.getRecentOrders.useQuery(
+    { limit: 3 },
+    { enabled: status === "authenticated" && (session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN") }
+  );
+
+  const { data: popularProducts, isLoading: productsLoading } = api.orders.getPopularProducts.useQuery(
+    undefined,
+    { enabled: status === "authenticated" && (session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN") }
+  );
+
+  const { data: customerStats, isLoading: customersLoading } = api.users.getCustomerCount.useQuery(
+    undefined,
+    { enabled: status === "authenticated" && (session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN") }
+  );
+
+  const isLoading = statsLoading || ordersLoading || productsLoading || customersLoading;
+
   if (status === "loading") {
     return (
       <div className="section-padding">
         <div className="container-custom">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 w-48 rounded bg-muted" />
-            <div className="grid gap-4 md:grid-cols-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 rounded bg-muted" />
-              ))}
-            </div>
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
           </div>
         </div>
       </div>
@@ -109,6 +92,15 @@ export default function AdminDashboardPage() {
     router.push("/");
     return null;
   }
+
+  // Calculate percentage changes
+  const orderChange = todayStats?.yesterdayCount
+    ? Math.round(((todayStats.count - todayStats.yesterdayCount) / todayStats.yesterdayCount) * 100)
+    : 0;
+
+  const revenueChange = todayStats?.yesterdayRevenue
+    ? Math.round(((todayStats.revenue - todayStats.yesterdayRevenue) / todayStats.yesterdayRevenue) * 100)
+    : 0;
 
   return (
     <div className="section-padding bg-muted/30">
@@ -140,15 +132,21 @@ export default function AdminDashboardPage() {
                   <p className="text-sm text-muted-foreground">
                     {t("todayOrders")}
                   </p>
-                  <p className="text-3xl font-bold">{stats.todayOrders}</p>
+                  <p className="text-3xl font-bold">
+                    {statsLoading ? <Loader2 className="h-8 w-8 animate-spin" /> : todayStats?.count ?? 0}
+                  </p>
                 </div>
                 <div className="rounded-full bg-tea-100 p-3">
                   <ShoppingBag className="h-6 w-6 text-tea-600" />
                 </div>
               </div>
-              <div className="mt-2 flex items-center text-sm text-matcha-600">
-                <TrendingUp className="mr-1 h-4 w-4" />
-                +12% t.o.v. gisteren
+              <div className={`mt-2 flex items-center text-sm ${orderChange >= 0 ? "text-matcha-600" : "text-red-600"}`}>
+                {orderChange >= 0 ? (
+                  <TrendingUp className="mr-1 h-4 w-4" />
+                ) : (
+                  <TrendingDown className="mr-1 h-4 w-4" />
+                )}
+                {orderChange >= 0 ? "+" : ""}{orderChange}% t.o.v. gisteren
               </div>
             </CardContent>
           </Card>
@@ -161,16 +159,20 @@ export default function AdminDashboardPage() {
                     {t("todayRevenue")}
                   </p>
                   <p className="text-3xl font-bold">
-                    €{stats.todayRevenue.toFixed(2)}
+                    {statsLoading ? <Loader2 className="h-8 w-8 animate-spin" /> : `€${(todayStats?.revenue ?? 0).toFixed(2)}`}
                   </p>
                 </div>
                 <div className="rounded-full bg-matcha-100 p-3">
                   <Euro className="h-6 w-6 text-matcha-600" />
                 </div>
               </div>
-              <div className="mt-2 flex items-center text-sm text-matcha-600">
-                <TrendingUp className="mr-1 h-4 w-4" />
-                +8% t.o.v. gisteren
+              <div className={`mt-2 flex items-center text-sm ${revenueChange >= 0 ? "text-matcha-600" : "text-red-600"}`}>
+                {revenueChange >= 0 ? (
+                  <TrendingUp className="mr-1 h-4 w-4" />
+                ) : (
+                  <TrendingDown className="mr-1 h-4 w-4" />
+                )}
+                {revenueChange >= 0 ? "+" : ""}{revenueChange}% t.o.v. gisteren
               </div>
             </CardContent>
           </Card>
@@ -182,7 +184,9 @@ export default function AdminDashboardPage() {
                   <p className="text-sm text-muted-foreground">
                     {t("pendingOrders")}
                   </p>
-                  <p className="text-3xl font-bold">{stats.pendingOrders}</p>
+                  <p className="text-3xl font-bold">
+                    {statsLoading ? <Loader2 className="h-8 w-8 animate-spin" /> : todayStats?.pending ?? 0}
+                  </p>
                 </div>
                 <div className="rounded-full bg-yellow-100 p-3">
                   <Clock className="h-6 w-6 text-yellow-600" />
@@ -201,7 +205,9 @@ export default function AdminDashboardPage() {
                   <p className="text-sm text-muted-foreground">
                     {t("totalCustomers")}
                   </p>
-                  <p className="text-3xl font-bold">{stats.totalCustomers}</p>
+                  <p className="text-3xl font-bold">
+                    {customersLoading ? <Loader2 className="h-8 w-8 animate-spin" /> : customerStats?.total ?? 0}
+                  </p>
                 </div>
                 <div className="rounded-full bg-taro-100 p-3">
                   <Users className="h-6 w-6 text-taro-600" />
@@ -209,7 +215,7 @@ export default function AdminDashboardPage() {
               </div>
               <div className="mt-2 flex items-center text-sm text-matcha-600">
                 <TrendingUp className="mr-1 h-4 w-4" />
-                +5 deze week
+                +{customerStats?.newThisWeek ?? 0} deze week
               </div>
             </CardContent>
           </Card>
@@ -229,47 +235,59 @@ export default function AdminDashboardPage() {
               </Link>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between rounded-lg border p-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tea-100">
-                        <Coffee className="h-5 w-5 text-tea-600" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium">{order.id}</p>
-                          <Badge
-                            className={
-                              statusColors[
-                                order.status as keyof typeof statusColors
-                              ]
-                            }
-                          >
-                            {
-                              statusLabels[
-                                order.status as keyof typeof statusLabels
-                              ]
-                            }
-                          </Badge>
+              {ordersLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-tea-600" />
+                </div>
+              ) : recentOrders && recentOrders.length > 0 ? (
+                <div className="space-y-4">
+                  {recentOrders.map((order) => (
+                    <div
+                      key={order.id}
+                      className="flex items-center justify-between rounded-lg border p-4"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tea-100">
+                          <Coffee className="h-5 w-5 text-tea-600" />
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {order.customer} • {order.items.join(", ")}
-                        </p>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{order.id}</p>
+                            <Badge
+                              className={
+                                statusColors[
+                                  order.status as keyof typeof statusColors
+                                ]
+                              }
+                            >
+                              {
+                                statusLabels[
+                                  order.status as keyof typeof statusLabels
+                                ]
+                              }
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {order.customer} • {order.items.slice(0, 2).join(", ")}{order.items.length > 2 ? ` +${order.items.length - 2}` : ""}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">€{order.total.toFixed(2)}</p>
+                        {order.time && (
+                          <p className="text-sm text-muted-foreground">
+                            Afhalen: {order.time}
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">€{order.total.toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Afhalen: {order.time}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="py-8 text-center text-muted-foreground">
+                  Nog geen bestellingen vandaag
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -279,24 +297,34 @@ export default function AdminDashboardPage() {
               <CardTitle>Populaire Producten</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {popularProducts.map((product, index) => (
-                  <div
-                    key={product.name}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
-                        {index + 1}
+              {productsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-tea-600" />
+                </div>
+              ) : popularProducts && popularProducts.length > 0 ? (
+                <div className="space-y-4">
+                  {popularProducts.map((product, index) => (
+                    <div
+                      key={product.name}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
+                          {index + 1}
+                        </div>
+                        <span className="font-medium">{product.name}</span>
                       </div>
-                      <span className="font-medium">{product.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {product.orders} bestellingen
+                      </span>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {product.orders} bestellingen
-                    </span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="py-8 text-center text-muted-foreground">
+                  Nog geen data beschikbaar
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>

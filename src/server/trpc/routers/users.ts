@@ -95,6 +95,24 @@ export const usersRouter = router({
       });
     }),
 
+  getCustomerCount: adminProcedure.query(async ({ ctx }) => {
+    const total = await ctx.db.user.count({
+      where: { role: "USER" },
+    });
+
+    const thisWeek = new Date();
+    thisWeek.setDate(thisWeek.getDate() - 7);
+
+    const newThisWeek = await ctx.db.user.count({
+      where: {
+        role: "USER",
+        createdAt: { gte: thisWeek },
+      },
+    });
+
+    return { total, newThisWeek };
+  }),
+
   addLoyaltyPoints: adminProcedure
     .input(z.object({
       userId: z.string(),

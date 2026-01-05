@@ -146,14 +146,95 @@ export const ordersRouter = router({
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const orders = await ctx.db.order.findMany({
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const ordersToday = await ctx.db.order.findMany({
       where: { createdAt: { gte: today } },
     });
 
+    const ordersYesterday = await ctx.db.order.findMany({
+      where: {
+        createdAt: { gte: yesterday, lt: today },
+      },
+    });
+
+    const todayRevenue = ordersToday.reduce((sum, o) => sum + Number(o.total), 0);
+    const yesterdayRevenue = ordersYesterday.reduce((sum, o) => sum + Number(o.total), 0);
+
     return {
-      count: orders.length,
-      revenue: orders.reduce((sum, o) => sum + Number(o.total), 0),
-      pending: orders.filter((o) => ["PENDING", "PAID", "PREPARING"].includes(o.status)).length,
+      count: ordersToday.length,
+      revenue: todayRevenue,
+      pending: ordersToday.filter((o) => ["PENDING", "PAID", "PREPARING"].includes(o.status)).length,
+      yesterdayCount: ordersYesterday.length,
+      yesterdayRevenue,
     };
+  }),
+
+  getRecentOrders: adminProcedure
+    .input(z.object({ limit: z.number().default(5) }).optional())
+    .query(async ({ ctx, input }) => {
+      const orders = await ctx.db.order.findMany({
+        include: {
+          items: {
+            include: {
+              product: {
+                include: { translations: true },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: input?.limit || 5,
+      });
+
+      return orders.map((order) => ({
+        id: order.orderNumber,
+        customer: order.customerName || "Gast",
+        items: order.items.map((item) => item.product.translations[0]?.name || item.product.slug),
+        total: Number(order.total),
+        status: order.status,
+        time: order.pickupTime
+          ? new Date(order.pickupTime).toLocaleTimeString("nl-BE", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : null,
+      }));
+    }),
+
+  getPopularProducts: adminProcedure.query(async ({ ctx }) => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const orderItems = await ctx.db.orderItem.findMany({
+      where: {
+        order: {
+          createdAt: { gte: thirtyDaysAgo },
+          status: { not: "CANCELLED" },
+        },
+      },
+      include: {
+        product: {
+          include: { translations: true },
+        },
+      },
+    });
+
+    const productCounts = orderItems.reduce((acc, item) => {
+      const productId = item.productId;
+      if (!acc[productId]) {
+        acc[productId] = {
+          name: item.product.translations[0]?.name || item.product.slug,
+          orders: 0,
+        };
+      }
+      acc[productId].orders += item.quantity;
+      return acc;
+    }, {} as Record<string, { name: string; orders: number }>);
+
+    return Object.values(productCounts)
+      .sort((a, b) => b.orders - a.orders)
+      .slice(0, 4);
   }),
 });
