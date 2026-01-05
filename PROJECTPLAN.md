@@ -512,6 +512,9 @@ yibei-tea/
 - [ ] Email notifications (Resend)
 
 ### Recently Completed
+- [x] Order confirmation: fetch real order data from DB (Jan 2026)
+- [x] Admin orders: connect to database with status updates (Jan 2026)
+- [x] Checkout form validation (Jan 2026)
 - [x] Checkout: save customizations to OrderItem (Jan 2026)
 
 ### Not Started
