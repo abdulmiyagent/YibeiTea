@@ -8,8 +8,8 @@ import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const languages = [
-  { code: "nl", label: "NL" },
-  { code: "en", label: "EN" },
+  { code: "nl" as const, label: "NL" },
+  { code: "en" as const, label: "EN" },
 ];
 
 export function LanguageSwitcher() {
@@ -19,7 +19,7 @@ export function LanguageSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleSelect = (langCode: string) => {
+  const handleSelect = (langCode: "nl" | "en") => {
     if (langCode !== locale) {
       router.replace(pathname, { locale: langCode });
     }
