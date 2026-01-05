@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const t = useTranslations("auth.login");
@@ -17,6 +17,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -92,7 +94,12 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/account");
+    // Fetch the session to check user role
+    const session = await getSession();
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN";
+
+    // Redirect based on role
+    router.push(isAdmin ? "/admin" : "/account");
   };
 
   const handleGoogleSignIn = () => {
@@ -155,14 +162,25 @@ export default function LoginPage() {
                     <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-10"
+                      className="pl-10 pr-10"
                       value={formData.password}
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
                       }
                     />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -173,9 +191,9 @@ export default function LoginPage() {
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         id="confirmPassword"
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        className="pl-10"
+                        className="pl-10 pr-10"
                         value={formData.confirmPassword}
                         onChange={(e) =>
                           setFormData({
@@ -184,6 +202,17 @@ export default function LoginPage() {
                           })
                         }
                       />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
                     </div>
                   </div>
                 )}

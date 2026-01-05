@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -1213,11 +1214,50 @@ async function main() {
     },
   });
 
+  // Create admin user with password
+  console.log("Creating admin user...");
+  const adminPassword = "Gonxo5-sevnyj-xuqjiw";
+  const hashedPassword = await hash(adminPassword, 12);
+
+  const adminUser = await prisma.user.upsert({
+    where: { email: "admin@yibeitea.be" },
+    update: { role: "SUPER_ADMIN" },
+    create: {
+      email: "admin@yibeitea.be",
+      name: "Admin",
+      role: "SUPER_ADMIN",
+    },
+  });
+
+  // Create credentials account with hashed password
+  await prisma.account.upsert({
+    where: {
+      provider_providerAccountId: {
+        provider: "credentials",
+        providerAccountId: adminUser.id,
+      },
+    },
+    update: {
+      access_token: hashedPassword,
+    },
+    create: {
+      userId: adminUser.id,
+      type: "credentials",
+      provider: "credentials",
+      providerAccountId: adminUser.id,
+      access_token: hashedPassword,
+    },
+  });
+
+  console.log(`Admin user: ${adminUser.email} (role: ${adminUser.role})`);
+  console.log(`Password: ${adminPassword}`);
+
   console.log(`\nSeeding completed!`);
   console.log(`- ${categories.length} categories created`);
   console.log(`- ${toppings.length} toppings created`);
   console.log(`- ${customizationGroups.length} customization groups created`);
   console.log(`- ${products.length} products created`);
+  console.log(`- 1 admin user created`);
 }
 
 main()

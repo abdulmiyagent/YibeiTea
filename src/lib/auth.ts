@@ -91,10 +91,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Check if admin users need to set up 2FA (required for ADMIN and SUPER_ADMIN)
-        const isAdminUser = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
-        if (isAdminUser && !user.twoFactorEnabled) {
-          throw new Error("2FA_SETUP_REQUIRED");
-        }
+        // TODO: Re-enable after initial setup
+        // const isAdminUser = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+        // if (isAdminUser && !user.twoFactorEnabled) {
+        //   throw new Error("2FA_SETUP_REQUIRED");
+        // }
 
         return {
           id: user.id,

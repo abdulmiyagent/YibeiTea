@@ -1,7 +1,7 @@
 # Yibei Tea - Project Documentation
 
 > **Version:** 1.0.0
-> **Last Updated:** 2026-01-05
+> **Last Updated:** 2026-01-06
 > **Status:** Active Development
 > **Repository:** github.com/abdulmiyagent/YibeiTea
 
@@ -57,7 +57,7 @@ A **web-based ordering platform** for Yibei Tea, a bubble tea shop in Ghent, Bel
 - [x] Admin dashboard for orders
 - [ ] Payment processing (Mollie)
 - [ ] Email notifications (Resend)
-- [ ] Loyalty points system
+- [x] Loyalty points system (earning on order)
 
 ### In Scope (Post-MVP)
 - Admin product management (CRUD)
@@ -512,6 +512,10 @@ yibei-tea/
 - [ ] Email notifications (Resend)
 
 ### Recently Completed
+- [x] Loyalty points earning on order creation (Jan 2026)
+- [x] Admin dashboard with real database stats (Jan 2026)
+- [x] Admin login redirect (admins → /admin, users → /account) (Jan 2026)
+- [x] Password visibility toggle on login page (Jan 2026)
 - [x] Order confirmation: fetch real order data from DB (Jan 2026)
 - [x] Admin orders: connect to database with status updates (Jan 2026)
 - [x] Checkout form validation (Jan 2026)
@@ -519,6 +523,6 @@ yibei-tea/
 
 ### Not Started
 - [ ] Admin product management
-- [ ] Loyalty points earning/redemption
+- [ ] Loyalty points redemption
 - [ ] Analytics dashboard
 - [ ] Production deployment
