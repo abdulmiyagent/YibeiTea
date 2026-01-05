@@ -510,7 +510,9 @@ yibei-tea/
 ### In Progress
 - [ ] Mollie payment integration
 - [ ] Email notifications (Resend)
-- [ ] Checkout: save customizations to OrderItem
+
+### Recently Completed
+- [x] Checkout: save customizations to OrderItem (Jan 2026)
 
 ### Not Started
 - [ ] Admin product management
