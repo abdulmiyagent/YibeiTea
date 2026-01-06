@@ -557,7 +557,7 @@ At the end of a work session, the command **"sluit af"** is used.
 
 When triggered, AI must:
 
-- Check whether decisions or changes made during the session require updates to this README.md
+- Check whether decisions, UX changes, architectural changes, or workflow changes made during the session require updates to this README.md
 - Update README.md first if needed
 - Commit and immediately push documentation changes
 - Commit completed, working code changes
