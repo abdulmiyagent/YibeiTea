@@ -35,26 +35,27 @@ const steps = [
   { id: "payment", icon: CreditCard },
 ];
 
-const timeSlots = [
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
-  "18:30",
-  "19:00",
-  "19:30",
-];
+// Helper function to generate time slots from opening hours
+function generateTimeSlots(openTime: string, closeTime: string): string[] {
+  const slots: string[] = [];
+  const [openHour, openMin] = openTime.split(":").map(Number);
+  const [closeHour, closeMin] = closeTime.split(":").map(Number);
+
+  let currentHour = openHour;
+  let currentMin = openMin;
+
+  // Generate slots in 30-minute intervals, stopping 30 min before close
+  while (currentHour < closeHour || (currentHour === closeHour && currentMin < closeMin - 30)) {
+    slots.push(`${currentHour.toString().padStart(2, "0")}:${currentMin.toString().padStart(2, "0")}`);
+    currentMin += 30;
+    if (currentMin >= 60) {
+      currentMin = 0;
+      currentHour++;
+    }
+  }
+
+  return slots;
+}
 
 const paymentMethods = [
   { id: "bancontact", label: "Bancontact", icon: "💳" },
@@ -95,6 +96,9 @@ export default function CheckoutPage() {
     { locale: "nl" },
     { enabled: isLoggedIn }
   );
+
+  // Fetch store settings for opening hours
+  const { data: storeSettings } = api.storeSettings.get.useQuery();
 
   const createPaymentMutation = api.payments.createPayment.useMutation({
     onSuccess: (data) => {
@@ -147,6 +151,23 @@ export default function CheckoutPage() {
     if (!rewards) return [];
     return rewards.filter((reward) => userPoints >= reward.pointsCost);
   }, [rewards, userPoints]);
+
+  // Generate time slots based on selected date and store settings
+  const timeSlots = useMemo(() => {
+    const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    const selectedDate = new Date(formData.pickupDate);
+    const dayName = dayNames[selectedDate.getDay()];
+
+    const openingHours = storeSettings?.openingHours as Record<string, { open: string; close: string }> | undefined;
+    const dayHours = openingHours?.[dayName];
+
+    if (dayHours) {
+      return generateTimeSlots(dayHours.open, dayHours.close);
+    }
+
+    // Default fallback
+    return generateTimeSlots("11:00", "20:00");
+  }, [formData.pickupDate, storeSettings]);
 
   // Get selected reward details
   const selectedReward = useMemo(() => {

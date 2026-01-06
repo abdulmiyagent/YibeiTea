@@ -126,6 +126,9 @@ export default function HomePage() {
     { enabled: !!session?.user }
   );
 
+  // Fetch store settings for opening hours
+  const { data: storeSettings } = api.storeSettings.get.useQuery();
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -1094,14 +1097,17 @@ export default function HomePage() {
               <div className="mt-8">
                 <h3 className="font-medium text-tea-900">{t("location.hours")}</h3>
                 <div className="mt-4 grid gap-2">
-                  {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => (
-                    <div key={day} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t(`location.${day}`)}</span>
-                      <span className="font-medium text-tea-900">
-                        {day === "sunday" ? "10:00 - 19:00" : "11:00 - 20:00"}
-                      </span>
-                    </div>
-                  ))}
+                  {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => {
+                    const hours = (storeSettings?.openingHours as Record<string, { open: string; close: string }> | undefined)?.[day];
+                    return (
+                      <div key={day} className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{t(`location.${day}`)}</span>
+                        <span className="font-medium text-tea-900">
+                          {hours ? `${hours.open} - ${hours.close}` : "11:00 - 20:00"}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
