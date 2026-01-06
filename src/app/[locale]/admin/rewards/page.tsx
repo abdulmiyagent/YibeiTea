@@ -66,6 +66,7 @@ export default function RewardsAdminPage() {
     descriptionEn: "",
   });
   const [isTranslating, setIsTranslating] = useState(false);
+  const [manuallyEditedEn, setManuallyEditedEn] = useState({ name: false, description: false });
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN";
@@ -77,21 +78,24 @@ export default function RewardsAdminPage() {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Only auto-translate if there's NL content
-    if (!formData.nameNl && !formData.descriptionNl) return;
+    // Only auto-translate if there's NL content and EN fields haven't been manually edited
+    const shouldTranslateName = formData.nameNl && !manuallyEditedEn.name;
+    const shouldTranslateDesc = formData.descriptionNl && !manuallyEditedEn.description;
+
+    if (!shouldTranslateName && !shouldTranslateDesc) return;
 
     // Set new timer - wait 800ms after user stops typing
     debounceTimerRef.current = setTimeout(async () => {
       setIsTranslating(true);
       try {
         const [nameEn, descriptionEn] = await Promise.all([
-          formData.nameNl ? translate(formData.nameNl, "nl-en") : "",
-          formData.descriptionNl ? translate(formData.descriptionNl, "nl-en") : "",
+          shouldTranslateName ? translate(formData.nameNl, "nl-en") : null,
+          shouldTranslateDesc ? translate(formData.descriptionNl, "nl-en") : null,
         ]);
         setFormData((prev) => ({
           ...prev,
-          nameEn: nameEn || prev.nameEn,
-          descriptionEn: descriptionEn || prev.descriptionEn,
+          ...(nameEn !== null && { nameEn }),
+          ...(descriptionEn !== null && { descriptionEn }),
         }));
       } catch (error) {
         console.error("Translation failed:", error);
@@ -105,7 +109,7 @@ export default function RewardsAdminPage() {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [formData.nameNl, formData.descriptionNl]);
+  }, [formData.nameNl, formData.descriptionNl, manuallyEditedEn]);
 
   const utils = api.useUtils();
 
@@ -148,6 +152,7 @@ export default function RewardsAdminPage() {
       descriptionNl: "",
       descriptionEn: "",
     });
+    setManuallyEditedEn({ name: false, description: false });
   };
 
   const handleEdit = (reward: NonNullable<typeof rewards>[0]) => {
@@ -165,6 +170,11 @@ export default function RewardsAdminPage() {
       nameEn: enTranslation?.name || "",
       descriptionNl: nlTranslation?.description || "",
       descriptionEn: enTranslation?.description || "",
+    });
+    // Mark EN fields as manually edited when editing existing reward
+    setManuallyEditedEn({
+      name: !!enTranslation?.name,
+      description: !!enTranslation?.description,
     });
     setIsDialogOpen(true);
   };
@@ -353,18 +363,39 @@ export default function RewardsAdminPage() {
                   <div className="space-y-4 rounded-lg border p-4">
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium">English</h4>
-                      {isTranslating && (
-                        <span className="flex items-center text-xs text-muted-foreground">
-                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                          Vertalen...
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {isTranslating && (
+                          <span className="flex items-center text-xs text-muted-foreground">
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                            Vertalen...
+                          </span>
+                        )}
+                        {(manuallyEditedEn.name || manuallyEditedEn.description) && !isTranslating && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setManuallyEditedEn({ name: false, description: false })}
+                            className="text-xs h-6 px-2"
+                          >
+                            Opnieuw vertalen
+                          </Button>
+                        )}
+                      </div>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      {manuallyEditedEn.name || manuallyEditedEn.description
+                        ? "Handmatig aangepast - auto-vertaling uitgeschakeld"
+                        : "Wordt automatisch vertaald vanuit Nederlands"}
+                    </p>
                     <div className="space-y-2">
                       <Label>Name (EN)</Label>
                       <Input
                         value={formData.nameEn}
-                        onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, nameEn: e.target.value });
+                          setManuallyEditedEn((prev) => ({ ...prev, name: true }));
+                        }}
                         placeholder="Free small bubble tea"
                         required
                         className={isTranslating ? "bg-muted" : ""}
@@ -374,7 +405,10 @@ export default function RewardsAdminPage() {
                       <Label>Description (EN)</Label>
                       <Input
                         value={formData.descriptionEn}
-                        onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, descriptionEn: e.target.value });
+                          setManuallyEditedEn((prev) => ({ ...prev, description: true }));
+                        }}
                         placeholder="Redeem for a free drink"
                         required
                         className={isTranslating ? "bg-muted" : ""}
