@@ -1,6 +1,6 @@
 # Yibei Tea - Project Documentation
 
-> **Version:** 1.0.1
+> **Version:** 1.1.0
 > **Last Updated:** 2026-01-06
 > **Status:** Active Development
 > **Repository:** github.com/abdulmiyagent/YibeiTea
@@ -13,7 +13,7 @@
 
 **Stack:** Next.js 14 + TypeScript + Tailwind + tRPC + Prisma + Supabase
 
-**Status:** Menu, cart, checkout en admin dashboard zijn klaar. Betalingen (Mollie) en e-mail (Resend) nog te implementeren.
+**Status:** MVP compleet inclusief betalingen (Mollie), e-mail (Resend), loyaliteitspunten en promotiecode systeem. Klaar voor productie-deployment.
 
 **Key beslissingen:**
 - Horizontale compacte kaarten op menu (6-7 items zichtbaar per scherm)
@@ -55,16 +55,16 @@ A **web-based ordering platform** for Yibei Tea, a bubble tea shop in Ghent, Bel
 - [x] User accounts with order history
 - [x] Checkout flow with pickup time selection
 - [x] Admin dashboard for orders
-- [ ] Payment processing (Mollie)
-- [ ] Email notifications (Resend)
+- [x] Payment processing (Mollie)
+- [x] Email notifications (Resend)
 - [x] Loyalty points system (earning on order)
 
 ### In Scope (Post-MVP)
 - ~~Admin product management (CRUD)~~ ✅ Done
-- Admin analytics dashboard
-- Rewards redemption
+- ~~Admin analytics dashboard~~ ✅ Done
+- ~~Rewards redemption~~ ✅ Done (checkout integration)
 - Birthday rewards automation
-- Promo code system
+- ~~Promo code system~~ ✅ Done
 
 ### Explicitly Out of Scope
 | Feature | Reason |
@@ -607,12 +607,22 @@ yibei-tea/
 - [x] Admin dashboard with order management
 - [x] i18n (Dutch + English)
 - [x] 64 products seeded across 10 categories
+- [x] Mollie payment integration
+- [x] Email notifications (Resend)
+- [x] Loyalty points redemption at checkout
+- [x] Admin analytics dashboard
+- [x] Promo code system
 
 ### In Progress
-- [ ] Mollie payment integration
-- [ ] Email notifications (Resend)
+- [ ] Production deployment
 
 ### Recently Completed
+- [x] Mollie payment integration with Bancontact, iDEAL, Credit Card, PayPal (Jan 2026)
+- [x] Email notifications: order confirmation + order ready (Jan 2026)
+- [x] Promo code system: percentage and fixed amount discounts (Jan 2026)
+- [x] Admin promo codes management page (Jan 2026)
+- [x] Loyalty rewards redemption at checkout (Jan 2026)
+- [x] Admin analytics dashboard with revenue, orders, customers stats (Jan 2026)
 - [x] Loyalty points earning on order creation (Jan 2026)
 - [x] Admin dashboard with real database stats (Jan 2026)
 - [x] Admin login redirect (admins → /admin, users → /account) (Jan 2026)
@@ -625,6 +635,5 @@ yibei-tea/
 - [x] Per-product sugar/ice/toppings toggle (allowSugarCustomization, allowIceCustomization, allowToppings) (Jan 2026)
 
 ### Not Started
-- [ ] Loyalty points redemption
-- [ ] Analytics dashboard
+- [ ] Birthday rewards automation
 - [ ] Production deployment

@@ -128,6 +128,7 @@ export const usersRouter = router({
 
       await ctx.db.loyaltyTransaction.create({
         data: {
+          id: crypto.randomUUID(),
           userId: input.userId,
           points: input.points,
           type: input.points > 0 ? "BONUS" : "ADJUSTMENT",

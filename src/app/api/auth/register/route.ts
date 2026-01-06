@@ -29,12 +29,16 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user with Account for credentials
+    const userId = crypto.randomUUID();
     const user = await db.user.create({
       data: {
+        id: userId,
         name,
         email,
+        updatedAt: new Date(),
         accounts: {
           create: {
+            id: crypto.randomUUID(),
             type: "credentials",
             provider: "credentials",
             providerAccountId: email,

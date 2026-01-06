@@ -97,12 +97,17 @@ export const categoriesRouter = router({
 
       const category = await db.category.create({
         data: {
+          id: crypto.randomUUID(),
           slug: input.slug,
           sortOrder: input.sortOrder,
           isActive: input.isActive,
           imageUrl: input.imageUrl,
+          updatedAt: new Date(),
           translations: {
-            create: input.translations,
+            create: input.translations.map((t) => ({
+              id: crypto.randomUUID(),
+              ...t,
+            })),
           },
         },
         include: {
@@ -162,7 +167,10 @@ export const categoriesRouter = router({
           ...(translations && {
             translations: {
               deleteMany: {},
-              create: translations,
+              create: translations.map((t) => ({
+                id: crypto.randomUUID(),
+                ...t,
+              })),
             },
           }),
         },

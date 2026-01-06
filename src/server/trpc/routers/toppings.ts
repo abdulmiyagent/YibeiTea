@@ -51,7 +51,17 @@ export const toppingsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { translations, ...data } = input;
       return ctx.db.topping.create({
-        data: { ...data, translations: { create: translations } },
+        data: {
+          id: crypto.randomUUID(),
+          ...data,
+          updatedAt: new Date(),
+          translations: {
+            create: translations.map((t) => ({
+              id: crypto.randomUUID(),
+              ...t,
+            })),
+          },
+        },
         include: { translations: true },
       });
     }),
@@ -77,7 +87,10 @@ export const toppingsRouter = router({
           ...(translations && {
             translations: {
               deleteMany: {},
-              create: translations,
+              create: translations.map((t) => ({
+                id: crypto.randomUUID(),
+                ...t,
+              })),
             },
           }),
         },

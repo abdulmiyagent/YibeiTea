@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc";
 import { generateOrderNumber, calculateLoyaltyTier } from "@/lib/utils";
+import { TRPCError } from "@trpc/server";
 
 export const ordersRouter = router({
   create: publicProcedure
@@ -17,6 +18,7 @@ export const ordersRouter = router({
       pickupTime: z.string(),
       notes: z.string().optional(),
       promoCode: z.string().optional(),
+      rewardId: z.string().optional(), // Selected reward to redeem at checkout
     }))
     .mutation(async ({ ctx, input }) => {
       const subtotal = input.items.reduce(
@@ -24,10 +26,107 @@ export const ordersRouter = router({
         0
       );
 
-      const pointsEarned = Math.floor(subtotal * 10);
+      let discount = 0;
+      let pointsRedeemed = 0;
+      let rewardName = "";
+      let promoCodeUsed: string | null = null;
+
+      // Process promo code if provided
+      if (input.promoCode) {
+        const promoCode = await ctx.db.promoCode.findUnique({
+          where: { code: input.promoCode.toUpperCase() },
+        });
+
+        if (promoCode && promoCode.isActive) {
+          const now = new Date();
+          const isValid =
+            now >= promoCode.validFrom &&
+            now <= promoCode.validUntil &&
+            (!promoCode.maxUses || promoCode.usedCount < promoCode.maxUses) &&
+            (!promoCode.minOrderAmount || subtotal >= Number(promoCode.minOrderAmount));
+
+          if (isValid) {
+            if (promoCode.discountType === "PERCENTAGE") {
+              discount = (subtotal * Number(promoCode.discountValue)) / 100;
+            } else {
+              discount = Number(promoCode.discountValue);
+            }
+            discount = Math.min(discount, subtotal);
+            promoCodeUsed = promoCode.code;
+
+            // Increment usage count
+            await ctx.db.promoCode.update({
+              where: { id: promoCode.id },
+              data: { usedCount: { increment: 1 } },
+            });
+          }
+        }
+      }
+
+      // Process reward redemption if selected and user is logged in (can stack with promo code)
+      if (input.rewardId && ctx.session?.user?.id) {
+        const reward = await ctx.db.reward.findUnique({
+          where: { id: input.rewardId },
+          include: { translations: true },
+        });
+
+        if (!reward || !reward.isAvailable) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Deze beloning is niet beschikbaar",
+          });
+        }
+
+        const user = await ctx.db.user.findUnique({
+          where: { id: ctx.session.user.id },
+          select: { loyaltyPoints: true },
+        });
+
+        if (!user || user.loyaltyPoints < reward.pointsCost) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Je hebt niet genoeg punten voor deze beloning",
+          });
+        }
+
+        // Calculate discount based on reward type
+        pointsRedeemed = reward.pointsCost;
+        rewardName = reward.translations[0]?.name || reward.slug;
+
+        let rewardDiscount = 0;
+        switch (reward.rewardType) {
+          case "DISCOUNT":
+            rewardDiscount = Number(reward.rewardValue);
+            break;
+          case "FREE_DRINK":
+            // Free drink up to reward value
+            rewardDiscount = Math.min(Number(reward.rewardValue), subtotal);
+            break;
+          case "FREE_TOPPING":
+            // Small discount for free topping
+            rewardDiscount = Number(reward.rewardValue);
+            break;
+          case "SIZE_UPGRADE":
+            // Small discount for size upgrade
+            rewardDiscount = Number(reward.rewardValue);
+            break;
+          default:
+            rewardDiscount = Number(reward.rewardValue);
+        }
+
+        // Add reward discount to total discount (stacks with promo code)
+        discount += rewardDiscount;
+      }
+
+      // Ensure total discount doesn't exceed subtotal
+      discount = Math.min(discount, subtotal);
+
+      const total = Math.max(0, subtotal - discount);
+      const pointsEarned = Math.floor(total * 10); // Earn points on final total, not subtotal
 
       const order = await ctx.db.order.create({
         data: {
+          id: crypto.randomUUID(),
           orderNumber: generateOrderNumber(),
           userId: ctx.session?.user?.id,
           customerName: input.customerName,
@@ -36,10 +135,14 @@ export const ordersRouter = router({
           pickupTime: new Date(input.pickupTime),
           notes: input.notes,
           subtotal,
-          total: subtotal,
+          discount,
+          total,
           pointsEarned,
+          pointsRedeemed,
+          updatedAt: new Date(),
           items: {
             create: input.items.map((item) => ({
+              id: crypto.randomUUID(),
               productId: item.productId,
               quantity: item.quantity,
               unitPrice: item.unitPrice,
@@ -51,18 +154,19 @@ export const ordersRouter = router({
         include: { items: true },
       });
 
-      // Award loyalty points to logged-in users
-      if (ctx.session?.user?.id && pointsEarned > 0) {
+      // Process REDEEMED points immediately (to prevent double-use)
+      // EARNED points are handled by the Mollie webhook after successful payment
+      if (ctx.session?.user?.id && pointsRedeemed > 0) {
         const user = await ctx.db.user.findUnique({
           where: { id: ctx.session.user.id },
           select: { loyaltyPoints: true },
         });
 
         if (user) {
-          const newPoints = user.loyaltyPoints + pointsEarned;
+          const newPoints = Math.max(0, user.loyaltyPoints - pointsRedeemed);
           const newTier = calculateLoyaltyTier(newPoints);
 
-          // Update user points and tier
+          // Deduct redeemed points
           await ctx.db.user.update({
             where: { id: ctx.session.user.id },
             data: {
@@ -71,18 +175,20 @@ export const ordersRouter = router({
             },
           });
 
-          // Create loyalty transaction record
+          // Create REDEEM transaction
           await ctx.db.loyaltyTransaction.create({
             data: {
+              id: crypto.randomUUID(),
               userId: ctx.session.user.id,
-              points: pointsEarned,
-              type: "EARN",
-              description: `Bestelling ${order.orderNumber}`,
+              points: -pointsRedeemed,
+              type: "REDEEM",
+              description: `Ingewisseld: ${rewardName} (Bestelling ${order.orderNumber})`,
               orderId: order.id,
             },
           });
         }
       }
+      // Note: EARN transactions are created by the Mollie webhook after payment confirmation
 
       return order;
     }),
@@ -172,10 +278,22 @@ export const ordersRouter = router({
       status: z.enum(["PENDING", "PAID", "PREPARING", "READY", "COMPLETED", "CANCELLED"]),
     }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.order.update({
+      const order = await ctx.db.order.update({
         where: { id: input.id },
         data: { status: input.status },
       });
+
+      // Send notification email when order is ready
+      if (input.status === "READY" && order.customerEmail) {
+        const { sendOrderReadyNotification } = await import("@/lib/email");
+        await sendOrderReadyNotification({
+          orderNumber: order.orderNumber,
+          customerName: order.customerName || "Klant",
+          customerEmail: order.customerEmail,
+        });
+      }
+
+      return order;
     }),
 
   getTodayStats: adminProcedure.query(async ({ ctx }) => {

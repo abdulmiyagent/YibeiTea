@@ -118,6 +118,60 @@ const toppings = [
   },
 ];
 
+// ============ REWARDS ============
+const rewards = [
+  {
+    slug: "free-topping",
+    pointsCost: 50,
+    rewardType: "FREE_TOPPING",
+    rewardValue: 0.5,
+    translations: {
+      nl: { name: "Gratis Topping", description: "Voeg een gratis topping naar keuze toe aan je bestelling" },
+      en: { name: "Free Topping", description: "Add a free topping of your choice to your order" },
+    },
+  },
+  {
+    slug: "discount-1-euro",
+    pointsCost: 100,
+    rewardType: "DISCOUNT",
+    rewardValue: 1.0,
+    translations: {
+      nl: { name: "€1 Korting", description: "Ontvang €1 korting op je volgende bestelling" },
+      en: { name: "€1 Discount", description: "Get €1 off your next order" },
+    },
+  },
+  {
+    slug: "size-upgrade",
+    pointsCost: 150,
+    rewardType: "SIZE_UPGRADE",
+    rewardValue: 0.5,
+    translations: {
+      nl: { name: "Gratis Size Upgrade", description: "Upgrade naar een groter formaat zonder extra kosten" },
+      en: { name: "Free Size Upgrade", description: "Upgrade to a larger size at no extra cost" },
+    },
+  },
+  {
+    slug: "discount-2-euro",
+    pointsCost: 200,
+    rewardType: "DISCOUNT",
+    rewardValue: 2.0,
+    translations: {
+      nl: { name: "€2 Korting", description: "Ontvang €2 korting op je volgende bestelling" },
+      en: { name: "€2 Discount", description: "Get €2 off your next order" },
+    },
+  },
+  {
+    slug: "free-drink",
+    pointsCost: 500,
+    rewardType: "FREE_DRINK",
+    rewardValue: 5.5,
+    translations: {
+      nl: { name: "Gratis Drankje", description: "Ontvang een gratis drankje naar keuze (t.w.v. €5.50)" },
+      en: { name: "Free Drink", description: "Get a free drink of your choice (worth €5.50)" },
+    },
+  },
+];
+
 // ============ CUSTOMIZATION GROUPS ============
 const customizationGroups = [
   {
@@ -1087,11 +1141,13 @@ async function main() {
 
     const created = await prisma.category.create({
       data: {
+        id: crypto.randomUUID(),
         ...data,
+        updatedAt: new Date(),
         translations: {
           create: [
-            { locale: "nl", name: translations.nl.name, description: translations.nl.description },
-            { locale: "en", name: translations.en.name, description: translations.en.description },
+            { id: crypto.randomUUID(), locale: "nl", name: translations.nl.name, description: translations.nl.description },
+            { id: crypto.randomUUID(), locale: "en", name: translations.en.name, description: translations.en.description },
           ],
         },
       },
@@ -1108,11 +1164,13 @@ async function main() {
 
     await prisma.topping.create({
       data: {
+        id: crypto.randomUUID(),
         ...data,
+        updatedAt: new Date(),
         translations: {
           create: [
-            { locale: "nl", name: translations.nl.name },
-            { locale: "en", name: translations.en.name },
+            { id: crypto.randomUUID(), locale: "nl", name: translations.nl.name },
+            { id: crypto.randomUUID(), locale: "en", name: translations.en.name },
           ],
         },
       },
@@ -1126,9 +1184,11 @@ async function main() {
   for (const group of customizationGroups) {
     const createdGroup = await prisma.customizationGroup.create({
       data: {
+        id: crypto.randomUUID(),
         type: group.type,
         sortOrder: group.sortOrder,
         isActive: true,
+        updatedAt: new Date(),
       },
     });
 
@@ -1136,6 +1196,7 @@ async function main() {
     for (const value of group.values) {
       await prisma.customizationValue.create({
         data: {
+          id: crypto.randomUUID(),
           groupId: createdGroup.id,
           value: value.value,
           sortOrder: value.sortOrder,
@@ -1144,8 +1205,8 @@ async function main() {
           priceModifier: 0,
           translations: {
             create: [
-              { locale: "nl", label: value.translations.nl },
-              { locale: "en", label: value.translations.en },
+              { id: crypto.randomUUID(), locale: "nl", label: value.translations.nl },
+              { id: crypto.randomUUID(), locale: "en", label: value.translations.en },
             ],
           },
         },
@@ -1168,12 +1229,14 @@ async function main() {
 
     await prisma.product.create({
       data: {
+        id: crypto.randomUUID(),
         ...data,
         categoryId,
+        updatedAt: new Date(),
         translations: {
           create: [
-            { locale: "nl", name: translations.nl.name, description: translations.nl.description },
-            { locale: "en", name: translations.en.name, description: translations.en.description },
+            { id: crypto.randomUUID(), locale: "nl", name: translations.nl.name, description: translations.nl.description },
+            { id: crypto.randomUUID(), locale: "en", name: translations.en.name, description: translations.en.description },
           ],
         },
       },
@@ -1196,6 +1259,7 @@ async function main() {
         saturday: { open: "11:00", close: "20:00" },
         sunday: { open: "10:00", close: "19:00" },
       },
+      updatedAt: new Date(),
     },
     create: {
       id: "default",
@@ -1211,8 +1275,39 @@ async function main() {
       minPickupMinutes: 15,
       maxAdvanceOrderDays: 7,
       pointsPerEuro: 10,
+      updatedAt: new Date(),
     },
   });
+
+  // Create rewards
+  console.log("Creating rewards...");
+  for (const reward of rewards) {
+    const { translations, ...data } = reward;
+
+    await prisma.reward.upsert({
+      where: { slug: data.slug },
+      update: {
+        pointsCost: data.pointsCost,
+        rewardType: data.rewardType,
+        rewardValue: data.rewardValue,
+        isAvailable: true,
+      },
+      create: {
+        id: crypto.randomUUID(),
+        ...data,
+        isAvailable: true,
+        updatedAt: new Date(),
+        translations: {
+          create: [
+            { id: crypto.randomUUID(), locale: "nl", name: translations.nl.name, description: translations.nl.description },
+            { id: crypto.randomUUID(), locale: "en", name: translations.en.name, description: translations.en.description },
+          ],
+        },
+      },
+    });
+
+    console.log(`Created reward: ${data.slug}`);
+  }
 
   // Create admin user with password
   console.log("Creating admin user...");
@@ -1223,9 +1318,11 @@ async function main() {
     where: { email: "admin@yibeitea.be" },
     update: { role: "SUPER_ADMIN" },
     create: {
+      id: crypto.randomUUID(),
       email: "admin@yibeitea.be",
       name: "Admin",
       role: "SUPER_ADMIN",
+      updatedAt: new Date(),
     },
   });
 
@@ -1241,6 +1338,7 @@ async function main() {
       access_token: hashedPassword,
     },
     create: {
+      id: crypto.randomUUID(),
       userId: adminUser.id,
       type: "credentials",
       provider: "credentials",
@@ -1257,6 +1355,7 @@ async function main() {
   console.log(`- ${toppings.length} toppings created`);
   console.log(`- ${customizationGroups.length} customization groups created`);
   console.log(`- ${products.length} products created`);
+  console.log(`- ${rewards.length} rewards created`);
   console.log(`- 1 admin user created`);
 }
 

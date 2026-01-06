@@ -1,0 +1,187 @@
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@yibeitea.be";
+
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+  customizations?: Record<string, unknown> | null;
+}
+
+interface OrderConfirmationData {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  pickupTime: Date;
+  total: number;
+  pointsEarned: number;
+  items: OrderItem[];
+}
+
+function formatCustomizations(customizations: Record<string, unknown> | null | undefined): string {
+  if (!customizations) return "";
+  const parts: string[] = [];
+  if (customizations.sugarLevel) parts.push(`Suiker: ${customizations.sugarLevel}%`);
+  if (customizations.iceLevel) parts.push(`IJs: ${customizations.iceLevel}`);
+  if (customizations.toppings && Array.isArray(customizations.toppings) && customizations.toppings.length > 0) {
+    parts.push(`Toppings: ${customizations.toppings.map((t: { name?: string }) => t.name || "").join(", ")}`);
+  }
+  return parts.length > 0 ? ` (${parts.join(", ")})` : "";
+}
+
+export async function sendOrderConfirmation(data: OrderConfirmationData) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not set, skipping email");
+    return;
+  }
+
+  const pickupTimeFormatted = new Intl.DateTimeFormat("nl-BE", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(data.pickupTime);
+
+  const itemsList = data.items
+    .map((item) => `${item.quantity}x ${item.name}${formatCustomizations(item.customizations)} - €${item.price.toFixed(2)}`)
+    .join("\n      ");
+
+  try {
+    await resend.emails.send({
+      from: `Yibei Tea <${FROM_EMAIL}>`,
+      to: data.customerEmail,
+      subject: `Bevestiging bestelling ${data.orderNumber} - Yibei Tea`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Bevestiging bestelling ${data.orderNumber}</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #9B7B5B; margin-bottom: 5px;">Yibei Tea</h1>
+            <p style="color: #666; margin: 0;">Jouw bubble tea bestelling</p>
+          </div>
+
+          <div style="background: #f8f5f2; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+            <h2 style="color: #9B7B5B; margin-top: 0; margin-bottom: 16px;">Bedankt voor je bestelling, ${data.customerName}!</h2>
+            <p style="margin: 0;">Je bestelling <strong>#${data.orderNumber}</strong> is bevestigd en wordt nu voorbereid.</p>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #e0d9d3; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+            <h3 style="color: #9B7B5B; margin-top: 0; border-bottom: 1px solid #e0d9d3; padding-bottom: 12px;">Afhaalmoment</h3>
+            <p style="font-size: 18px; font-weight: 600; color: #333; margin: 0;">
+              ${pickupTimeFormatted}
+            </p>
+            <p style="color: #666; margin: 8px 0 0 0;">
+              Sint-Niklaasstraat 36, 9000 Gent
+            </p>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #e0d9d3; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+            <h3 style="color: #9B7B5B; margin-top: 0; border-bottom: 1px solid #e0d9d3; padding-bottom: 12px;">Je bestelling</h3>
+            <div style="white-space: pre-line; color: #333;">
+      ${itemsList}
+            </div>
+            <div style="border-top: 1px solid #e0d9d3; margin-top: 16px; padding-top: 16px;">
+              <p style="font-size: 18px; font-weight: 700; color: #9B7B5B; margin: 0; text-align: right;">
+                Totaal: €${data.total.toFixed(2)}
+              </p>
+            </div>
+          </div>
+
+          ${data.pointsEarned > 0 ? `
+          <div style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
+            <p style="color: #155724; margin: 0; font-weight: 600;">
+              Je hebt <strong>+${data.pointsEarned} punten</strong> verdiend!
+            </p>
+          </div>
+          ` : ""}
+
+          <div style="text-align: center; color: #666; font-size: 14px; border-top: 1px solid #e0d9d3; padding-top: 24px;">
+            <p>Vragen over je bestelling?</p>
+            <p>Neem contact met ons op via <a href="mailto:info@yibeitea.be" style="color: #9B7B5B;">info@yibeitea.be</a></p>
+            <p style="margin-top: 20px;">
+              <a href="https://yibeitea.be" style="color: #9B7B5B; text-decoration: none;">yibeitea.be</a>
+            </p>
+          </div>
+        </body>
+        </html>
+      `,
+    });
+
+    console.log(`Order confirmation email sent to ${data.customerEmail}`);
+  } catch (error) {
+    console.error("Failed to send order confirmation email:", error);
+    // Don't throw - email failure shouldn't block the order
+  }
+}
+
+interface OrderReadyData {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+}
+
+export async function sendOrderReadyNotification(data: OrderReadyData) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not set, skipping email");
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: `Yibei Tea <${FROM_EMAIL}>`,
+      to: data.customerEmail,
+      subject: `Je bestelling is klaar! - ${data.orderNumber}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #9B7B5B; margin-bottom: 5px;">Yibei Tea</h1>
+          </div>
+
+          <div style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 24px;">
+            <h2 style="color: #155724; margin: 0 0 10px 0;">Je bestelling is klaar!</h2>
+            <p style="color: #155724; margin: 0; font-size: 18px;">
+              Haal je drankjes op bij onze winkel.
+            </p>
+          </div>
+
+          <div style="text-align: center; padding: 24px;">
+            <p style="color: #666; margin-bottom: 8px;">Bestelnummer:</p>
+            <p style="font-size: 24px; font-weight: 700; color: #9B7B5B; margin: 0;">
+              #${data.orderNumber}
+            </p>
+          </div>
+
+          <div style="background: #f8f5f2; border-radius: 12px; padding: 20px; text-align: center;">
+            <p style="margin: 0; color: #666;">
+              <strong>Sint-Niklaasstraat 36, 9000 Gent</strong>
+            </p>
+          </div>
+
+          <div style="text-align: center; color: #666; font-size: 14px; margin-top: 24px;">
+            <p>Tot zo bij Yibei Tea!</p>
+          </div>
+        </body>
+        </html>
+      `,
+    });
+
+    console.log(`Order ready notification sent to ${data.customerEmail}`);
+  } catch (error) {
+    console.error("Failed to send order ready notification:", error);
+  }
+}

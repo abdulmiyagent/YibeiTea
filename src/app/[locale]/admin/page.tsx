@@ -23,6 +23,7 @@ import {
   Shield,
   FolderOpen,
   Loader2,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -394,6 +395,23 @@ export default function AdminDashboardPage() {
                   <p className="font-medium">Analytics</p>
                   <p className="text-sm text-muted-foreground">
                     Bekijk statistieken en rapporten
+                  </p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/admin/promo-codes">
+            <Card className="cursor-pointer transition-colors hover:bg-muted/50">
+              <CardContent className="flex items-center gap-4 pt-6">
+                <div className="rounded-full bg-honey-100 p-3">
+                  <Tag className="h-6 w-6 text-honey-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Promotiecodes</p>
+                  <p className="text-sm text-muted-foreground">
+                    Beheer kortingscodes
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />

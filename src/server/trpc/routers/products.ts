@@ -129,7 +129,17 @@ export const productsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { translations, ...data } = input;
       return ctx.db.product.create({
-        data: { ...data, translations: { create: translations } },
+        data: {
+          id: crypto.randomUUID(),
+          ...data,
+          updatedAt: new Date(),
+          translations: {
+            create: translations.map((t) => ({
+              id: crypto.randomUUID(),
+              ...t,
+            })),
+          },
+        },
         include: { translations: true, category: true },
       });
     }),
@@ -157,15 +167,19 @@ export const productsRouter = router({
       })).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const { id, translations, ...data } = input;
+      const { id, translations, categoryId, ...data } = input;
       return ctx.db.product.update({
         where: { id },
         data: {
           ...data,
+          ...(categoryId && { category: { connect: { id: categoryId } } }),
           ...(translations && {
             translations: {
               deleteMany: {},
-              create: translations,
+              create: translations.map((t) => ({
+                id: crypto.randomUUID(),
+                ...t,
+              })),
             },
           }),
         },

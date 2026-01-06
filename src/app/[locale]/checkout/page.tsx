@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
@@ -21,6 +21,11 @@ import {
   Check,
   ArrowLeft,
   AlertCircle,
+  Gift,
+  Crown,
+  X,
+  Tag,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -61,18 +66,61 @@ const paymentMethods = [
 export default function CheckoutPage() {
   const t = useTranslations("checkout");
   const router = useRouter();
-  const { data: session } = useSession();
-  const { items, getSubtotal, getTotal, discount, promoCode, clearCart } = useCartStore();
+  const { data: session, status: sessionStatus } = useSession();
+  const { items, getSubtotal, clearCart } = useCartStore();
+  const isLoggedIn = sessionStatus === "authenticated";
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [appliedPromoCode, setAppliedPromoCode] = useState<{
+    code: string;
+    discountType: string;
+    discountValue: number;
+    discountAmount: number;
+  } | null>(null);
+  const [promoCodeError, setPromoCodeError] = useState<string | null>(null);
+
+  // Fetch user's loyalty info (only if logged in)
+  const { data: loyaltyInfo } = api.users.getLoyaltyInfo.useQuery(
+    undefined,
+    { enabled: isLoggedIn }
+  );
+
+  // Fetch available rewards (only if logged in)
+  const { data: rewards } = api.rewards.getAll.useQuery(
+    { locale: "nl" },
+    { enabled: isLoggedIn }
+  );
+
+  const createPaymentMutation = api.payments.createPayment.useMutation({
+    onSuccess: (data) => {
+      clearCart();
+      // Redirect to Mollie checkout
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        setError("Er is een fout opgetreden bij het starten van de betaling.");
+        setIsProcessing(false);
+      }
+    },
+    onError: (err) => {
+      setError(err.message || "Er is een fout opgetreden bij het starten van de betaling.");
+      setIsProcessing(false);
+    },
+  });
 
   const createOrderMutation = api.orders.create.useMutation({
     onSuccess: (order) => {
-      clearCart();
-      router.push(`/order/confirmation?orderNumber=${order.orderNumber}`);
+      // After order is created, initiate payment
+      createPaymentMutation.mutate({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        amount: Number(order.total),
+      });
     },
     onError: (err) => {
       setError(err.message || "Er is een fout opgetreden bij het plaatsen van je bestelling.");
@@ -92,17 +140,82 @@ export default function CheckoutPage() {
   });
 
   const subtotal = getSubtotal();
-  const total = getTotal();
+  const userPoints = loyaltyInfo?.loyaltyPoints ?? 0;
+
+  // Filter rewards that user can afford
+  const affordableRewards = useMemo(() => {
+    if (!rewards) return [];
+    return rewards.filter((reward) => userPoints >= reward.pointsCost);
+  }, [rewards, userPoints]);
+
+  // Get selected reward details
+  const selectedReward = useMemo(() => {
+    if (!selectedRewardId || !rewards) return null;
+    return rewards.find((r) => r.id === selectedRewardId) || null;
+  }, [selectedRewardId, rewards]);
+
+  // Calculate discount from selected reward
+  const rewardDiscount = useMemo(() => {
+    if (!selectedReward) return 0;
+    const discountValue = selectedReward.rewardValue;
+    // Ensure discount doesn't exceed subtotal
+    return Math.min(discountValue, subtotal);
+  }, [selectedReward, subtotal]);
+
+  // Calculate promo code discount
+  const promoDiscount = appliedPromoCode?.discountAmount ?? 0;
+
+  // Total discount (reward + promo code)
+  const totalDiscount = Math.min(rewardDiscount + promoDiscount, subtotal);
+  const total = Math.max(0, subtotal - totalDiscount);
+  const pointsToEarn = Math.floor(total * 10);
+
+  // Promo code validation
+  const handleApplyPromoCode = async () => {
+    if (!promoCodeInput.trim()) return;
+    setPromoCodeError(null);
+
+    try {
+      const result = await new Promise<{
+        code: string;
+        discountType: string;
+        discountValue: number;
+        discountAmount: number;
+      }>((resolve, reject) => {
+        // Use utils to call the validate query
+        fetch(`/api/trpc/promoCodes.validate?input=${encodeURIComponent(JSON.stringify({ code: promoCodeInput, orderAmount: subtotal }))}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.result?.data) {
+              resolve(data.result.data);
+            } else if (data.error) {
+              reject(new Error(data.error.message || "Ongeldige promotiecode"));
+            } else {
+              reject(new Error("Ongeldige promotiecode"));
+            }
+          })
+          .catch(() => reject(new Error("Er is een fout opgetreden")));
+      });
+
+      setAppliedPromoCode(result);
+      setPromoCodeInput("");
+    } catch (err) {
+      setPromoCodeError(err instanceof Error ? err.message : "Ongeldige promotiecode");
+    }
+  };
+
+  const handleRemovePromoCode = () => {
+    setAppliedPromoCode(null);
+    setPromoCodeError(null);
+  };
 
   const updateFormData = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear field error when user starts typing
     if (fieldErrors[field]) {
       setFieldErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
-  // Validation functions
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -112,7 +225,6 @@ export default function CheckoutPage() {
     const errors: Record<string, string> = {};
 
     if (step === 0) {
-      // Contact details validation
       if (!formData.name.trim()) {
         errors.name = t("validation.nameRequired") || "Naam is verplicht";
       }
@@ -124,7 +236,6 @@ export default function CheckoutPage() {
     }
 
     if (step === 1) {
-      // Pickup time validation
       const pickupDateTime = new Date(`${formData.pickupDate}T${formData.pickupTime}`);
       const now = new Date();
       if (pickupDateTime < now) {
@@ -149,7 +260,6 @@ export default function CheckoutPage() {
   };
 
   const handleSubmit = async () => {
-    // Validate all steps before submitting
     if (!validateStep(0) || !validateStep(1)) {
       setError(t("validation.fixErrors") || "Corrigeer de fouten voordat je bestelt");
       return;
@@ -158,10 +268,8 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     setError(null);
 
-    // Build pickup datetime
     const pickupDateTime = `${formData.pickupDate}T${formData.pickupTime}:00`;
 
-    // Create order with cart items and customizations
     createOrderMutation.mutate({
       items: items.map((item) => ({
         productId: item.productId,
@@ -174,7 +282,8 @@ export default function CheckoutPage() {
       customerPhone: formData.phone.trim() || undefined,
       pickupTime: pickupDateTime,
       notes: formData.notes.trim() || undefined,
-      promoCode: promoCode || undefined,
+      rewardId: selectedRewardId || undefined,
+      promoCode: appliedPromoCode?.code || undefined,
     });
   };
 
@@ -244,9 +353,7 @@ export default function CheckoutPage() {
                         <Input
                           id="name"
                           value={formData.name}
-                          onChange={(e) =>
-                            updateFormData("name", e.target.value)
-                          }
+                          onChange={(e) => updateFormData("name", e.target.value)}
                           placeholder="Jan Janssen"
                           className={fieldErrors.name ? "border-red-500" : ""}
                         />
@@ -260,9 +367,7 @@ export default function CheckoutPage() {
                           id="phone"
                           type="tel"
                           value={formData.phone}
-                          onChange={(e) =>
-                            updateFormData("phone", e.target.value)
-                          }
+                          onChange={(e) => updateFormData("phone", e.target.value)}
                           placeholder="0471 23 45 67"
                         />
                       </div>
@@ -273,9 +378,7 @@ export default function CheckoutPage() {
                         id="email"
                         type="email"
                         value={formData.email}
-                        onChange={(e) =>
-                          updateFormData("email", e.target.value)
-                        }
+                        onChange={(e) => updateFormData("email", e.target.value)}
                         placeholder="jan@email.be"
                         className={fieldErrors.email ? "border-red-500" : ""}
                       />
@@ -296,9 +399,7 @@ export default function CheckoutPage() {
                         id="date"
                         type="date"
                         value={formData.pickupDate}
-                        onChange={(e) =>
-                          updateFormData("pickupDate", e.target.value)
-                        }
+                        onChange={(e) => updateFormData("pickupDate", e.target.value)}
                         min={new Date().toISOString().split("T")[0]}
                       />
                     </div>
@@ -308,9 +409,7 @@ export default function CheckoutPage() {
                         {timeSlots.map((time) => (
                           <Button
                             key={time}
-                            variant={
-                              formData.pickupTime === time ? "tea" : "outline"
-                            }
+                            variant={formData.pickupTime === time ? "tea" : "outline"}
                             size="sm"
                             onClick={() => updateFormData("pickupTime", time)}
                           >
@@ -324,9 +423,7 @@ export default function CheckoutPage() {
                       <Input
                         id="notes"
                         value={formData.notes}
-                        onChange={(e) =>
-                          updateFormData("notes", e.target.value)
-                        }
+                        onChange={(e) => updateFormData("notes", e.target.value)}
                         placeholder={t("notes.placeholder")}
                       />
                     </div>
@@ -347,9 +444,7 @@ export default function CheckoutPage() {
                               ? "border-tea-500 bg-tea-50"
                               : "border-muted hover:border-tea-300"
                           )}
-                          onClick={() =>
-                            updateFormData("paymentMethod", method.id)
-                          }
+                          onClick={() => updateFormData("paymentMethod", method.id)}
                         >
                           <span className="text-2xl">{method.icon}</span>
                           <span className="font-medium">{method.label}</span>
@@ -423,16 +518,145 @@ export default function CheckoutPage() {
 
                 <Separator />
 
+                {/* Rewards Section - Only show for logged in users */}
+                {isLoggedIn && (
+                  <>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Crown className="h-4 w-4 text-tea-600" />
+                          <span className="text-sm font-medium">Jouw punten</span>
+                        </div>
+                        <Badge variant="secondary">{userPoints} pts</Badge>
+                      </div>
+
+                      {affordableRewards.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">
+                            Gebruik punten voor korting:
+                          </p>
+                          {affordableRewards.map((reward) => (
+                            <button
+                              key={reward.id}
+                              onClick={() =>
+                                setSelectedRewardId(
+                                  selectedRewardId === reward.id ? null : reward.id
+                                )
+                              }
+                              className={cn(
+                                "flex w-full items-center justify-between rounded-lg border p-3 text-left text-sm transition-colors",
+                                selectedRewardId === reward.id
+                                  ? "border-matcha-500 bg-matcha-50"
+                                  : "border-muted hover:border-tea-300"
+                              )}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Gift className="h-4 w-4 text-matcha-600" />
+                                <div>
+                                  <p className="font-medium">{reward.name}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {reward.pointsCost} punten
+                                  </p>
+                                </div>
+                              </div>
+                              {selectedRewardId === reward.id ? (
+                                <X className="h-4 w-4 text-matcha-600" />
+                              ) : (
+                                <span className="text-xs text-matcha-600">
+                                  -{formatPrice(reward.rewardValue)}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {affordableRewards.length === 0 && rewards && rewards.length > 0 && (
+                        <p className="text-xs text-muted-foreground">
+                          Nog {rewards[0].pointsCost - userPoints} punten nodig voor je eerste beloning
+                        </p>
+                      )}
+                    </div>
+
+                    <Separator />
+                  </>
+                )}
+
+                {/* Promo Code */}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    <Tag className="h-4 w-4" />
+                    Promotiecode
+                  </p>
+                  {appliedPromoCode ? (
+                    <div className="flex items-center justify-between rounded-lg border border-matcha-300 bg-matcha-50 p-3">
+                      <div>
+                        <p className="font-mono font-medium text-matcha-700">{appliedPromoCode.code}</p>
+                        <p className="text-xs text-matcha-600">
+                          {appliedPromoCode.discountType === "PERCENTAGE"
+                            ? `${appliedPromoCode.discountValue}% korting`
+                            : `€${appliedPromoCode.discountValue.toFixed(2)} korting`}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRemovePromoCode}
+                        className="text-matcha-600 hover:text-matcha-700"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        value={promoCodeInput}
+                        onChange={(e) => {
+                          setPromoCodeInput(e.target.value.toUpperCase());
+                          setPromoCodeError(null);
+                        }}
+                        placeholder="CODE"
+                        className="flex-1 font-mono"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleApplyPromoCode}
+                        disabled={!promoCodeInput.trim()}
+                      >
+                        Toepassen
+                      </Button>
+                    </div>
+                  )}
+                  {promoCodeError && (
+                    <p className="text-xs text-red-500">{promoCodeError}</p>
+                  )}
+                </div>
+
+                <Separator />
+
                 {/* Totals */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotaal</span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>
-                  {discount > 0 && (
+                  {promoDiscount > 0 && appliedPromoCode && (
                     <div className="flex justify-between text-sm text-matcha-600">
-                      <span>Korting</span>
-                      <span>-{formatPrice(discount)}</span>
+                      <span className="flex items-center gap-1">
+                        <Tag className="h-3 w-3" />
+                        {appliedPromoCode.code}
+                      </span>
+                      <span>-{formatPrice(promoDiscount)}</span>
+                    </div>
+                  )}
+                  {rewardDiscount > 0 && selectedReward && (
+                    <div className="flex justify-between text-sm text-matcha-600">
+                      <span className="flex items-center gap-1">
+                        <Gift className="h-3 w-3" />
+                        {selectedReward.name}
+                      </span>
+                      <span>-{formatPrice(rewardDiscount)}</span>
                     </div>
                   )}
                 </div>
@@ -443,6 +667,14 @@ export default function CheckoutPage() {
                   <span>Totaal</span>
                   <span className="text-tea-600">{formatPrice(total)}</span>
                 </div>
+
+                {/* Points to earn */}
+                {isLoggedIn && pointsToEarn > 0 && (
+                  <div className="flex items-center justify-between rounded-lg bg-matcha-50 p-3 text-sm">
+                    <span className="text-matcha-700">Je verdient</span>
+                    <span className="font-medium text-matcha-700">+{pointsToEarn} punten</span>
+                  </div>
+                )}
 
                 {/* Pickup Info */}
                 {formData.pickupTime && (

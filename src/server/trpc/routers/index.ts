@@ -6,6 +6,10 @@ import { twoFactorRouter } from "./two-factor";
 import { categoriesRouter } from "./categories";
 import { toppingsRouter } from "./toppings";
 import { customizationsRouter } from "./customizations";
+import { rewardsRouter } from "./rewards";
+import { analyticsRouter } from "./analytics";
+import { paymentsRouter } from "./payments";
+import { promoCodesRouter } from "./promoCodes";
 
 export const appRouter = router({
   products: productsRouter,
@@ -15,6 +19,10 @@ export const appRouter = router({
   categories: categoriesRouter,
   toppings: toppingsRouter,
   customizations: customizationsRouter,
+  rewards: rewardsRouter,
+  analytics: analyticsRouter,
+  payments: paymentsRouter,
+  promoCodes: promoCodesRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -89,13 +89,19 @@ export const customizationsRouter = router({
 
       return ctx.db.customizationValue.create({
         data: {
+          id: crypto.randomUUID(),
           groupId: group.id,
           value: input.value,
           priceModifier: input.priceModifier,
           isDefault: input.isDefault,
           isAvailable: input.isAvailable,
           sortOrder: input.sortOrder,
-          translations: { create: input.translations },
+          translations: {
+            create: input.translations.map((t) => ({
+              id: crypto.randomUUID(),
+              ...t,
+            })),
+          },
         },
         include: { translations: true },
       });
@@ -146,7 +152,10 @@ export const customizationsRouter = router({
           ...(translations && {
             translations: {
               deleteMany: {},
-              create: translations,
+              create: translations.map((t) => ({
+                id: crypto.randomUUID(),
+                ...t,
+              })),
             },
           }),
         },
