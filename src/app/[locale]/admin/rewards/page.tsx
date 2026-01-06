@@ -32,8 +32,10 @@ import {
   Loader2,
   Coins,
   Edit,
+  Languages,
 } from "lucide-react";
 import Link from "next/link";
+import { translate } from "@/lib/translate";
 
 const REWARD_TYPES = [
   { value: "DISCOUNT", label: "Korting (€)" },
@@ -64,8 +66,50 @@ export default function RewardsAdminPage() {
     descriptionNl: "",
     descriptionEn: "",
   });
+  const [isTranslating, setIsTranslating] = useState(false);
 
   const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN";
+
+  // Translation functions
+  const translateToEnglish = async () => {
+    if (!formData.nameNl && !formData.descriptionNl) return;
+    setIsTranslating(true);
+    try {
+      const [nameEn, descriptionEn] = await Promise.all([
+        formData.nameNl ? translate(formData.nameNl, "nl-en") : "",
+        formData.descriptionNl ? translate(formData.descriptionNl, "nl-en") : "",
+      ]);
+      setFormData((prev) => ({
+        ...prev,
+        nameEn: nameEn || prev.nameEn,
+        descriptionEn: descriptionEn || prev.descriptionEn,
+      }));
+    } catch (error) {
+      console.error("Translation failed:", error);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const translateToDutch = async () => {
+    if (!formData.nameEn && !formData.descriptionEn) return;
+    setIsTranslating(true);
+    try {
+      const [nameNl, descriptionNl] = await Promise.all([
+        formData.nameEn ? translate(formData.nameEn, "en-nl") : "",
+        formData.descriptionEn ? translate(formData.descriptionEn, "en-nl") : "",
+      ]);
+      setFormData((prev) => ({
+        ...prev,
+        nameNl: nameNl || prev.nameNl,
+        descriptionNl: descriptionNl || prev.descriptionNl,
+      }));
+    } catch (error) {
+      console.error("Translation failed:", error);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   const utils = api.useUtils();
 
@@ -288,7 +332,24 @@ export default function RewardsAdminPage() {
                   </div>
 
                   <div className="space-y-4 rounded-lg border p-4">
-                    <h4 className="font-medium">Nederlands</h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Nederlands</h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={translateToEnglish}
+                        disabled={isTranslating || (!formData.nameNl && !formData.descriptionNl)}
+                        className="text-xs"
+                      >
+                        {isTranslating ? (
+                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                        ) : (
+                          <Languages className="mr-1 h-3 w-3" />
+                        )}
+                        Vertaal naar EN
+                      </Button>
+                    </div>
                     <div className="space-y-2">
                       <Label>Naam (NL)</Label>
                       <Input
@@ -310,7 +371,24 @@ export default function RewardsAdminPage() {
                   </div>
 
                   <div className="space-y-4 rounded-lg border p-4">
-                    <h4 className="font-medium">English</h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">English</h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={translateToDutch}
+                        disabled={isTranslating || (!formData.nameEn && !formData.descriptionEn)}
+                        className="text-xs"
+                      >
+                        {isTranslating ? (
+                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                        ) : (
+                          <Languages className="mr-1 h-3 w-3" />
+                        )}
+                        Vertaal naar NL
+                      </Button>
+                    </div>
                     <div className="space-y-2">
                       <Label>Name (EN)</Label>
                       <Input
