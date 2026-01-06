@@ -242,8 +242,13 @@ export default function AdminProductsPage() {
     });
   };
 
-  const getPrice = (price: number | { toNumber: () => number }) => {
-    return typeof price === "object" ? price.toNumber() : price;
+  const getPrice = (price: unknown): number => {
+    if (typeof price === "number") return price;
+    if (typeof price === "string") return parseFloat(price);
+    if (price && typeof price === "object" && "toNumber" in price) {
+      return (price as { toNumber: () => number }).toNumber();
+    }
+    return Number(price) || 0;
   };
 
   return (

@@ -1,6 +1,6 @@
 # Yibei Tea - Project Documentation
 
-> **Version:** 1.0.0
+> **Version:** 1.0.1
 > **Last Updated:** 2026-01-06
 > **Status:** Active Development
 > **Repository:** github.com/abdulmiyagent/YibeiTea
@@ -394,6 +394,91 @@ src/app/[locale]/
 - Gift card system
 - Social login (Google OAuth)
 - Reviews and ratings
+
+### Future Architecture: Delivery Support
+
+> **Note:** This architecture is designed for future projects (e.g., sushi restaurant) that require delivery. Yibei Tea is pickup-only.
+
+#### Current State (Pickup Only)
+- Order model has `pickupTime: DateTime?`
+- No `orderType` enum
+- No delivery address fields on Order
+- User has `addresses` relation but unused for orders
+
+#### Required Schema Changes
+
+```prisma
+enum OrderType {
+  PICKUP
+  DELIVERY
+}
+
+model Order {
+  // Existing fields...
+  orderType         OrderType      @default(PICKUP)
+  pickupTime        DateTime?      // For PICKUP orders
+  deliveryAddress   String?        // For DELIVERY orders
+  deliveryCity      String?
+  deliveryPostcode  String?
+  deliveryNotes     String?
+  deliveryFee       Decimal?       @db.Decimal(10, 2)
+  estimatedDelivery DateTime?      // For DELIVERY orders
+}
+
+model DeliveryZone {
+  id          String   @id @default(cuid())
+  postcode    String   @unique
+  city        String
+  fee         Decimal  @db.Decimal(10, 2)
+  minOrder    Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  deliveryMin Int      // Minimum delivery time in minutes
+  deliveryMax Int      // Maximum delivery time in minutes
+}
+```
+
+#### Configuration-Driven Approach
+
+```typescript
+// lib/fulfillment-config.ts
+export const fulfillmentConfig = {
+  supportedTypes: ["PICKUP"] as const, // Add "DELIVERY" when ready
+  delivery: {
+    enabled: false,
+    defaultFee: 2.50,
+    freeThreshold: 25.00,
+    zones: [] // Loaded from DB
+  },
+  pickup: {
+    enabled: true,
+    leadTimeMinutes: 15
+  }
+};
+```
+
+#### Checkout Flow Modifications
+1. Add fulfillment type selector (Pickup/Delivery)
+2. Conditional rendering based on selection:
+   - **Pickup**: Time slot picker (current)
+   - **Delivery**: Address form + delivery zone validation
+3. Order summary shows appropriate fees
+4. Confirmation page shows pickup time OR delivery estimate
+
+#### Implementation Phases
+
+| Phase | Scope | Effort |
+|-------|-------|--------|
+| 1 | Schema migration + config flag | 2-3 hours |
+| 2 | Checkout UI (type selector + address form) | 4-6 hours |
+| 3 | Delivery zone validation + fee calculation | 2-3 hours |
+| 4 | Admin: zone management UI | 3-4 hours |
+| 5 | Order confirmation + tracking updates | 2-3 hours |
+
+#### Key Design Decisions
+- **Config-driven**: Feature flag controls availability
+- **Zone-based pricing**: Different fees per postcode
+- **Minimum order**: Enforce per zone
+- **Address reuse**: Link to User.addresses for repeat orders
 
 ### Deprecated/Removed
 - ~~Large grid cards for menu~~ → Replaced with horizontal compact list (Jan 2026)

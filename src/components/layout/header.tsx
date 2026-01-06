@@ -131,39 +131,43 @@ export function Header() {
                       onClick={() => setUserMenuOpen(false)}
                     />
                     <div className="absolute right-0 top-full z-50 mt-2 w-48 rounded-md border bg-background py-1 shadow-lg">
-                      <Link
-                        href="/account"
-                        className="flex items-center px-4 py-2 text-sm hover:bg-muted"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        {t("account")}
-                      </Link>
-                      <Link
-                        href="/account/orders"
-                        className="flex items-center px-4 py-2 text-sm hover:bg-muted"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <Package className="mr-2 h-4 w-4" />
-                        {t("orders")}
-                      </Link>
-                      <Link
-                        href="/account/favorites"
-                        className="flex items-center px-4 py-2 text-sm hover:bg-muted"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <Heart className="mr-2 h-4 w-4" />
-                        {t("favorites")}
-                      </Link>
-                      {session.user?.role === "ADMIN" && (
+                      {/* Admin users go to /admin, regular users go to /account */}
+                      {session.user?.role === "ADMIN" || session.user?.role === "SUPER_ADMIN" ? (
                         <Link
                           href="/admin"
                           className="flex items-center px-4 py-2 text-sm hover:bg-muted"
                           onClick={() => setUserMenuOpen(false)}
                         >
                           <Settings className="mr-2 h-4 w-4" />
-                          {t("admin")}
+                          Dashboard
                         </Link>
+                      ) : (
+                        <>
+                          <Link
+                            href="/account"
+                            className="flex items-center px-4 py-2 text-sm hover:bg-muted"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <User className="mr-2 h-4 w-4" />
+                            {t("account")}
+                          </Link>
+                          <Link
+                            href="/account/orders"
+                            className="flex items-center px-4 py-2 text-sm hover:bg-muted"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <Package className="mr-2 h-4 w-4" />
+                            {t("orders")}
+                          </Link>
+                          <Link
+                            href="/account/favorites"
+                            className="flex items-center px-4 py-2 text-sm hover:bg-muted"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <Heart className="mr-2 h-4 w-4" />
+                            {t("favorites")}
+                          </Link>
+                        </>
                       )}
                       <hr className="my-1" />
                       <button
