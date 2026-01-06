@@ -10,6 +10,7 @@ import { rewardsRouter } from "./rewards";
 import { analyticsRouter } from "./analytics";
 import { paymentsRouter } from "./payments";
 import { promoCodesRouter } from "./promoCodes";
+import { storeSettingsRouter } from "./storeSettings";
 
 export const appRouter = router({
   products: productsRouter,
@@ -23,6 +24,7 @@ export const appRouter = router({
   analytics: analyticsRouter,
   payments: paymentsRouter,
   promoCodes: promoCodesRouter,
+  storeSettings: storeSettingsRouter,
 });
 
 export type AppRouter = typeof appRouter;

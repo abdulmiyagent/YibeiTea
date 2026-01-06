@@ -24,6 +24,8 @@ import {
   FolderOpen,
   Loader2,
   Tag,
+  Gift,
+  Coins,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -412,6 +414,40 @@ export default function AdminDashboardPage() {
                   <p className="font-medium">Promotiecodes</p>
                   <p className="text-sm text-muted-foreground">
                     Beheer kortingscodes
+                  </p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/admin/rewards">
+            <Card className="cursor-pointer transition-colors hover:bg-muted/50">
+              <CardContent className="flex items-center gap-4 pt-6">
+                <div className="rounded-full bg-taro-100 p-3">
+                  <Gift className="h-6 w-6 text-taro-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Beloningen</p>
+                  <p className="text-sm text-muted-foreground">
+                    Loyalty rewards beheren
+                  </p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/admin/users">
+            <Card className="cursor-pointer transition-colors hover:bg-muted/50">
+              <CardContent className="flex items-center gap-4 pt-6">
+                <div className="rounded-full bg-amber-100 p-3">
+                  <Coins className="h-6 w-6 text-amber-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Klanten</p>
+                  <p className="text-sm text-muted-foreground">
+                    Punten en klantbeheer
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />

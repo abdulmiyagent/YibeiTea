@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { calculateLoyaltyTier } from "@/lib/utils";
 
@@ -128,4 +128,107 @@ export const rewardsRouter = router({
 
     return redemptions;
   }),
+
+  // Admin: Get all rewards including inactive
+  getAllAdmin: adminProcedure.query(async ({ ctx }) => {
+    const rewards = await ctx.db.reward.findMany({
+      include: { translations: true },
+      orderBy: { pointsCost: "asc" },
+    });
+
+    return rewards.map((reward) => ({
+      id: reward.id,
+      slug: reward.slug,
+      pointsCost: reward.pointsCost,
+      rewardType: reward.rewardType,
+      rewardValue: Number(reward.rewardValue),
+      isAvailable: reward.isAvailable,
+      translations: reward.translations,
+    }));
+  }),
+
+  // Admin: Create reward
+  create: adminProcedure
+    .input(
+      z.object({
+        slug: z.string().min(1),
+        pointsCost: z.number().int().positive(),
+        rewardType: z.enum(["DISCOUNT", "FREE_DRINK", "FREE_TOPPING", "SIZE_UPGRADE"]),
+        rewardValue: z.number().positive(),
+        isAvailable: z.boolean().default(true),
+        translations: z.array(
+          z.object({
+            locale: z.enum(["nl", "en"]),
+            name: z.string(),
+            description: z.string(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { translations, ...data } = input;
+      return ctx.db.reward.create({
+        data: {
+          id: crypto.randomUUID(),
+          ...data,
+          updatedAt: new Date(),
+          translations: {
+            create: translations.map((t) => ({
+              id: crypto.randomUUID(),
+              ...t,
+            })),
+          },
+        },
+        include: { translations: true },
+      });
+    }),
+
+  // Admin: Update reward
+  update: adminProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        slug: z.string().optional(),
+        pointsCost: z.number().int().positive().optional(),
+        rewardType: z.enum(["DISCOUNT", "FREE_DRINK", "FREE_TOPPING", "SIZE_UPGRADE"]).optional(),
+        rewardValue: z.number().positive().optional(),
+        isAvailable: z.boolean().optional(),
+        translations: z
+          .array(
+            z.object({
+              locale: z.enum(["nl", "en"]),
+              name: z.string(),
+              description: z.string(),
+            })
+          )
+          .optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, translations, ...data } = input;
+      return ctx.db.reward.update({
+        where: { id },
+        data: {
+          ...data,
+          ...(translations && {
+            translations: {
+              deleteMany: {},
+              create: translations.map((t) => ({
+                id: crypto.randomUUID(),
+                ...t,
+              })),
+            },
+          }),
+        },
+        include: { translations: true },
+      });
+    }),
+
+  // Admin: Delete reward
+  delete: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.reward.delete({ where: { id: input.id } });
+      return { success: true };
+    }),
 });
