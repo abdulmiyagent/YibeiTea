@@ -32,6 +32,14 @@
     "orders": "Bestellingen",
     "favorites": "Favorieten"
   },
+  "storeStatus": {
+    "open": "Open",
+    "closed": "Gesloten",
+    "openUntil": "Open tot {time}",
+    "opensAt": "Opent om {time}",
+    "opensTomorrow": "Opent morgen om {time}",
+    "closedToday": "Vandaag gesloten"
+  },
   "contact": {
     "title": "Contact",
     "subtitle": "Heb je een vraag of suggestie? Neem gerust contact met ons op!",
@@ -276,6 +284,12 @@
   },
   "checkout": {
     "title": "Afrekenen",
+    "preorder": {
+      "title": "Pre-order",
+      "badge": "Pre-order",
+      "description": "De winkel is momenteel gesloten. Je kunt wel alvast bestellen voor later.",
+      "pickupInfo": "Je bestelling wordt klaargemaakt wanneer we weer open zijn."
+    },
     "steps": {
       "details": "Gegevens",
       "pickup": "Afhalen",

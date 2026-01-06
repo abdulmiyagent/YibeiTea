@@ -8,20 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/trpc";
 import {
@@ -32,6 +18,9 @@ import {
   Loader2,
   Coins,
   Edit,
+  X,
+  Save,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { translate } from "@/lib/translate";
@@ -52,7 +41,7 @@ type RewardTranslation = {
 export default function RewardsAdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     slug: "",
@@ -73,18 +62,15 @@ export default function RewardsAdminPage() {
 
   // Auto-translate when NL fields change (with debounce)
   useEffect(() => {
-    // Clear previous timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Only auto-translate if there's NL content and EN fields haven't been manually edited
     const shouldTranslateName = formData.nameNl && !manuallyEditedEn.name;
     const shouldTranslateDesc = formData.descriptionNl && !manuallyEditedEn.description;
 
     if (!shouldTranslateName && !shouldTranslateDesc) return;
 
-    // Set new timer - wait 800ms after user stops typing
     debounceTimerRef.current = setTimeout(async () => {
       setIsTranslating(true);
       try {
@@ -120,7 +106,7 @@ export default function RewardsAdminPage() {
   const createMutation = api.rewards.create.useMutation({
     onSuccess: () => {
       utils.rewards.getAllAdmin.invalidate();
-      setIsDialogOpen(false);
+      setIsModalOpen(false);
       resetForm();
     },
   });
@@ -128,7 +114,7 @@ export default function RewardsAdminPage() {
   const updateMutation = api.rewards.update.useMutation({
     onSuccess: () => {
       utils.rewards.getAllAdmin.invalidate();
-      setIsDialogOpen(false);
+      setIsModalOpen(false);
       setEditingId(null);
       resetForm();
     },
@@ -153,6 +139,7 @@ export default function RewardsAdminPage() {
       descriptionEn: "",
     });
     setManuallyEditedEn({ name: false, description: false });
+    setEditingId(null);
   };
 
   const handleEdit = (reward: NonNullable<typeof rewards>[0]) => {
@@ -171,16 +158,14 @@ export default function RewardsAdminPage() {
       descriptionNl: nlTranslation?.description || "",
       descriptionEn: enTranslation?.description || "",
     });
-    // Mark EN fields as manually edited when editing existing reward
     setManuallyEditedEn({
       name: !!enTranslation?.name,
       description: !!enTranslation?.description,
     });
-    setIsDialogOpen(true);
+    setIsModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = () => {
     const translations: RewardTranslation[] = [
       { locale: "nl", name: formData.nameNl, description: formData.descriptionNl },
       { locale: "en", name: formData.nameEn, description: formData.descriptionEn },
@@ -218,6 +203,11 @@ export default function RewardsAdminPage() {
     }
   };
 
+  const openAddModal = () => {
+    resetForm();
+    setIsModalOpen(true);
+  };
+
   if (status === "loading") {
     return (
       <div className="section-padding">
@@ -243,206 +233,27 @@ export default function RewardsAdminPage() {
     <div className="section-padding bg-muted/30">
       <div className="container-custom">
         {/* Header */}
-        <div className="mb-8">
-          <Link href="/admin">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Terug naar dashboard
-            </Button>
-          </Link>
-          <div className="flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/admin">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
             <div>
-              <h1 className="heading-1 flex items-center gap-3">
-                <Gift className="h-8 w-8 text-tea-600" />
+              <h1 className="heading-2 flex items-center gap-3">
+                <Gift className="h-7 w-7 text-tea-600" />
                 Beloningen
               </h1>
-              <p className="mt-2 text-muted-foreground">
+              <p className="text-muted-foreground">
                 Beheer loyalty beloningen die klanten kunnen inwisselen
               </p>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={(open) => {
-              setIsDialogOpen(open);
-              if (!open) {
-                setEditingId(null);
-                resetForm();
-              }
-            }}>
-              <DialogTrigger asChild>
-                <Button variant="tea">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nieuwe beloning
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-lg">
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingId ? "Beloning bewerken" : "Nieuwe beloning"}
-                  </DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Slug (ID)</Label>
-                      <Input
-                        value={formData.slug}
-                        onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })}
-                        placeholder="free-drink-small"
-                        required
-                        disabled={!!editingId}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Punten kosten</Label>
-                      <Input
-                        type="number"
-                        min="1"
-                        value={formData.pointsCost}
-                        onChange={(e) => setFormData({ ...formData, pointsCost: e.target.value })}
-                        placeholder="100"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Type</Label>
-                      <Select
-                        value={formData.rewardType}
-                        onValueChange={(v: string) => setFormData({ ...formData, rewardType: v as typeof formData.rewardType })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {REWARD_TYPES.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Waarde (€)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.rewardValue}
-                        onChange={(e) => setFormData({ ...formData, rewardValue: e.target.value })}
-                        placeholder="5.00"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 rounded-lg border p-4">
-                    <h4 className="font-medium">Nederlands</h4>
-                    <p className="text-xs text-muted-foreground">Vul Nederlands in, Engels wordt automatisch vertaald</p>
-                    <div className="space-y-2">
-                      <Label>Naam (NL)</Label>
-                      <Input
-                        value={formData.nameNl}
-                        onChange={(e) => setFormData({ ...formData, nameNl: e.target.value })}
-                        placeholder="Gratis kleine bubble tea"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Beschrijving (NL)</Label>
-                      <Input
-                        value={formData.descriptionNl}
-                        onChange={(e) => setFormData({ ...formData, descriptionNl: e.target.value })}
-                        placeholder="Wissel in voor een gratis drankje"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 rounded-lg border p-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">English</h4>
-                      <div className="flex items-center gap-2">
-                        {isTranslating && (
-                          <span className="flex items-center text-xs text-muted-foreground">
-                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                            Vertalen...
-                          </span>
-                        )}
-                        {(manuallyEditedEn.name || manuallyEditedEn.description) && !isTranslating && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setManuallyEditedEn({ name: false, description: false })}
-                            className="text-xs h-6 px-2"
-                          >
-                            Opnieuw vertalen
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {manuallyEditedEn.name || manuallyEditedEn.description
-                        ? "Handmatig aangepast - auto-vertaling uitgeschakeld"
-                        : "Wordt automatisch vertaald vanuit Nederlands"}
-                    </p>
-                    <div className="space-y-2">
-                      <Label>Name (EN)</Label>
-                      <Input
-                        value={formData.nameEn}
-                        onChange={(e) => {
-                          setFormData({ ...formData, nameEn: e.target.value });
-                          setManuallyEditedEn((prev) => ({ ...prev, name: true }));
-                        }}
-                        placeholder="Free small bubble tea"
-                        required
-                        className={isTranslating ? "bg-muted" : ""}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Description (EN)</Label>
-                      <Input
-                        value={formData.descriptionEn}
-                        onChange={(e) => {
-                          setFormData({ ...formData, descriptionEn: e.target.value });
-                          setManuallyEditedEn((prev) => ({ ...prev, description: true }));
-                        }}
-                        placeholder="Redeem for a free drink"
-                        required
-                        className={isTranslating ? "bg-muted" : ""}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={formData.isAvailable}
-                      onCheckedChange={(checked) => setFormData({ ...formData, isAvailable: checked })}
-                    />
-                    <Label>Beschikbaar</Label>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    variant="tea"
-                    className="w-full"
-                    disabled={createMutation.isPending || updateMutation.isPending}
-                  >
-                    {(createMutation.isPending || updateMutation.isPending) ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {editingId ? "Bijwerken..." : "Aanmaken..."}
-                      </>
-                    ) : (
-                      editingId ? "Bijwerken" : "Aanmaken"
-                    )}
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
           </div>
+          <Button variant="tea" onClick={openAddModal}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nieuwe beloning
+          </Button>
         </div>
 
         {/* Rewards List */}
@@ -522,6 +333,201 @@ export default function RewardsAdminPage() {
           </Card>
         )}
       </div>
+
+      {/* Add/Edit Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="max-h-[90vh] w-full max-w-2xl overflow-y-auto">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>
+                {editingId ? "Beloning Bewerken" : "Nieuwe Beloning"}
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsModalOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Basic Info */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="slug">Slug (ID)</Label>
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })}
+                    placeholder="free-drink-small"
+                    disabled={!!editingId}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Unieke identifier voor deze beloning
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="pointsCost">Punten kosten</Label>
+                  <Input
+                    id="pointsCost"
+                    type="number"
+                    min="1"
+                    value={formData.pointsCost}
+                    onChange={(e) => setFormData({ ...formData, pointsCost: e.target.value })}
+                    placeholder="100"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="rewardType">Type beloning</Label>
+                  <select
+                    id="rewardType"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={formData.rewardType}
+                    onChange={(e) => setFormData({ ...formData, rewardType: e.target.value as typeof formData.rewardType })}
+                  >
+                    {REWARD_TYPES.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="rewardValue">Waarde (EUR)</Label>
+                  <Input
+                    id="rewardValue"
+                    type="number"
+                    step="0.50"
+                    min="0"
+                    value={formData.rewardValue}
+                    onChange={(e) => setFormData({ ...formData, rewardValue: e.target.value })}
+                    placeholder="5.00"
+                  />
+                </div>
+              </div>
+
+              {/* Dutch translations */}
+              <div className="space-y-4 rounded-lg border p-4">
+                <h4 className="font-medium">Nederlands</h4>
+                <p className="text-xs text-muted-foreground">
+                  Vul de Nederlandse tekst in - Engels wordt automatisch vertaald
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="nameNl">Naam</Label>
+                  <Input
+                    id="nameNl"
+                    value={formData.nameNl}
+                    onChange={(e) => setFormData({ ...formData, nameNl: e.target.value })}
+                    placeholder="Gratis kleine bubble tea"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="descriptionNl">Beschrijving</Label>
+                  <Input
+                    id="descriptionNl"
+                    value={formData.descriptionNl}
+                    onChange={(e) => setFormData({ ...formData, descriptionNl: e.target.value })}
+                    placeholder="Wissel in voor een gratis drankje naar keuze"
+                  />
+                </div>
+              </div>
+
+              {/* English translations */}
+              <div className="space-y-4 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">English</h4>
+                  <div className="flex items-center gap-2">
+                    {isTranslating && (
+                      <span className="flex items-center text-xs text-muted-foreground">
+                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                        Vertalen...
+                      </span>
+                    )}
+                    {(manuallyEditedEn.name || manuallyEditedEn.description) && !isTranslating && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setManuallyEditedEn({ name: false, description: false })}
+                        className="h-7 px-2 text-xs"
+                      >
+                        <RefreshCw className="mr-1 h-3 w-3" />
+                        Opnieuw vertalen
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {manuallyEditedEn.name || manuallyEditedEn.description
+                    ? "Handmatig aangepast - klik 'Opnieuw vertalen' om te resetten"
+                    : "Wordt automatisch vertaald vanuit Nederlands"}
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="nameEn">Name</Label>
+                  <Input
+                    id="nameEn"
+                    value={formData.nameEn}
+                    onChange={(e) => {
+                      setFormData({ ...formData, nameEn: e.target.value });
+                      setManuallyEditedEn((prev) => ({ ...prev, name: true }));
+                    }}
+                    placeholder="Free small bubble tea"
+                    className={isTranslating ? "bg-muted" : ""}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="descriptionEn">Description</Label>
+                  <Input
+                    id="descriptionEn"
+                    value={formData.descriptionEn}
+                    onChange={(e) => {
+                      setFormData({ ...formData, descriptionEn: e.target.value });
+                      setManuallyEditedEn((prev) => ({ ...prev, description: true }));
+                    }}
+                    placeholder="Redeem for a free drink of your choice"
+                    className={isTranslating ? "bg-muted" : ""}
+                  />
+                </div>
+              </div>
+
+              {/* Options */}
+              <div className="rounded-lg border border-tea-200 bg-tea-50 p-4">
+                <h4 className="mb-3 font-medium text-tea-800">Status</h4>
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.isAvailable}
+                    onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <span>Beschikbaar voor klanten om in te wisselen</span>
+                </label>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-2 border-t pt-4">
+                <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                  Annuleren
+                </Button>
+                <Button
+                  variant="tea"
+                  onClick={handleSave}
+                  disabled={createMutation.isPending || updateMutation.isPending || !formData.slug || !formData.pointsCost || !formData.nameNl || !formData.nameEn}
+                >
+                  {(createMutation.isPending || updateMutation.isPending) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  <Save className="mr-2 h-4 w-4" />
+                  Opslaan
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

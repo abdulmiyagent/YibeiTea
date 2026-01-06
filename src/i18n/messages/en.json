@@ -32,6 +32,14 @@
     "orders": "Orders",
     "favorites": "Favorites"
   },
+  "storeStatus": {
+    "open": "Open",
+    "closed": "Closed",
+    "openUntil": "Open until {time}",
+    "opensAt": "Opens at {time}",
+    "opensTomorrow": "Opens tomorrow at {time}",
+    "closedToday": "Closed today"
+  },
   "contact": {
     "title": "Contact",
     "subtitle": "Have a question or suggestion? Feel free to reach out!",
@@ -276,6 +284,12 @@
   },
   "checkout": {
     "title": "Checkout",
+    "preorder": {
+      "title": "Pre-order",
+      "badge": "Pre-order",
+      "description": "The store is currently closed. You can still order for later.",
+      "pickupInfo": "Your order will be prepared when we reopen."
+    },
     "steps": {
       "details": "Details",
       "pickup": "Pickup",

@@ -617,6 +617,10 @@ yibei-tea/
 - [ ] Production deployment
 
 ### Recently Completed
+- [x] Store status badge in header: shows "Open tot XX:XX" (green) or "Opent om XX:XX" (red) with dynamic opening hours from database (Jan 2026)
+- [x] Pre-order flow: customers can order when store is closed, with amber pre-order banner in checkout and automatic date/time slot selection (Jan 2026)
+- [x] Dynamic time slot filtering: filters out past time slots, auto-switches to tomorrow if no slots available today (Jan 2026)
+- [x] Shared store status hook (`useStoreStatus`) for reusable open/closed logic across components (Jan 2026)
 - [x] Mollie payment integration with Bancontact, iDEAL, Credit Card, PayPal (Jan 2026)
 - [x] Email notifications: order confirmation + order ready (Jan 2026)
 - [x] Promo code system: percentage and fixed amount discounts (Jan 2026)

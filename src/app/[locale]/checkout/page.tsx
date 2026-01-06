@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/stores/cart-store";
 import { formatPrice } from "@/lib/utils";
 import { api } from "@/lib/trpc";
+import { useStoreStatus, filterValidTimeSlots } from "@/hooks/use-store-status";
 import {
   User,
   Clock,
@@ -26,6 +27,7 @@ import {
   X,
   Tag,
   Loader2,
+  CalendarClock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -70,6 +72,10 @@ export default function CheckoutPage() {
   const { data: session, status: sessionStatus } = useSession();
   const { items, getSubtotal, clearCart } = useCartStore();
   const isLoggedIn = sessionStatus === "authenticated";
+
+  // Check store status for pre-order indication
+  const storeStatus = useStoreStatus();
+  const isPreorder = !storeStatus.isOpen;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -161,13 +167,42 @@ export default function CheckoutPage() {
     const openingHours = storeSettings?.openingHours as Record<string, { open: string; close: string }> | undefined;
     const dayHours = openingHours?.[dayName];
 
+    let slots: string[];
     if (dayHours) {
-      return generateTimeSlots(dayHours.open, dayHours.close);
+      slots = generateTimeSlots(dayHours.open, dayHours.close);
+    } else {
+      // Default fallback
+      slots = generateTimeSlots("11:00", "20:00");
     }
 
-    // Default fallback
-    return generateTimeSlots("11:00", "20:00");
+    // Filter out past time slots if ordering for today
+    const minPickupMinutes = storeSettings?.minPickupMinutes ?? 15;
+    return filterValidTimeSlots(slots, formData.pickupDate, minPickupMinutes);
   }, [formData.pickupDate, storeSettings]);
+
+  // Auto-switch to tomorrow if no valid time slots today
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    if (formData.pickupDate === today && timeSlots.length === 0) {
+      // No valid slots for today, switch to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setFormData((prev) => ({
+        ...prev,
+        pickupDate: tomorrow.toISOString().split("T")[0],
+      }));
+    }
+  }, [timeSlots, formData.pickupDate]);
+
+  // Auto-select first available time slot when time slots change
+  useEffect(() => {
+    if (timeSlots.length > 0 && !timeSlots.includes(formData.pickupTime)) {
+      setFormData((prev) => ({
+        ...prev,
+        pickupTime: timeSlots[0],
+      }));
+    }
+  }, [timeSlots, formData.pickupTime]);
 
   // Get selected reward details
   const selectedReward = useMemo(() => {
@@ -350,6 +385,33 @@ export default function CheckoutPage() {
             </span>
           </div>
         </div>
+
+        {/* Pre-order Banner */}
+        {isPreorder && (
+          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-amber-100 p-2">
+                <CalendarClock className="h-5 w-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium text-amber-800">
+                    {t("preorder.title")}
+                  </h3>
+                  <Badge className="bg-amber-200 text-amber-800 hover:bg-amber-200">
+                    {t("preorder.badge")}
+                  </Badge>
+                </div>
+                <p className="mt-1 text-sm text-amber-700">
+                  {t("preorder.description")}
+                </p>
+                <p className="mt-1 text-xs text-amber-600">
+                  {storeStatus.message}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Form Section */}
@@ -695,13 +757,26 @@ export default function CheckoutPage() {
 
                 {/* Pickup Info */}
                 {formData.pickupTime && (
-                  <div className="rounded-lg bg-muted/50 p-3 text-sm">
+                  <div className={cn(
+                    "rounded-lg p-3 text-sm",
+                    isPreorder ? "bg-amber-50 border border-amber-200" : "bg-muted/50"
+                  )}>
                     <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-tea-600" />
-                      <span>
-                        Afhalen: {formData.pickupDate} om {formData.pickupTime}
+                      {isPreorder ? (
+                        <CalendarClock className="h-4 w-4 text-amber-600" />
+                      ) : (
+                        <Clock className="h-4 w-4 text-tea-600" />
+                      )}
+                      <span className={isPreorder ? "text-amber-700" : ""}>
+                        {isPreorder ? "Pre-order: " : "Afhalen: "}
+                        {formData.pickupDate} om {formData.pickupTime}
                       </span>
                     </div>
+                    {isPreorder && (
+                      <p className="mt-1 text-xs text-amber-600">
+                        {t("preorder.pickupInfo")}
+                      </p>
+                    )}
                   </div>
                 )}
               </CardContent>

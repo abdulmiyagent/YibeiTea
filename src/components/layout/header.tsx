@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { LanguageSwitcher } from "./language-switcher";
 import { CartDrawer } from "@/components/cart/cart-drawer";
+import { StoreStatusBadge, MobileStoreStatusBadge } from "./store-status-badge";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -88,6 +89,7 @@ export function Header() {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
+            <StoreStatusBadge />
             <LanguageSwitcher />
 
             {/* Cart */}
@@ -212,6 +214,8 @@ export function Header() {
         {mobileMenuOpen && (
           <nav className="border-t py-4 md:hidden">
             <div className="flex flex-col space-y-3">
+              {/* Mobile Store Status */}
+              <MobileStoreStatusBadge />
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
