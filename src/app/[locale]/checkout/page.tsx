@@ -171,36 +171,28 @@ export default function CheckoutPage() {
   const pointsToEarn = Math.floor(total * 10);
 
   // Promo code validation
+  const utils = api.useUtils();
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+
   const handleApplyPromoCode = async () => {
     if (!promoCodeInput.trim()) return;
     setPromoCodeError(null);
+    setIsValidatingPromo(true);
 
     try {
-      const result = await new Promise<{
-        code: string;
-        discountType: string;
-        discountValue: number;
-        discountAmount: number;
-      }>((resolve, reject) => {
-        // Use utils to call the validate query
-        fetch(`/api/trpc/promoCodes.validate?input=${encodeURIComponent(JSON.stringify({ code: promoCodeInput, orderAmount: subtotal }))}`)
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.result?.data) {
-              resolve(data.result.data);
-            } else if (data.error) {
-              reject(new Error(data.error.message || "Ongeldige promotiecode"));
-            } else {
-              reject(new Error("Ongeldige promotiecode"));
-            }
-          })
-          .catch(() => reject(new Error("Er is een fout opgetreden")));
+      const result = await utils.promoCodes.validate.fetch({
+        code: promoCodeInput.trim(),
+        orderAmount: subtotal,
       });
 
       setAppliedPromoCode(result);
       setPromoCodeInput("");
-    } catch (err) {
-      setPromoCodeError(err instanceof Error ? err.message : "Ongeldige promotiecode");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message :
+        (err as { message?: string })?.message || "Ongeldige promotiecode";
+      setPromoCodeError(errorMessage);
+    } finally {
+      setIsValidatingPromo(false);
     }
   };
 
@@ -622,9 +614,13 @@ export default function CheckoutPage() {
                         variant="outline"
                         size="sm"
                         onClick={handleApplyPromoCode}
-                        disabled={!promoCodeInput.trim()}
+                        disabled={!promoCodeInput.trim() || isValidatingPromo}
                       >
-                        Toepassen
+                        {isValidatingPromo ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          "Toepassen"
+                        )}
                       </Button>
                     </div>
                   )}
