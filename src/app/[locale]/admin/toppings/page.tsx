@@ -8,6 +8,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api } from "@/lib/trpc";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   Plus,
   Pencil,
@@ -18,75 +36,143 @@ import {
   Save,
   Eye,
   EyeOff,
-  GripVertical,
   Cherry,
+  Loader2,
+  GripVertical,
 } from "lucide-react";
 import Link from "next/link";
 
-// Sample toppings data - would come from database via tRPC
-const sampleToppings = [
-  {
-    id: "1",
-    slug: "tapioca",
-    price: 0.5,
-    isAvailable: true,
-    sortOrder: 1,
-    name: "Tapioca",
-    nameEn: "Tapioca",
-  },
-  {
-    id: "2",
-    slug: "popping-boba",
-    price: 0.5,
-    isAvailable: true,
-    sortOrder: 2,
-    name: "Popping Boba",
-    nameEn: "Popping Boba",
-  },
-  {
-    id: "3",
-    slug: "coco-jelly",
-    price: 0.5,
-    isAvailable: true,
-    sortOrder: 3,
-    name: "Coco Jelly",
-    nameEn: "Coco Jelly",
-  },
-  {
-    id: "4",
-    slug: "grass-jelly",
-    price: 0.5,
-    isAvailable: false,
-    sortOrder: 4,
-    name: "Grass Jelly",
-    nameEn: "Grass Jelly",
-  },
-  {
-    id: "5",
-    slug: "aloe-vera",
-    price: 0.5,
-    isAvailable: true,
-    sortOrder: 5,
-    name: "Aloë Vera",
-    nameEn: "Aloe Vera",
-  },
-  {
-    id: "6",
-    slug: "red-bean",
-    price: 0.5,
-    isAvailable: true,
-    sortOrder: 6,
-    name: "Rode Bonen",
-    nameEn: "Red Bean",
-  },
-];
+type Topping = {
+  id: string;
+  slug: string;
+  price: number | { toNumber: () => number };
+  isAvailable: boolean;
+  sortOrder: number;
+  translations: { locale: string; name: string }[];
+};
 
-type Topping = (typeof sampleToppings)[0];
+// Sortable topping item component
+function SortableToppingItem({
+  topping,
+  isSuperAdmin,
+  onToggleAvailability,
+  onEdit,
+  onDelete,
+  getPrice,
+  isUpdating,
+}: {
+  topping: Topping;
+  isSuperAdmin: boolean;
+  onToggleAvailability: (topping: Topping) => void;
+  onEdit: (topping: Topping) => void;
+  onDelete: (id: string) => void;
+  getPrice: (price: unknown) => number;
+  isUpdating: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: topping.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : 1,
+  };
+
+  return (
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={`transition-all ${!topping.isAvailable ? "opacity-60" : ""} ${isDragging ? "shadow-lg ring-2 ring-tea-500" : ""}`}
+    >
+      <CardContent className="py-4">
+        <div className="flex items-center gap-4">
+          {/* Drag Handle */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab touch-none rounded p-1 hover:bg-muted active:cursor-grabbing"
+          >
+            <GripVertical className="h-5 w-5 text-muted-foreground" />
+          </div>
+
+          {/* Icon */}
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-taro-100">
+            <Cherry className="h-6 w-6 text-taro-600" />
+          </div>
+
+          {/* Info */}
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <h3 className="font-semibold">
+                {topping.translations[0]?.name || topping.slug}
+              </h3>
+              {!topping.isAvailable && (
+                <Badge variant="secondary" className="text-xs">
+                  Uitgeschakeld
+                </Badge>
+              )}
+            </div>
+            <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="font-mono">{topping.slug}</span>
+              <span>•</span>
+              <span className="font-medium text-tea-600">
+                €{getPrice(topping.price).toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onToggleAvailability(topping)}
+              title={topping.isAvailable ? "Uitschakelen" : "Inschakelen"}
+              disabled={isUpdating}
+            >
+              {topping.isAvailable ? (
+                <Eye className="h-4 w-4" />
+              ) : (
+                <EyeOff className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(topping)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            {isSuperAdmin && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={() => onDelete(topping.id)}
+                disabled={isUpdating}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function AdminToppingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [toppings, setToppings] = useState(sampleToppings);
+  const utils = api.useUtils();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTopping, setEditingTopping] = useState<Topping | null>(null);
@@ -101,13 +187,65 @@ export default function AdminToppingsPage() {
     sortOrder: "",
   });
 
-  if (status === "loading") {
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Fetch toppings from database
+  const { data: toppings, isLoading: toppingsLoading } = api.toppings.getAll.useQuery({
+    locale: "nl",
+    onlyAvailable: false,
+  });
+
+  // Mutations
+  const createMutation = api.toppings.create.useMutation({
+    onSuccess: () => {
+      utils.toppings.getAll.invalidate();
+      setIsModalOpen(false);
+      resetForm();
+    },
+  });
+
+  const updateMutation = api.toppings.update.useMutation({
+    onSuccess: () => {
+      utils.toppings.getAll.invalidate();
+      setIsModalOpen(false);
+      resetForm();
+    },
+  });
+
+  const deleteMutation = api.toppings.delete.useMutation({
+    onSuccess: () => {
+      utils.toppings.getAll.invalidate();
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      slug: "",
+      price: "0.50",
+      name: "",
+      nameEn: "",
+      isAvailable: true,
+      sortOrder: "",
+    });
+    setEditingTopping(null);
+  };
+
+  if (status === "loading" || toppingsLoading) {
     return (
       <div className="section-padding">
         <div className="container-custom">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 w-48 rounded bg-muted" />
-            <div className="h-96 rounded bg-muted" />
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
           </div>
         </div>
       </div>
@@ -124,18 +262,52 @@ export default function AdminToppingsPage() {
     return null;
   }
 
-  const filteredToppings = toppings
-    .filter((topping) => {
-      const matchesSearch =
-        topping.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        topping.slug.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesSearch;
-    })
-    .sort((a, b) => a.sortOrder - b.sortOrder);
+  const getPrice = (price: unknown): number => {
+    if (typeof price === "number") return price;
+    if (typeof price === "string") return parseFloat(price);
+    if (price && typeof price === "object" && "toNumber" in price) {
+      return (price as { toNumber: () => number }).toNumber();
+    }
+    return Number(price) || 0;
+  };
+
+  const sortedToppings = [...(toppings || [])].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const filteredToppings = sortedToppings.filter((topping) => {
+    const name = topping.translations[0]?.name || topping.slug;
+    const matchesSearch =
+      name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      topping.slug.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  });
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = sortedToppings.findIndex((t) => t.id === active.id);
+      const newIndex = sortedToppings.findIndex((t) => t.id === over.id);
+
+      const newOrder = arrayMove(sortedToppings, oldIndex, newIndex);
+
+      // Update sort orders in database
+      const updates = newOrder.map((topping, index) => ({
+        id: topping.id,
+        sortOrder: index + 1,
+      }));
+
+      // Update all affected toppings
+      for (const update of updates) {
+        if (sortedToppings.find((t) => t.id === update.id)?.sortOrder !== update.sortOrder) {
+          await updateMutation.mutateAsync(update);
+        }
+      }
+    }
+  };
 
   const openAddModal = () => {
-    setEditingTopping(null);
-    const nextSortOrder = Math.max(...toppings.map((t) => t.sortOrder), 0) + 1;
+    resetForm();
+    const nextSortOrder = Math.max(...(toppings || []).map((t) => t.sortOrder), 0) + 1;
     setFormData({
       slug: "",
       price: "0.50",
@@ -148,96 +320,63 @@ export default function AdminToppingsPage() {
   };
 
   const openEditModal = (topping: Topping) => {
+    const nlTranslation = topping.translations.find((t) => t.locale === "nl");
+    const enTranslation = topping.translations.find((t) => t.locale === "en");
+
     setEditingTopping(topping);
     setFormData({
       slug: topping.slug,
-      price: topping.price.toString(),
-      name: topping.name,
-      nameEn: topping.nameEn,
+      price: getPrice(topping.price).toString(),
+      name: nlTranslation?.name || "",
+      nameEn: enTranslation?.name || "",
       isAvailable: topping.isAvailable,
       sortOrder: topping.sortOrder.toString(),
     });
     setIsModalOpen(true);
   };
 
-  const handleSave = () => {
-    // Here you would call tRPC mutation to save the topping
+  const handleSave = async () => {
     if (editingTopping) {
-      setToppings(
-        toppings.map((t) =>
-          t.id === editingTopping.id
-            ? {
-                ...t,
-                slug: formData.slug,
-                price: parseFloat(formData.price),
-                name: formData.name,
-                nameEn: formData.nameEn,
-                isAvailable: formData.isAvailable,
-                sortOrder: parseInt(formData.sortOrder),
-              }
-            : t
-        )
-      );
-    } else {
-      // Add new topping
-      const newTopping: Topping = {
-        id: Date.now().toString(),
+      await updateMutation.mutateAsync({
+        id: editingTopping.id,
         slug: formData.slug,
         price: parseFloat(formData.price),
-        name: formData.name,
-        nameEn: formData.nameEn,
         isAvailable: formData.isAvailable,
         sortOrder: parseInt(formData.sortOrder),
-      };
-      setToppings([...toppings, newTopping]);
+        translations: [
+          { locale: "nl" as const, name: formData.name },
+          { locale: "en" as const, name: formData.nameEn || formData.name },
+        ],
+      });
+    } else {
+      await createMutation.mutateAsync({
+        slug: formData.slug,
+        price: parseFloat(formData.price),
+        isAvailable: formData.isAvailable,
+        sortOrder: parseInt(formData.sortOrder),
+        translations: [
+          { locale: "nl" as const, name: formData.name },
+          { locale: "en" as const, name: formData.nameEn || formData.name },
+        ],
+      });
     }
-    console.log("Saving topping:", formData);
-    setIsModalOpen(false);
   };
 
-  const handleDelete = (toppingId: string) => {
+  const handleDelete = async (toppingId: string) => {
     if (!isSuperAdmin) {
       alert("Alleen Super Admins kunnen toppings verwijderen.");
       return;
     }
     if (confirm("Weet je zeker dat je deze topping wilt verwijderen?")) {
-      setToppings(toppings.filter((t) => t.id !== toppingId));
+      await deleteMutation.mutateAsync({ id: toppingId });
     }
   };
 
-  const toggleAvailability = (toppingId: string) => {
-    setToppings(
-      toppings.map((t) =>
-        t.id === toppingId ? { ...t, isAvailable: !t.isAvailable } : t
-      )
-    );
-  };
-
-  const moveTopping = (toppingId: string, direction: "up" | "down") => {
-    const sortedToppings = [...toppings].sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = sortedToppings.findIndex((t) => t.id === toppingId);
-
-    if (direction === "up" && index > 0) {
-      const prevOrder = sortedToppings[index - 1].sortOrder;
-      const currentOrder = sortedToppings[index].sortOrder;
-      setToppings(
-        toppings.map((t) => {
-          if (t.id === toppingId) return { ...t, sortOrder: prevOrder };
-          if (t.id === sortedToppings[index - 1].id) return { ...t, sortOrder: currentOrder };
-          return t;
-        })
-      );
-    } else if (direction === "down" && index < sortedToppings.length - 1) {
-      const nextOrder = sortedToppings[index + 1].sortOrder;
-      const currentOrder = sortedToppings[index].sortOrder;
-      setToppings(
-        toppings.map((t) => {
-          if (t.id === toppingId) return { ...t, sortOrder: nextOrder };
-          if (t.id === sortedToppings[index + 1].id) return { ...t, sortOrder: currentOrder };
-          return t;
-        })
-      );
-    }
+  const toggleAvailability = async (topping: Topping) => {
+    await updateMutation.mutateAsync({
+      id: topping.id,
+      isAvailable: !topping.isAvailable,
+    });
   };
 
   return (
@@ -287,111 +426,37 @@ export default function AdminToppingsPage() {
         <Card className="mb-6 border-tea-200 bg-tea-50">
           <CardContent className="py-4">
             <p className="text-sm text-tea-700">
-              <strong>Tip:</strong> Toppings worden automatisch getoond bij alle dranken waar klanten extra&apos;s kunnen toevoegen.
-              Gebruik de volgorde knoppen om de weergavevolgorde aan te passen.
+              <strong>Tip:</strong> Sleep toppings met het <GripVertical className="inline h-4 w-4" /> icoon om de volgorde aan te passen.
             </p>
           </CardContent>
         </Card>
 
-        {/* Toppings List */}
-        <div className="space-y-3">
-          {filteredToppings.map((topping, index) => (
-            <Card
-              key={topping.id}
-              className={`transition-all ${!topping.isAvailable ? "opacity-60" : ""}`}
-            >
-              <CardContent className="py-4">
-                <div className="flex items-center gap-4">
-                  {/* Sort Handle */}
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => moveTopping(topping.id, "up")}
-                      disabled={index === 0}
-                    >
-                      <span className="text-xs">▲</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => moveTopping(topping.id, "down")}
-                      disabled={index === filteredToppings.length - 1}
-                    >
-                      <span className="text-xs">▼</span>
-                    </Button>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-taro-100">
-                    <Cherry className="h-6 w-6 text-taro-600" />
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-semibold">{topping.name}</h3>
-                      {!topping.isAvailable && (
-                        <Badge variant="secondary" className="text-xs">
-                          Uitgeschakeld
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="font-mono">{topping.slug}</span>
-                      <span>•</span>
-                      <span className="font-medium text-tea-600">
-                        €{topping.price.toFixed(2)}
-                      </span>
-                      <span>•</span>
-                      <span>Volgorde: {topping.sortOrder}</span>
-                    </div>
-                  </div>
-
-                  {/* English name */}
-                  <div className="hidden text-sm text-muted-foreground md:block">
-                    EN: {topping.nameEn}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleAvailability(topping.id)}
-                      title={topping.isAvailable ? "Uitschakelen" : "Inschakelen"}
-                    >
-                      {topping.isAvailable ? (
-                        <Eye className="h-4 w-4" />
-                      ) : (
-                        <EyeOff className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEditModal(topping)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    {isSuperAdmin && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => handleDelete(topping.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Toppings List with Drag and Drop */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={filteredToppings.map((t) => t.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-3">
+              {filteredToppings.map((topping) => (
+                <SortableToppingItem
+                  key={topping.id}
+                  topping={topping}
+                  isSuperAdmin={isSuperAdmin}
+                  onToggleAvailability={toggleAvailability}
+                  onEdit={openEditModal}
+                  onDelete={handleDelete}
+                  getPrice={getPrice}
+                  isUpdating={updateMutation.isPending || deleteMutation.isPending}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
 
         {filteredToppings.length === 0 && (
           <Card>
@@ -412,10 +477,10 @@ export default function AdminToppingsPage() {
           <CardContent className="py-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
-                Totaal: <strong>{toppings.length}</strong> toppings
+                Totaal: <strong>{(toppings || []).length}</strong> toppings
               </span>
               <span className="text-muted-foreground">
-                Actief: <strong>{toppings.filter((t) => t.isAvailable).length}</strong>
+                Actief: <strong>{(toppings || []).filter((t) => t.isAvailable).length}</strong>
               </span>
             </div>
           </CardContent>
@@ -504,24 +569,6 @@ export default function AdminToppingsPage() {
                 />
               </div>
 
-              {/* Sort Order */}
-              <div className="space-y-2">
-                <Label htmlFor="sortOrder">Volgorde</Label>
-                <Input
-                  id="sortOrder"
-                  type="number"
-                  min="1"
-                  placeholder="1"
-                  value={formData.sortOrder}
-                  onChange={(e) =>
-                    setFormData({ ...formData, sortOrder: e.target.value })
-                  }
-                />
-                <p className="text-xs text-muted-foreground">
-                  Lagere nummers worden eerst getoond
-                </p>
-              </div>
-
               {/* Options */}
               <label className="flex items-center gap-2">
                 <input
@@ -540,7 +587,14 @@ export default function AdminToppingsPage() {
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                   Annuleren
                 </Button>
-                <Button variant="tea" onClick={handleSave}>
+                <Button
+                  variant="tea"
+                  onClick={handleSave}
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                >
+                  {(createMutation.isPending || updateMutation.isPending) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   <Save className="mr-2 h-4 w-4" />
                   Opslaan
                 </Button>

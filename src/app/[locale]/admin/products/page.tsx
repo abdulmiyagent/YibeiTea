@@ -37,6 +37,9 @@ type Product = {
   isFeatured: boolean;
   caffeine: boolean;
   vegan: boolean;
+  allowSugarCustomization: boolean;
+  allowIceCustomization: boolean;
+  allowToppings: boolean;
   categoryId: string;
   translations: { locale: string; name: string; description: string }[];
   category: {
@@ -70,6 +73,9 @@ export default function AdminProductsPage() {
     isFeatured: false,
     caffeine: true,
     vegan: false,
+    allowSugarCustomization: true,
+    allowIceCustomization: true,
+    allowToppings: true,
   });
 
   // Fetch products
@@ -118,6 +124,9 @@ export default function AdminProductsPage() {
       isFeatured: false,
       caffeine: true,
       vegan: false,
+      allowSugarCustomization: true,
+      allowIceCustomization: true,
+      allowToppings: true,
     });
     setEditingProduct(null);
   };
@@ -179,6 +188,9 @@ export default function AdminProductsPage() {
       isFeatured: product.isFeatured,
       caffeine: product.caffeine,
       vegan: product.vegan,
+      allowSugarCustomization: product.allowSugarCustomization,
+      allowIceCustomization: product.allowIceCustomization,
+      allowToppings: product.allowToppings,
     });
     setIsModalOpen(true);
   };
@@ -195,6 +207,9 @@ export default function AdminProductsPage() {
         isFeatured: formData.isFeatured,
         caffeine: formData.caffeine,
         vegan: formData.vegan,
+        allowSugarCustomization: formData.allowSugarCustomization,
+        allowIceCustomization: formData.allowIceCustomization,
+        allowToppings: formData.allowToppings,
         translations: [
           { locale: "nl" as const, name: formData.name, description: formData.description },
           { locale: "en" as const, name: formData.nameEn, description: formData.descriptionEn },
@@ -210,6 +225,9 @@ export default function AdminProductsPage() {
         isFeatured: formData.isFeatured,
         caffeine: formData.caffeine,
         vegan: formData.vegan,
+        allowSugarCustomization: formData.allowSugarCustomization,
+        allowIceCustomization: formData.allowIceCustomization,
+        allowToppings: formData.allowToppings,
         translations: [
           { locale: "nl" as const, name: formData.name, description: formData.description },
           { locale: "en" as const, name: formData.nameEn, description: formData.descriptionEn },
@@ -646,6 +664,49 @@ export default function AdminProductsPage() {
                   />
                   <span>Vegan</span>
                 </label>
+              </div>
+
+              {/* Customization Options */}
+              <div className="space-y-4 rounded-lg border border-tea-200 bg-tea-50 p-4">
+                <h4 className="font-medium text-tea-800">Aanpassingsmogelijkheden</h4>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.allowSugarCustomization}
+                      onChange={(e) =>
+                        setFormData({ ...formData, allowSugarCustomization: e.target.checked })
+                      }
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span>Suikerniveau aanpasbaar</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.allowIceCustomization}
+                      onChange={(e) =>
+                        setFormData({ ...formData, allowIceCustomization: e.target.checked })
+                      }
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span>IJsniveau aanpasbaar</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.allowToppings}
+                      onChange={(e) =>
+                        setFormData({ ...formData, allowToppings: e.target.checked })
+                      }
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span>Toppings toevoegbaar</span>
+                  </label>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Bepaal welke aanpassingen klanten kunnen maken bij dit product
+                </p>
               </div>
 
               {/* Actions */}

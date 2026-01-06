@@ -29,6 +29,9 @@ export interface ProductData {
   vegan: boolean;
   caffeine: boolean;
   calories: number | null;
+  allowSugarCustomization: boolean;
+  allowIceCustomization: boolean;
+  allowToppings: boolean;
   translations: Array<{
     name: string;
     description: string | null;
@@ -95,10 +98,24 @@ export function ProductCustomization({
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
 
+  // Filter customization groups based on product settings
+  const filteredCustomizationGroups = useMemo(() => {
+    return customizationGroups.filter((group) => {
+      if (group.type === "SUGAR_LEVEL" && !product.allowSugarCustomization) return false;
+      if (group.type === "ICE_LEVEL" && !product.allowIceCustomization) return false;
+      return true;
+    });
+  }, [customizationGroups, product.allowSugarCustomization, product.allowIceCustomization]);
+
+  // Only show toppings if allowed for this product
+  const filteredToppings = useMemo(() => {
+    return product.allowToppings ? toppings : [];
+  }, [toppings, product.allowToppings]);
+
   // Initialize defaults from customization groups
   useEffect(() => {
     const defaults: Record<string, string> = {};
-    customizationGroups.forEach((group) => {
+    filteredCustomizationGroups.forEach((group) => {
       const defaultValue = group.values.find((v) => v.isDefault);
       if (defaultValue) {
         defaults[group.type] = defaultValue.value;
@@ -107,14 +124,14 @@ export function ProductCustomization({
       }
     });
     setSelectedOptions(defaults);
-  }, [customizationGroups]);
+  }, [filteredCustomizationGroups]);
 
   // Calculate total price
   const totalPrice = useMemo(() => {
     let price = Number(product.price);
 
     // Add customization price modifiers
-    customizationGroups.forEach((group) => {
+    filteredCustomizationGroups.forEach((group) => {
       const selectedValue = selectedOptions[group.type];
       const option = group.values.find((v) => v.value === selectedValue);
       if (option) {
@@ -124,17 +141,17 @@ export function ProductCustomization({
 
     // Add toppings
     selectedToppings.forEach((id) => {
-      const topping = toppings.find((t) => t.id === id);
+      const topping = filteredToppings.find((t) => t.id === id);
       if (topping) price += Number(topping.price);
     });
 
     return price * quantity;
-  }, [product.price, customizationGroups, selectedOptions, toppings, selectedToppings, quantity]);
+  }, [product.price, filteredCustomizationGroups, selectedOptions, filteredToppings, selectedToppings, quantity]);
 
   // Handle add to cart
   const handleAddToCart = () => {
     const toppingNames = selectedToppings
-      .map((id) => toppings.find((t) => t.id === id)?.translations[0]?.name || "")
+      .map((id) => filteredToppings.find((t) => t.id === id)?.translations[0]?.name || "")
       .filter(Boolean);
 
     addItem({
@@ -222,9 +239,9 @@ export function ProductCustomization({
         </div>
 
         {/* Customization Options - ultra compact */}
-        {customizationGroups.length > 0 && (
+        {filteredCustomizationGroups.length > 0 && (
           <div className="mt-2.5 space-y-2">
-            {customizationGroups.map((group) => (
+            {filteredCustomizationGroups.map((group) => (
               <div key={group.id}>
                 <label className="mb-1 block text-[10px] font-medium text-gray-400 uppercase tracking-wider">
                   {getGroupLabel(group.type)}
@@ -261,13 +278,13 @@ export function ProductCustomization({
         )}
 
         {/* Toppings - ultra compact */}
-        {toppings.length > 0 && (
+        {filteredToppings.length > 0 && (
           <div className="mt-2">
             <label className="mb-1 block text-[10px] font-medium text-gray-400 uppercase tracking-wider">
               {t("customize.toppings")}
             </label>
             <div className="flex flex-wrap gap-1">
-              {toppings.map((topping) => {
+              {filteredToppings.map((topping) => {
                 const isSelected = selectedToppings.includes(topping.id);
                 return (
                   <button
@@ -413,11 +430,11 @@ export function ProductCustomization({
         </div>
 
         {/* Dynamic Customization Groups */}
-        {customizationGroups.length > 0 && (
+        {filteredCustomizationGroups.length > 0 && (
           <div className="space-y-5 border-t border-gray-100 pt-6">
             <h3 className="text-sm font-semibold">{t("customize.title")}</h3>
 
-            {customizationGroups.map((group) => (
+            {filteredCustomizationGroups.map((group) => (
               <div key={group.id}>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   {getGroupLabel(group.type)}
@@ -464,13 +481,13 @@ export function ProductCustomization({
         )}
 
         {/* Toppings */}
-        {toppings.length > 0 && (
+        {filteredToppings.length > 0 && (
           <div className="border-t border-gray-100 pt-6">
             <label className="mb-2 block text-sm font-medium text-gray-700">
               {t("customize.toppings")}
             </label>
             <div className="flex flex-wrap gap-2">
-              {toppings.map((topping) => {
+              {filteredToppings.map((topping) => {
                 const isSelected = selectedToppings.includes(topping.id);
                 return (
                   <button

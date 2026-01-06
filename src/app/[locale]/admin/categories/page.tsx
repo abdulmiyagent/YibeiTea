@@ -9,6 +9,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { api } from "@/lib/trpc";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   Plus,
   Pencil,
@@ -24,7 +42,16 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
-import { api } from "@/lib/trpc";
+
+type Category = {
+  id: string;
+  slug: string;
+  sortOrder: number;
+  isActive: boolean;
+  imageUrl: string | null;
+  translations: { locale: string; name: string; description: string | null }[];
+  _count: { products: number };
+};
 
 type CategoryFormData = {
   slug: string;
@@ -48,6 +75,160 @@ const initialFormData: CategoryFormData = {
   descriptionEn: "",
 };
 
+// Sortable category item component
+function SortableCategoryItem({
+  category,
+  onToggleActive,
+  onEdit,
+  onDelete,
+  deleteConfirmId,
+  setDeleteConfirmId,
+  isUpdating,
+  isDeleting,
+}: {
+  category: Category;
+  onToggleActive: (category: Category) => void;
+  onEdit: (category: Category) => void;
+  onDelete: (id: string) => void;
+  deleteConfirmId: string | null;
+  setDeleteConfirmId: (id: string | null) => void;
+  isUpdating: boolean;
+  isDeleting: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : 1,
+  };
+
+  const nlTranslation = category.translations.find((t) => t.locale === "nl");
+  const enTranslation = category.translations.find((t) => t.locale === "en");
+
+  return (
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={`relative transition-all ${!category.isActive ? "opacity-60" : ""} ${isDragging ? "shadow-lg ring-2 ring-tea-500" : ""}`}
+    >
+      <CardContent className="py-4">
+        <div className="flex items-center gap-4">
+          {/* Drag Handle */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab touch-none rounded p-1 hover:bg-muted active:cursor-grabbing"
+          >
+            <GripVertical className="h-5 w-5 text-muted-foreground" />
+          </div>
+
+          {/* Category Info */}
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <h3 className="font-semibold">
+                {nlTranslation?.name || category.slug}
+              </h3>
+              <span className="text-sm text-muted-foreground">
+                ({enTranslation?.name || "-"})
+              </span>
+              {!category.isActive && (
+                <Badge variant="secondary">Inactief</Badge>
+              )}
+            </div>
+            <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="font-mono">{category.slug}</span>
+              <span>•</span>
+              <span>{category._count.products} producten</span>
+            </div>
+            {nlTranslation?.description && (
+              <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
+                {nlTranslation.description}
+              </p>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onToggleActive(category)}
+              title={category.isActive ? "Deactiveren" : "Activeren"}
+              disabled={isUpdating}
+            >
+              {category.isActive ? (
+                <Eye className="h-4 w-4" />
+              ) : (
+                <EyeOff className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(category)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            {category._count.products === 0 ? (
+              deleteConfirmId === category.id ? (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => onDelete(category.id)}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Ja"
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDeleteConfirmId(null)}
+                  >
+                    Nee
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive"
+                  onClick={() => setDeleteConfirmId(category.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled
+                title="Kan niet verwijderen: bevat producten"
+                className="opacity-30"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminCategoriesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -56,6 +237,18 @@ export default function AdminCategoriesPage() {
   const [formData, setFormData] = useState<CategoryFormData>(initialFormData);
   const [formError, setFormError] = useState("");
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Fetch categories
   const {
@@ -125,6 +318,37 @@ export default function AdminCategoriesPage() {
     return null;
   }
 
+  const sortedCategories = [...(categories || [])].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = sortedCategories.findIndex((c) => c.id === active.id);
+      const newIndex = sortedCategories.findIndex((c) => c.id === over.id);
+
+      const newOrder = arrayMove(sortedCategories, oldIndex, newIndex);
+
+      // Update sort orders in database
+      for (let i = 0; i < newOrder.length; i++) {
+        const category = newOrder[i];
+        if (category.sortOrder !== i + 1) {
+          const nlTranslation = category.translations.find((t) => t.locale === "nl");
+          const enTranslation = category.translations.find((t) => t.locale === "en");
+
+          await updateMutation.mutateAsync({
+            id: category.id,
+            sortOrder: i + 1,
+            translations: [
+              { locale: "nl" as const, name: nlTranslation?.name || "", description: nlTranslation?.description || undefined },
+              { locale: "en" as const, name: enTranslation?.name || "", description: enTranslation?.description || undefined },
+            ],
+          });
+        }
+      }
+    }
+  };
+
   const openAddModal = () => {
     setEditingCategoryId(null);
     setFormData({
@@ -135,7 +359,7 @@ export default function AdminCategoriesPage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (category: NonNullable<typeof categories>[0]) => {
+  const openEditModal = (category: Category) => {
     setEditingCategoryId(category.id);
     const nlTranslation = category.translations.find((t) => t.locale === "nl");
     const enTranslation = category.translations.find((t) => t.locale === "en");
@@ -194,7 +418,7 @@ export default function AdminCategoriesPage() {
     deleteMutation.mutate({ id: categoryId });
   };
 
-  const toggleActive = (category: NonNullable<typeof categories>[0]) => {
+  const toggleActive = (category: Category) => {
     const nlTranslation = category.translations.find((t) => t.locale === "nl");
     const enTranslation = category.translations.find((t) => t.locale === "en");
 
@@ -240,153 +464,57 @@ export default function AdminCategoriesPage() {
         </div>
 
         {/* Info Card */}
-        <Card className="mb-6 border-blue-200 bg-blue-50">
-          <CardContent className="flex items-start gap-4 py-4">
-            <FolderOpen className="h-6 w-6 text-blue-600 flex-shrink-0" />
-            <div>
-              <p className="font-medium text-blue-800">
-                Categorieën uit yibeitea.be
-              </p>
-              <p className="text-sm text-blue-700 mt-1">
-                Brown Sugar, Milk Tea, Cream Cheese, Iced Coffee, Hot Coffee, Ice Tea, Mojito, Kids Star, Latte Special, Frappucchino
-              </p>
-            </div>
+        <Card className="mb-6 border-tea-200 bg-tea-50">
+          <CardContent className="py-4">
+            <p className="text-sm text-tea-700">
+              <strong>Tip:</strong> Sleep categorieën met het <GripVertical className="inline h-4 w-4" /> icoon om de menu volgorde aan te passen.
+            </p>
           </CardContent>
         </Card>
 
-        {/* Categories List */}
-        <div className="space-y-4">
-          {categories && categories.length > 0 ? (
-            categories.map((category) => {
-              const nlTranslation = category.translations.find((t) => t.locale === "nl");
-              const enTranslation = category.translations.find((t) => t.locale === "en");
-
-              return (
-                <Card
-                  key={category.id}
-                  className={`relative ${!category.isActive ? "opacity-60" : ""}`}
-                >
-                  <CardContent className="py-4">
-                    <div className="flex items-center gap-4">
-                      {/* Drag Handle */}
-                      <div className="cursor-grab text-muted-foreground">
-                        <GripVertical className="h-5 w-5" />
-                      </div>
-
-                      {/* Category Info */}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <h3 className="font-semibold">
-                            {nlTranslation?.name || category.slug}
-                          </h3>
-                          <span className="text-sm text-muted-foreground">
-                            ({enTranslation?.name || "-"})
-                          </span>
-                          {!category.isActive && (
-                            <Badge variant="secondary">Inactief</Badge>
-                          )}
-                        </div>
-                        <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="font-mono">{category.slug}</span>
-                          <span>•</span>
-                          <span>{category._count.products} producten</span>
-                          <span>•</span>
-                          <span>Volgorde: {category.sortOrder}</span>
-                        </div>
-                        {nlTranslation?.description && (
-                          <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
-                            {nlTranslation.description}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleActive(category)}
-                          title={category.isActive ? "Deactiveren" : "Activeren"}
-                        >
-                          {category.isActive ? (
-                            <Eye className="h-4 w-4" />
-                          ) : (
-                            <EyeOff className="h-4 w-4" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openEditModal(category)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        {category._count.products === 0 ? (
-                          deleteConfirmId === category.id ? (
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleDelete(category.id)}
-                                disabled={deleteMutation.isPending}
-                              >
-                                {deleteMutation.isPending ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  "Ja"
-                                )}
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setDeleteConfirmId(null)}
-                              >
-                                Nee
-                              </Button>
-                            </div>
-                          ) : (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-destructive hover:text-destructive"
-                              onClick={() => setDeleteConfirmId(category.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )
-                        ) : (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            disabled
-                            title="Kan niet verwijderen: bevat producten"
-                            className="opacity-30"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })
-          ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <FolderOpen className="mx-auto h-12 w-12 text-muted-foreground" />
-                <p className="mt-4 text-lg font-medium">Geen categorieën gevonden</p>
-                <p className="text-muted-foreground">
-                  Voeg je eerste categorie toe om te beginnen
-                </p>
-                <Button variant="tea" className="mt-4" onClick={openAddModal}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nieuwe Categorie
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        {/* Categories List with Drag and Drop */}
+        {categories && categories.length > 0 ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={sortedCategories.map((c) => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {sortedCategories.map((category) => (
+                  <SortableCategoryItem
+                    key={category.id}
+                    category={category}
+                    onToggleActive={toggleActive}
+                    onEdit={openEditModal}
+                    onDelete={handleDelete}
+                    deleteConfirmId={deleteConfirmId}
+                    setDeleteConfirmId={setDeleteConfirmId}
+                    isUpdating={updateMutation.isPending}
+                    isDeleting={deleteMutation.isPending}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        ) : (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <FolderOpen className="mx-auto h-12 w-12 text-muted-foreground" />
+              <p className="mt-4 text-lg font-medium">Geen categorieën gevonden</p>
+              <p className="text-muted-foreground">
+                Voeg je eerste categorie toe om te beginnen
+              </p>
+              <Button variant="tea" className="mt-4" onClick={openAddModal}>
+                <Plus className="mr-2 h-4 w-4" />
+                Nieuwe Categorie
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Add/Edit Modal */}
@@ -414,33 +542,19 @@ export default function AdminCategoriesPage() {
               )}
 
               {/* Basic Info */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="slug">Slug (URL)</Label>
-                  <Input
-                    id="slug"
-                    placeholder="brown-sugar"
-                    value={formData.slug}
-                    onChange={(e) =>
-                      setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") })
-                    }
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Alleen kleine letters, cijfers en streepjes
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sortOrder">Volgorde</Label>
-                  <Input
-                    id="sortOrder"
-                    type="number"
-                    min="0"
-                    value={formData.sortOrder}
-                    onChange={(e) =>
-                      setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })
-                    }
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug (URL)</Label>
+                <Input
+                  id="slug"
+                  placeholder="brown-sugar"
+                  value={formData.slug}
+                  onChange={(e) =>
+                    setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") })
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  Alleen kleine letters, cijfers en streepjes
+                </p>
               </div>
 
               <div className="space-y-2">

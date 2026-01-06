@@ -36,6 +36,9 @@ async function getProductData(slug: string, locale: string) {
     vegan: product.vegan,
     caffeine: product.caffeine,
     calories: product.calories,
+    allowSugarCustomization: product.allowSugarCustomization,
+    allowIceCustomization: product.allowIceCustomization,
+    allowToppings: product.allowToppings,
     translations: product.translations.map((t) => ({
       name: t.name,
       description: t.description,

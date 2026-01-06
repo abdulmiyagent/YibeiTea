@@ -117,6 +117,9 @@ export const productsRouter = router({
       caffeine: z.boolean().default(true),
       vegan: z.boolean().default(false),
       calories: z.number().int().optional(),
+      allowSugarCustomization: z.boolean().default(true),
+      allowIceCustomization: z.boolean().default(true),
+      allowToppings: z.boolean().default(true),
       translations: z.array(z.object({
         locale: z.enum(["nl", "en"]),
         name: z.string(),
@@ -144,6 +147,9 @@ export const productsRouter = router({
       caffeine: z.boolean().optional(),
       vegan: z.boolean().optional(),
       calories: z.number().int().optional().nullable(),
+      allowSugarCustomization: z.boolean().optional(),
+      allowIceCustomization: z.boolean().optional(),
+      allowToppings: z.boolean().optional(),
       translations: z.array(z.object({
         locale: z.enum(["nl", "en"]),
         name: z.string(),

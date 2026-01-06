@@ -60,7 +60,7 @@ A **web-based ordering platform** for Yibei Tea, a bubble tea shop in Ghent, Bel
 - [x] Loyalty points system (earning on order)
 
 ### In Scope (Post-MVP)
-- Admin product management (CRUD)
+- ~~Admin product management (CRUD)~~ ✅ Done
 - Admin analytics dashboard
 - Rewards redemption
 - Birthday rewards automation
@@ -231,6 +231,7 @@ Product
 ├── id, slug, categoryId, price
 ├── imageUrl, isAvailable, isFeatured
 ├── calories, caffeine, vegan
+├── allowSugarCustomization, allowIceCustomization, allowToppings
 └── relations: translations, category
 
 Category
@@ -620,9 +621,10 @@ yibei-tea/
 - [x] Admin orders: connect to database with status updates (Jan 2026)
 - [x] Checkout form validation (Jan 2026)
 - [x] Checkout: save customizations to OrderItem (Jan 2026)
+- [x] Admin product management with per-product customization settings (Jan 2026)
+- [x] Per-product sugar/ice/toppings toggle (allowSugarCustomization, allowIceCustomization, allowToppings) (Jan 2026)
 
 ### Not Started
-- [ ] Admin product management
 - [ ] Loyalty points redemption
 - [ ] Analytics dashboard
 - [ ] Production deployment
