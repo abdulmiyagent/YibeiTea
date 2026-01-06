@@ -313,6 +313,13 @@
       "label": "Notes",
       "placeholder": "Special requests or allergies..."
     },
+    "validation": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email address",
+      "pickupTimeInvalid": "Please select a future pickup time",
+      "fixErrors": "Please fix the errors before placing your order"
+    },
     "placeOrder": "Place Order",
     "processing": "Processing..."
   },

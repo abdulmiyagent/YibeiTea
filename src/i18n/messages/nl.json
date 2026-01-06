@@ -313,6 +313,13 @@
       "label": "Opmerkingen",
       "placeholder": "Speciale verzoeken of allergieën..."
     },
+    "validation": {
+      "nameRequired": "Naam is verplicht",
+      "emailRequired": "E-mail is verplicht",
+      "emailInvalid": "Ongeldig e-mailadres",
+      "pickupTimeInvalid": "Kies een toekomstige afhaaltijd",
+      "fixErrors": "Corrigeer de fouten voordat je bestelt"
+    },
     "placeOrder": "Bestelling Plaatsen",
     "processing": "Verwerken..."
   },
