@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,7 +32,6 @@ import {
   Loader2,
   Coins,
   Edit,
-  Languages,
 } from "lucide-react";
 import Link from "next/link";
 import { translate } from "@/lib/translate";
@@ -67,49 +66,46 @@ export default function RewardsAdminPage() {
     descriptionEn: "",
   });
   const [isTranslating, setIsTranslating] = useState(false);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN";
 
-  // Translation functions
-  const translateToEnglish = async () => {
-    if (!formData.nameNl && !formData.descriptionNl) return;
-    setIsTranslating(true);
-    try {
-      const [nameEn, descriptionEn] = await Promise.all([
-        formData.nameNl ? translate(formData.nameNl, "nl-en") : "",
-        formData.descriptionNl ? translate(formData.descriptionNl, "nl-en") : "",
-      ]);
-      setFormData((prev) => ({
-        ...prev,
-        nameEn: nameEn || prev.nameEn,
-        descriptionEn: descriptionEn || prev.descriptionEn,
-      }));
-    } catch (error) {
-      console.error("Translation failed:", error);
-    } finally {
-      setIsTranslating(false);
+  // Auto-translate when NL fields change (with debounce)
+  useEffect(() => {
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
     }
-  };
 
-  const translateToDutch = async () => {
-    if (!formData.nameEn && !formData.descriptionEn) return;
-    setIsTranslating(true);
-    try {
-      const [nameNl, descriptionNl] = await Promise.all([
-        formData.nameEn ? translate(formData.nameEn, "en-nl") : "",
-        formData.descriptionEn ? translate(formData.descriptionEn, "en-nl") : "",
-      ]);
-      setFormData((prev) => ({
-        ...prev,
-        nameNl: nameNl || prev.nameNl,
-        descriptionNl: descriptionNl || prev.descriptionNl,
-      }));
-    } catch (error) {
-      console.error("Translation failed:", error);
-    } finally {
-      setIsTranslating(false);
-    }
-  };
+    // Only auto-translate if there's NL content
+    if (!formData.nameNl && !formData.descriptionNl) return;
+
+    // Set new timer - wait 800ms after user stops typing
+    debounceTimerRef.current = setTimeout(async () => {
+      setIsTranslating(true);
+      try {
+        const [nameEn, descriptionEn] = await Promise.all([
+          formData.nameNl ? translate(formData.nameNl, "nl-en") : "",
+          formData.descriptionNl ? translate(formData.descriptionNl, "nl-en") : "",
+        ]);
+        setFormData((prev) => ({
+          ...prev,
+          nameEn: nameEn || prev.nameEn,
+          descriptionEn: descriptionEn || prev.descriptionEn,
+        }));
+      } catch (error) {
+        console.error("Translation failed:", error);
+      } finally {
+        setIsTranslating(false);
+      }
+    }, 800);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [formData.nameNl, formData.descriptionNl]);
 
   const utils = api.useUtils();
 
@@ -332,24 +328,8 @@ export default function RewardsAdminPage() {
                   </div>
 
                   <div className="space-y-4 rounded-lg border p-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">Nederlands</h4>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={translateToEnglish}
-                        disabled={isTranslating || (!formData.nameNl && !formData.descriptionNl)}
-                        className="text-xs"
-                      >
-                        {isTranslating ? (
-                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                        ) : (
-                          <Languages className="mr-1 h-3 w-3" />
-                        )}
-                        Vertaal naar EN
-                      </Button>
-                    </div>
+                    <h4 className="font-medium">Nederlands</h4>
+                    <p className="text-xs text-muted-foreground">Vul Nederlands in, Engels wordt automatisch vertaald</p>
                     <div className="space-y-2">
                       <Label>Naam (NL)</Label>
                       <Input
@@ -373,21 +353,12 @@ export default function RewardsAdminPage() {
                   <div className="space-y-4 rounded-lg border p-4">
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium">English</h4>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={translateToDutch}
-                        disabled={isTranslating || (!formData.nameEn && !formData.descriptionEn)}
-                        className="text-xs"
-                      >
-                        {isTranslating ? (
+                      {isTranslating && (
+                        <span className="flex items-center text-xs text-muted-foreground">
                           <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                        ) : (
-                          <Languages className="mr-1 h-3 w-3" />
-                        )}
-                        Vertaal naar NL
-                      </Button>
+                          Vertalen...
+                        </span>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>Name (EN)</Label>
@@ -396,6 +367,7 @@ export default function RewardsAdminPage() {
                         onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
                         placeholder="Free small bubble tea"
                         required
+                        className={isTranslating ? "bg-muted" : ""}
                       />
                     </div>
                     <div className="space-y-2">
@@ -405,6 +377,7 @@ export default function RewardsAdminPage() {
                         onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
                         placeholder="Redeem for a free drink"
                         required
+                        className={isTranslating ? "bg-muted" : ""}
                       />
                     </div>
                   </div>
