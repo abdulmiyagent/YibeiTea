@@ -551,6 +551,21 @@ When using Claude or other AI assistants on this project:
 - Move deprecated items to "Deprecated/Removed" section
 - Never delete historical decisions (they provide context)
 
+### Session Shutdown (AI)
+
+At the end of a work session, the command **"sluit af"** is used.
+
+When triggered, AI must:
+
+- Check whether decisions or changes made during the session require updates to this README.md
+- Update README.md first if needed
+- Commit and immediately push documentation changes
+- Commit completed, working code changes
+- Push all safe commits
+- Never commit or push broken, incomplete, or experimental work
+- Report actions taken (README updated / commits / push)
+- End the session without introducing new tasks or suggestions
+
 ---
 
 ## Appendix: File Structure
