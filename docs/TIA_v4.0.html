@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transfer Impact Assessment (TIA) v4.0 - Yibei Tea</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      font-size: 14px;
+    }
+    h1 { color: #333; margin-bottom: 5px; font-size: 22px; }
+    h2 { color: #9B7B5B; margin-top: 25px; margin-bottom: 12px; font-size: 16px; border-bottom: 1px solid #e0d9d3; padding-bottom: 5px; }
+    h3 { color: #555; margin-top: 15px; margin-bottom: 8px; font-size: 14px; }
+    p { margin-bottom: 10px; }
+    .header { border-bottom: 2px solid #9B7B5B; padding-bottom: 20px; margin-bottom: 25px; }
+    .subtitle { color: #666; font-size: 14px; }
+    .date { color: #999; font-size: 13px; margin-top: 5px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    th, td { border: 1px solid #e0d9d3; padding: 8px 10px; text-align: left; }
+    th { background: #f8f5f2; font-weight: 600; }
+    ul, ol { margin: 10px 0 15px 20px; }
+    li { margin-bottom: 5px; }
+    .tag-eu { background: #d4edda; color: #155724; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .tag-scc { background: #cce5ff; color: #004085; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .tag-low { background: #d4edda; color: #155724; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .section { margin-bottom: 25px; }
+    .info-box { background: #f8f5f2; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    .removed { background: #f8d7da; border: 1px solid #f5c6cb; padding: 12px; border-radius: 8px; margin: 15px 0; }
+    .signature { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0d9d3; }
+    @media print { body { padding: 20px; } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Transfer Impact Assessment (TIA)</h1>
+  <p class="subtitle">Yibei Tea - Internationale Gegevensoverdrachten</p>
+  <p class="date">Versie 4.0 — Januari 2026</p>
+</div>
+
+<div class="section">
+  <h2>1. Inleiding</h2>
+  <p>Dit document bevat de Transfer Impact Assessment (TIA) voor Yibei Tea conform de vereisten van het Schrems II arrest (C-311/18) en de aanbevelingen van de European Data Protection Board (EDPB).</p>
+
+  <div class="info-box">
+    <p><strong>Verwerkingsverantwoordelijke:</strong></p>
+    <p>Idris & Adam BV h/a Yibei Tea</p>
+    <p>Sint-Niklaasstraat 36, 9000 Gent, België</p>
+    <p>KBO: 0786.830.346 | BTW: BE0786.830.346</p>
+  </div>
+</div>
+
+<div class="section">
+  <h2>2. Overzicht Verwerkers</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Verwerker</th>
+        <th>Locatie</th>
+        <th>Doel</th>
+        <th>Transfer</th>
+        <th>TIA Vereist</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Mollie B.V.</strong></td>
+        <td>Nederland</td>
+        <td>Betalingsverwerking</td>
+        <td><span class="tag-eu">EU</span></td>
+        <td>Nee</td>
+      </tr>
+      <tr>
+        <td><strong>Supabase Inc.</strong></td>
+        <td>AWS Frankfurt</td>
+        <td>Database hosting</td>
+        <td><span class="tag-eu">EU</span></td>
+        <td>Nee</td>
+      </tr>
+      <tr>
+        <td><strong>Brevo (Sendinblue)</strong></td>
+        <td>Frankrijk</td>
+        <td>Email verzending</td>
+        <td><span class="tag-eu">EU</span></td>
+        <td>Nee</td>
+      </tr>
+      <tr>
+        <td><strong>Google LLC</strong></td>
+        <td>Verenigde Staten</td>
+        <td>OAuth login (optioneel)</td>
+        <td><span class="tag-scc">SCCs</span></td>
+        <td>Ja</td>
+      </tr>
+      <tr>
+        <td><strong>Vercel Inc.</strong></td>
+        <td>Verenigde Staten</td>
+        <td>Website hosting</td>
+        <td><span class="tag-scc">SCCs</span></td>
+        <td>Ja</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="removed">
+    <p><strong>Verwijderd in v4.0:</strong> Resend Inc. (US-based email provider) is vervangen door Brevo (Frankrijk, EU). Hierdoor is geen TIA meer vereist voor email verzending.</p>
+  </div>
+</div>
+
+<div class="section">
+  <h2>3. TIA: Google LLC (OAuth)</h2>
+
+  <h3>3.1 Gegevensoverdracht</h3>
+  <table>
+    <tr>
+      <th>Aspect</th>
+      <th>Details</th>
+    </tr>
+    <tr>
+      <td>Categorie gegevens</td>
+      <td>Email adres, naam (bij Google login)</td>
+    </tr>
+    <tr>
+      <td>Aantal betrokkenen</td>
+      <td>Beperkt (alleen gebruikers die kiezen voor Google login)</td>
+    </tr>
+    <tr>
+      <td>Frequentie</td>
+      <td>Incidenteel (alleen bij login)</td>
+    </tr>
+    <tr>
+      <td>Gevoeligheid</td>
+      <td>Laag (geen bijzondere categorieën)</td>
+    </tr>
+  </table>
+
+  <h3>3.2 Juridisch Kader VS</h3>
+  <ul>
+    <li><strong>FISA 702:</strong> Van toepassing op Google als "electronic communications service provider"</li>
+    <li><strong>EO 12333:</strong> Potentieel van toepassing</li>
+    <li><strong>CLOUD Act:</strong> Van toepassing</li>
+  </ul>
+
+  <h3>3.3 Aanvullende Waarborgen</h3>
+  <ul>
+    <li>SCCs (Standard Contractual Clauses) 2021 via Google DPA</li>
+    <li>Technische maatregelen: TLS encryptie, OAuth 2.0 protocol</li>
+    <li>Beperkte data: alleen authenticatie tokens, geen inhoudelijke data</li>
+    <li>Optionele service: gebruikers kunnen ook email/wachtwoord gebruiken</li>
+  </ul>
+
+  <h3>3.4 Risicobeoordeling</h3>
+  <p><strong>Risico:</strong> <span class="tag-low">LAAG</span></p>
+  <p>De overdracht betreft minimale data (enkel authenticatie) en is volledig optioneel. Google biedt robuuste technische en contractuele waarborgen.</p>
+</div>
+
+<div class="section">
+  <h2>4. TIA: Vercel Inc. (Hosting)</h2>
+
+  <h3>4.1 Gegevensoverdracht</h3>
+  <table>
+    <tr>
+      <th>Aspect</th>
+      <th>Details</th>
+    </tr>
+    <tr>
+      <td>Categorie gegevens</td>
+      <td>IP-adressen, request headers (logs)</td>
+    </tr>
+    <tr>
+      <td>Aantal betrokkenen</td>
+      <td>Alle websitebezoekers</td>
+    </tr>
+    <tr>
+      <td>Frequentie</td>
+      <td>Continu (bij elk paginaverzoek)</td>
+    </tr>
+    <tr>
+      <td>Gevoeligheid</td>
+      <td>Laag (technische metadata)</td>
+    </tr>
+  </table>
+
+  <h3>4.2 Juridisch Kader VS</h3>
+  <ul>
+    <li><strong>FISA 702:</strong> Potentieel van toepassing</li>
+    <li><strong>EO 12333:</strong> Potentieel van toepassing</li>
+    <li><strong>CLOUD Act:</strong> Van toepassing</li>
+  </ul>
+
+  <h3>4.3 Aanvullende Waarborgen</h3>
+  <ul>
+    <li>SCCs (Standard Contractual Clauses) 2021 via Vercel DPA</li>
+    <li>EU Edge Network: primaire serving vanuit EU locaties</li>
+    <li>Technische maatregelen: HTTPS/TLS, DDoS protection</li>
+    <li>Beperkte data: geen inhoudelijke gebruikersdata in logs</li>
+    <li>Retentie: korte log retentie (30 dagen)</li>
+  </ul>
+
+  <h3>4.4 Risicobeoordeling</h3>
+  <p><strong>Risico:</strong> <span class="tag-low">LAAG</span></p>
+  <p>De overdracht betreft uitsluitend technische metadata. Vercel gebruikt EU edge servers voor primaire content delivery. Geen inhoudelijke persoonsgegevens worden naar de VS overgedragen.</p>
+</div>
+
+<div class="section">
+  <h2>5. Conclusie</h2>
+
+  <p>Na uitvoering van deze TIA concluderen wij dat:</p>
+
+  <ol>
+    <li><strong>60% van de verwerkers (3 van 5)</strong> zijn EU-gebaseerd en vereisen geen internationale transfer</li>
+    <li><strong>Google OAuth:</strong> Acceptabel risico door optionele aard en minimale data</li>
+    <li><strong>Vercel Hosting:</strong> Acceptabel risico door EU edge network en technische waarborgen</li>
+    <li><strong>Resend (verwijderd):</strong> Vervangen door EU-gebaseerde Brevo - geen TIA meer vereist</li>
+  </ol>
+
+  <p style="margin-top: 20px;"><strong>Totaalbeoordeling:</strong> De internationale gegevensoverdrachten zijn verantwoord en proportioneel, met adequate waarborgen conform GDPR Chapter V.</p>
+</div>
+
+<div class="section">
+  <h2>6. Review Schedule</h2>
+  <ul>
+    <li>Volgende review: Januari 2027</li>
+    <li>Review bij: significante wijzigingen in verwerkers, wetgeving, of rechtspraak</li>
+  </ul>
+</div>
+
+<div class="signature">
+  <p>Opgesteld door:</p>
+  <p style="margin-top: 30px; border-top: 1px solid #333; width: 250px; padding-top: 5px;">
+    [Naam] — Verwerkingsverantwoordelijke<br>
+    <span style="color: #666; font-size: 12px;">Idris & Adam BV h/a Yibei Tea</span>
+  </p>
+  <p style="margin-top: 20px;">Datum: _______________ 2026</p>
+</div>
+
+<p style="margin-top: 40px; text-align: center; color: #999; font-size: 12px;">
+  TIA v4.0 — Januari 2026 — Yibei Tea
+</p>
+
+</body>
+</html>

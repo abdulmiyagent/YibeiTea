@@ -418,6 +418,48 @@ export const analyticsRouter = router({
       ? Math.round(((newThisMonth - newLastMonth) / newLastMonth) * 100)
       : 0;
 
+    // Guest order stats
+    const totalOrders = await ctx.db.order.count({
+      where: { status: { not: "CANCELLED" } },
+    });
+
+    const guestOrders = await ctx.db.order.count({
+      where: { isGuest: true, status: { not: "CANCELLED" } },
+    });
+
+    const guestOrdersThisMonth = await ctx.db.order.count({
+      where: {
+        isGuest: true,
+        status: { not: "CANCELLED" },
+        createdAt: { gte: thisMonthStart },
+      },
+    });
+
+    const registeredOrdersThisMonth = await ctx.db.order.count({
+      where: {
+        isGuest: false,
+        status: { not: "CANCELLED" },
+        createdAt: { gte: thisMonthStart },
+      },
+    });
+
+    // Guest emails that later created accounts (conversion tracking)
+    const guestEmails = await ctx.db.order.findMany({
+      where: { isGuest: true },
+      select: { customerEmail: true },
+      distinct: ["customerEmail"],
+    });
+
+    const guestEmailList = guestEmails
+      .map((o) => o.customerEmail)
+      .filter((e): e is string => e !== null);
+
+    const convertedGuests = guestEmailList.length > 0
+      ? await ctx.db.user.count({
+          where: { email: { in: guestEmailList } },
+        })
+      : 0;
+
     return {
       totalCustomers,
       newThisMonth,
@@ -430,6 +472,21 @@ export const analyticsRouter = router({
         : 0,
       retentionRate: customersWithOrders > 0
         ? Math.round((repeatCustomers / customersWithOrders) * 100)
+        : 0,
+      // Guest stats
+      totalOrders,
+      guestOrders,
+      registeredOrders: totalOrders - guestOrders,
+      guestOrderRate: totalOrders > 0
+        ? Math.round((guestOrders / totalOrders) * 100)
+        : 0,
+      guestOrdersThisMonth,
+      registeredOrdersThisMonth,
+      // Guest conversion (guests who later created accounts)
+      uniqueGuestEmails: guestEmailList.length,
+      convertedGuests,
+      guestConversionRate: guestEmailList.length > 0
+        ? Math.round((convertedGuests / guestEmailList.length) * 100)
         : 0,
     };
   }),

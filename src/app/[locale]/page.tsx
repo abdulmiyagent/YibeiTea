@@ -5,7 +5,7 @@ import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "@/lib/trpc";
 import {
@@ -31,6 +31,7 @@ import {
 import { useState } from "react";
 import { useCartStore } from "@/stores/cart-store";
 import { ProductCarousel } from "@/components/ProductCarousel";
+import { cn } from "@/lib/utils";
 
 // Gradient mappings for categories
 const categoryGradients: Record<string, string> = {
@@ -102,6 +103,125 @@ const scaleIn = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const } },
 };
+
+// Categories Carousel Component with pagination
+interface Category {
+  id: string;
+  slug: string;
+  translations: Array<{ name: string; description?: string | null }>;
+}
+
+function CategoriesCarousel({
+  categories,
+  categoryIcons,
+}: {
+  categories: Category[];
+  categoryIcons: Record<string, { icon: typeof Coffee; color: string }>;
+}) {
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Calculate total pages based on scroll width
+  useEffect(() => {
+    const updatePages = () => {
+      if (carouselRef.current) {
+        const { scrollWidth, clientWidth } = carouselRef.current;
+        const pages = Math.ceil(scrollWidth / clientWidth);
+        setTotalPages(pages);
+      }
+    };
+    updatePages();
+    window.addEventListener("resize", updatePages);
+    return () => window.removeEventListener("resize", updatePages);
+  }, [categories]);
+
+  // Update current page on scroll
+  const handleScroll = useCallback(() => {
+    if (carouselRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+      const maxScroll = scrollWidth - clientWidth;
+      const page = Math.round((scrollLeft / maxScroll) * (totalPages - 1));
+      setCurrentPage(Math.max(0, Math.min(page, totalPages - 1)));
+    }
+  }, [totalPages]);
+
+  // Scroll to page when dot is clicked
+  const scrollToPage = (page: number) => {
+    if (carouselRef.current) {
+      const { scrollWidth, clientWidth } = carouselRef.current;
+      const maxScroll = scrollWidth - clientWidth;
+      const scrollPosition = (page / (totalPages - 1)) * maxScroll;
+      carouselRef.current.scrollTo({ left: scrollPosition, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="relative mt-16"
+    >
+      {/* Scrollable container */}
+      <div
+        ref={carouselRef}
+        onScroll={handleScroll}
+        className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        {categories.map((cat) => {
+          const translation = cat.translations[0];
+          const iconConfig = categoryIcons[cat.slug] || { icon: Coffee, color: "tea" };
+          const Icon = iconConfig.icon;
+          const color = iconConfig.color;
+
+          return (
+            <Link
+              key={cat.id}
+              href={`/menu?category=${cat.slug}`}
+              className="flex-shrink-0 snap-start"
+              style={{ width: "calc(50% - 8px)", minWidth: "160px", maxWidth: "220px" }}
+            >
+              <div className="group cursor-pointer rounded-3xl border border-cream-200 bg-gradient-to-b from-cream-50 to-white p-6 text-center transition-all duration-300 hover:border-tea-200 hover:shadow-soft h-full">
+                <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-${color}-100 transition-transform duration-300 group-hover:scale-110`}>
+                  <Icon className={`h-7 w-7 text-${color}-600`} />
+                </div>
+                <h3 className="mt-4 font-serif text-base font-medium text-tea-900 sm:text-lg">
+                  {translation?.name || cat.slug}
+                </h3>
+                {translation?.description && (
+                  <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2 sm:text-sm">
+                    {translation.description}
+                  </p>
+                )}
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Pagination Dots */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center gap-2">
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => scrollToPage(index)}
+              className={cn(
+                "h-2 rounded-full transition-all duration-300",
+                currentPage === index
+                  ? "w-6 bg-tea-600"
+                  : "w-2 bg-tea-200 hover:bg-tea-300"
+              )}
+              aria-label={`Go to page ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
 
 export default function HomePage() {
   const t = useTranslations("home");
@@ -526,7 +646,7 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="mt-16"
             >
-              <ProductCarousel products={featuredProducts ?? []} />
+              <ProductCarousel products={featuredProducts ?? []} showFavoriteButton />
             </motion.div>
           )}
 
@@ -584,7 +704,7 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 className="mt-16"
               >
-                <ProductCarousel products={userFavorites} />
+                <ProductCarousel products={userFavorites} showFavoriteButton />
               </motion.div>
             ) : (
               <motion.div
@@ -736,40 +856,7 @@ export default function HomePage() {
               <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
             </div>
           ) : (
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={staggerContainer}
-              className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-            >
-              {(categories ?? []).slice(0, 8).map((cat) => {
-                const translation = cat.translations[0];
-                const iconConfig = categoryIcons[cat.slug] || { icon: Coffee, color: "tea" };
-                const Icon = iconConfig.icon;
-                const color = iconConfig.color;
-
-                return (
-                  <motion.div key={cat.id} variants={scaleIn}>
-                    <Link href={`/menu?category=${cat.slug}`}>
-                      <div className="group cursor-pointer rounded-3xl border border-cream-200 bg-gradient-to-b from-cream-50 to-white p-8 text-center transition-all duration-300 hover:border-tea-200 hover:shadow-soft">
-                        <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-${color}-100 transition-transform duration-300 group-hover:scale-110`}>
-                          <Icon className={`h-8 w-8 text-${color}-600`} />
-                        </div>
-                        <h3 className="mt-6 font-serif text-xl font-medium text-tea-900">
-                          {translation?.name || cat.slug}
-                        </h3>
-                        {translation?.description && (
-                          <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                            {translation.description}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
+            <CategoriesCarousel categories={categories ?? []} categoryIcons={categoryIcons} />
           )}
         </div>
       </section>
@@ -828,6 +915,59 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Loyalty CTA Section */}
+      <section className="section-padding relative overflow-hidden bg-gradient-to-br from-tea-600 via-tea-700 to-tea-800">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -left-20 -top-20 h-80 w-80 rounded-full bg-tea-500/30 blur-3xl" />
+          <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-matcha-500/20 blur-3xl" />
+        </div>
+
+        <div className="container-custom relative">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="mx-auto max-w-3xl text-center"
+          >
+            <motion.h2 variants={fadeInUp} className="heading-2 text-white">
+              {t("loyalty.title")}
+            </motion.h2>
+            <motion.p variants={fadeInUp} className="mt-4 text-lg text-tea-100">
+              {t("loyalty.subtitle")}
+            </motion.p>
+
+            <motion.div
+              variants={fadeInUp}
+              className="mt-10 flex flex-wrap justify-center gap-4"
+            >
+              {["benefit1", "benefit2", "benefit3"].map((benefit) => (
+                <div
+                  key={benefit}
+                  className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 backdrop-blur-sm"
+                >
+                  <Sparkles className="h-4 w-4 text-tea-200" />
+                  <span className="text-sm font-medium text-white">{t(`loyalty.${benefit}`)}</span>
+                </div>
+              ))}
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="mt-12">
+              <Link href="/register">
+                <Button
+                  size="lg"
+                  className="group h-14 rounded-full bg-white px-10 text-base font-semibold text-tea-700 shadow-lg transition-all hover:bg-cream-50 hover:shadow-xl"
+                >
+                  {t("loyalty.cta")}
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Reviews Section */}
       <section className="section-padding bg-white">
         <div className="container-custom">
@@ -880,59 +1020,6 @@ export default function HomePage() {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Loyalty CTA Section */}
-      <section className="section-padding relative overflow-hidden bg-gradient-to-br from-tea-600 via-tea-700 to-tea-800">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 -top-20 h-80 w-80 rounded-full bg-tea-500/30 blur-3xl" />
-          <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-matcha-500/20 blur-3xl" />
-        </div>
-
-        <div className="container-custom relative">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="mx-auto max-w-3xl text-center"
-          >
-            <motion.h2 variants={fadeInUp} className="heading-2 text-white">
-              {t("loyalty.title")}
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="mt-4 text-lg text-tea-100">
-              {t("loyalty.subtitle")}
-            </motion.p>
-
-            <motion.div
-              variants={fadeInUp}
-              className="mt-10 flex flex-wrap justify-center gap-4"
-            >
-              {["benefit1", "benefit2", "benefit3"].map((benefit) => (
-                <div
-                  key={benefit}
-                  className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 backdrop-blur-sm"
-                >
-                  <Sparkles className="h-4 w-4 text-tea-200" />
-                  <span className="text-sm font-medium text-white">{t(`loyalty.${benefit}`)}</span>
-                </div>
-              ))}
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="mt-12">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="group h-14 rounded-full bg-white px-10 text-base font-semibold text-tea-700 shadow-lg transition-all hover:bg-cream-50 hover:shadow-xl"
-                >
-                  {t("loyalty.cta")}
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-            </motion.div>
           </motion.div>
         </div>
       </section>

@@ -1,8 +1,8 @@
 # Yibei Tea - Project Documentation
 
-> **Version:** 1.1.0
+> **Version:** 1.2.0
 > **Last Updated:** 2026-01-07
-> **Status:** Active Development
+> **Status:** Production Ready
 > **Repository:** github.com/abdulmiyagent/YibeiTea
 
 ---
@@ -13,7 +13,7 @@
 
 **Stack:** Next.js 14 + TypeScript + Tailwind + tRPC + Prisma + Supabase
 
-**Status:** MVP compleet inclusief betalingen (Mollie), e-mail (Resend), loyaliteitspunten en promotiecode systeem. Klaar voor productie-deployment.
+**Status:** Meer dan MVP. Productie-klaar met betalingen (Mollie), e-mail (Brevo), loyaliteitspunten, promotiecode systeem, newsletter campaigns, GDPR compliance en admin dashboard. Juridisch gereviewed.
 
 **Key beslissingen:**
 - Horizontale compacte kaarten op menu (6-7 items zichtbaar per scherm)
@@ -56,15 +56,18 @@ A **web-based ordering platform** for Yibei Tea, a bubble tea shop in Ghent, Bel
 - [x] Checkout flow with pickup time selection
 - [x] Admin dashboard for orders
 - [x] Payment processing (Mollie)
-- [x] Email notifications (Resend)
+- [x] Email notifications (Brevo)
 - [x] Loyalty points system (earning on order)
 
 ### In Scope (Post-MVP)
 - ~~Admin product management (CRUD)~~ ✅ Done
 - ~~Admin analytics dashboard~~ ✅ Done
 - ~~Rewards redemption~~ ✅ Done (checkout integration)
-- Birthday rewards automation
 - ~~Promo code system~~ ✅ Done
+- ~~Newsletter campaigns~~ ✅ Done (Brevo integration)
+- ~~GDPR compliance~~ ✅ Done (data export, account deletion, consent tracking)
+- ~~Google OAuth login~~ ✅ Done
+- Birthday rewards automation
 
 ### Explicitly Out of Scope
 | Feature | Reason |
@@ -192,7 +195,7 @@ Dashboard → View Orders → Update Status (Preparing → Ready) → Customer N
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    EXTERNAL SERVICES                         │
-│  Payments: Mollie | Email: Resend | Hosting: Vercel         │
+│  Payments: Mollie | Email: Brevo | Hosting: Vercel          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -211,7 +214,7 @@ Dashboard → View Orders → Update Status (Preparing → Ready) → Customer N
 | Auth | NextAuth.js | Flexible, supports social login |
 | i18n | next-intl | Best App Router integration |
 | Payments | Mollie | Benelux focus, Bancontact/iDEAL support |
-| Email | Resend | Developer-friendly, free tier |
+| Email | Brevo | EU-based (France), GDPR native, 300/day free |
 | Hosting | Vercel | Optimal for Next.js, free tier |
 
 ---
@@ -358,10 +361,25 @@ src/app/[locale]/
 
 | Dependency | Risk Level | Mitigation |
 |------------|------------|------------|
-| Supabase (Database) | Medium | Free tier limits; upgrade path available |
-| Vercel (Hosting) | Low | Standard Next.js deployment; easy to migrate |
-| Mollie (Payments) | Medium | Benelux-only; alternative: Stripe for expansion |
-| Resend (Email) | Low | Easy to replace with SendGrid/Mailgun |
+| Supabase (Database) | Medium | Free tier limits; upgrade path available. EU datacenter (Frankfurt). |
+| Vercel (Hosting) | Low | Standard Next.js deployment; easy to migrate. DPA available. |
+| Mollie (Payments) | Low | Netherlands-based (EU). PCI-DSS certified. |
+| Brevo (Email) | Low | France-based (EU). Native GDPR compliance, no SCCs needed. |
+| Google OAuth | Low | Optional login method; SCCs via Google DPA. |
+
+### GDPR/Legal Compliance
+
+| Requirement | Implementation |
+|-------------|----------------|
+| Data export (Art. 20) | Account settings → Download data (JSON) |
+| Account deletion (Art. 17) | Account settings → Delete account (email confirmation required) |
+| Newsletter consent (Art. 7) | Opt-in default OFF, explicit toggle required |
+| Consent tracking | Timestamp + IP stored on newsletter signup |
+| International transfers | SCCs with US-based processors (Google, Vercel) |
+| Privacy Policy | /privacy page (NL/EN), lists all processors |
+| Terms of Service | /terms page (NL/EN), Belgian law |
+
+**Legal documentation:** See `docs/` folder for legal advisor materials.
 
 ### Technical Risks
 
@@ -393,8 +411,8 @@ src/app/[locale]/
 - Push notifications for order status
 - QR code ordering at store
 - Gift card system
-- Social login (Google OAuth)
 - Reviews and ratings
+- Homepage section reordering (drag & drop UI for super admin, softcoded section order in DB)
 
 ### Future Architecture: Delivery Support
 
@@ -497,7 +515,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env
-# Fill in: DATABASE_URL, NEXTAUTH_SECRET, MOLLIE_API_KEY, RESEND_API_KEY
+# Fill in: DATABASE_URL, NEXTAUTH_SECRET, MOLLIE_API_KEY, BREVO_API_KEY
 
 # Push database schema
 npm run db:push
@@ -526,7 +544,7 @@ DATABASE_URL=           # Supabase PostgreSQL connection string
 NEXTAUTH_URL=           # http://localhost:3000 for dev
 NEXTAUTH_SECRET=        # Random string for session encryption
 MOLLIE_API_KEY=         # Mollie API key (test_ for dev)
-RESEND_API_KEY=         # Resend API key for emails
+BREVO_API_KEY=          # Brevo API key for emails
 ```
 
 ### Working with AI Assistants
@@ -582,12 +600,18 @@ yibei-tea/
 │   │   └── cart/               # Cart-related
 │   ├── hooks/                  # Custom hooks
 │   ├── stores/                 # Zustand stores
-│   ├── lib/                    # Utilities (db, auth, utils)
+│   ├── lib/                    # Utilities (db, auth, email, utils)
 │   ├── server/trpc/            # tRPC routers
 │   └── i18n/                   # Translations (nl.json, en.json)
 ├── prisma/
 │   ├── schema.prisma           # Database schema
 │   └── seed.ts                 # Seed data
+├── docs/                       # Legal documentation
+│   ├── legal-tech-overview.html    # Technical overview for legal advisor
+│   ├── legal-documents.html        # Privacy Policy + Terms (printable)
+│   ├── legal-response.html         # Response to legal assessment
+│   ├── TIA_v4.0.html               # Transfer Impact Assessment v4.0
+│   └── Verwerkingsregister_v4.0.html # Records of Processing v4.0
 ├── public/images/              # Static assets
 └── package.json
 ```
@@ -599,7 +623,7 @@ yibei-tea/
 ### Completed
 - [x] Full-stack Next.js setup with TypeScript
 - [x] Database schema with Prisma + Supabase
-- [x] User authentication (NextAuth.js)
+- [x] User authentication (NextAuth.js + Google OAuth)
 - [x] Menu page with filtering and compact cards
 - [x] Product customization modal (intercepting routes)
 - [x] Cart drawer with persistence
@@ -608,15 +632,28 @@ yibei-tea/
 - [x] i18n (Dutch + English)
 - [x] 64 products seeded across 10 categories
 - [x] Mollie payment integration
-- [x] Email notifications (Resend)
+- [x] Email notifications (Brevo)
+- [x] Newsletter campaign sending (Brevo)
 - [x] Loyalty points redemption at checkout
 - [x] Admin analytics dashboard
 - [x] Promo code system
+- [x] GDPR compliance (data export, account deletion, consent tracking)
+- [x] Legal documentation (Privacy Policy, Terms of Service)
 
 ### In Progress
 - [ ] Production deployment
 
 ### Recently Completed
+- [x] Email provider migration: Resend (US) → Brevo (France/EU) for native GDPR compliance, no SCCs needed (Jan 2026)
+- [x] Legal documents v4.0: TIA and Verwerkingsregister updated, 60% of processors now EU-based (Jan 2026)
+- [x] Newsletter campaign sending: Brevo integration with batch processing (Jan 2026)
+- [x] GDPR compliance: newsletter opt-in default OFF (Art. 7 AVG), explicit consent required (Jan 2026)
+- [x] Privacy Policy updates: international transfers disclosure, SCCs, sub-processor list (Jan 2026)
+- [x] Legal documentation: tech overview, privacy policy, terms of service for legal review (Jan 2026)
+- [x] Google OAuth social login (Jan 2026)
+- [x] Data export API: users can download all personal data (GDPR Art. 20) (Jan 2026)
+- [x] Account deletion API: users can delete account with email confirmation (GDPR Art. 17) (Jan 2026)
+- [x] Consent tracking: timestamps + IP for newsletter signups (Jan 2026)
 - [x] Social media links system: admin-configurable priority order, mobile dropdown, desktop inline icons, footer integration (Jan 2026)
 - [x] Compact mobile header: smaller icons (32px), reduced spacing, sleeker look on mobile devices (Jan 2026)
 - [x] Product carousel: infinite scroll, floating add-to-cart buttons, category-based colors (Jan 2026)

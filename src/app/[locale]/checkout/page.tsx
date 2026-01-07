@@ -28,6 +28,9 @@ import {
   Tag,
   Loader2,
   CalendarClock,
+  LogIn,
+  UserPlus,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -408,6 +411,57 @@ export default function CheckoutPage() {
                   {storeStatus.message}
                 </p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Guest vs Login Banner - Only show for non-logged in users */}
+        {!isLoggedIn && sessionStatus !== "loading" && (
+          <div className="mb-6 rounded-lg border border-tea-200 bg-gradient-to-r from-tea-50 to-cream-50 p-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="rounded-full bg-tea-100 p-2">
+                  <Zap className="h-5 w-5 text-tea-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-tea-800">
+                    {t("guest.title") || "Snel afrekenen als gast"}
+                  </h3>
+                  <p className="mt-0.5 text-sm text-tea-600">
+                    {t("guest.subtitle") || "Geen account nodig. Of log in voor loyaliteitspunten."}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2 sm:flex-shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push("/login?redirect=/checkout")}
+                  className="flex-1 sm:flex-none"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  {t("guest.login") || "Inloggen"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push("/register?redirect=/checkout")}
+                  className="flex-1 sm:flex-none"
+                >
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {t("guest.register") || "Registreren"}
+                </Button>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Gift className="h-3 w-3" />
+                {t("guest.benefit1") || "Verdien loyaliteitspunten"}
+              </span>
+              <span className="flex items-center gap-1">
+                <Crown className="h-3 w-3" />
+                {t("guest.benefit2") || "Bekijk bestellingen"}
+              </span>
             </div>
           </div>
         )}

@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, Eye, EyeOff, Newspaper } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Newspaper, CheckCircle2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function LoginPage() {
   const t = useTranslations("auth.login");
@@ -26,7 +27,8 @@ export default function LoginPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    newsletterOptIn: true,
+    newsletterOptIn: false, // GDPR: default off, requires affirmative opt-in
+    termsAccepted: false,
   });
 
   // Password validation helper
@@ -47,6 +49,13 @@ export default function LoginPage() {
     setError("");
 
     if (isRegister) {
+      // Validate terms acceptance
+      if (!formData.termsAccepted) {
+        setError("Je moet akkoord gaan met de voorwaarden en privacybeleid");
+        setIsLoading(false);
+        return;
+      }
+
       // Client-side password validation
       if (!isPasswordValid) {
         setError(`Wachtwoord vereist: ${passwordErrors.join(", ")}`);
@@ -281,6 +290,29 @@ export default function LoginPage() {
                         setFormData({ ...formData, newsletterOptIn: checked })
                       }
                     />
+                  </div>
+                )}
+
+                {isRegister && (
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="terms"
+                      checked={formData.termsAccepted}
+                      onCheckedChange={(checked: boolean | "indeterminate") =>
+                        setFormData({ ...formData, termsAccepted: checked === true })
+                      }
+                      className="mt-0.5"
+                    />
+                    <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
+                      Ik ga akkoord met de{" "}
+                      <Link href="/terms" className="text-tea-600 hover:underline" target="_blank">
+                        algemene voorwaarden
+                      </Link>{" "}
+                      en het{" "}
+                      <Link href="/privacy" className="text-tea-600 hover:underline" target="_blank">
+                        privacybeleid
+                      </Link>
+                    </Label>
                   </div>
                 )}
 

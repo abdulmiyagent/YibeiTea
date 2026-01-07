@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yibei Tea - Technisch Overzicht voor Juridisch Adviseur</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 { color: #9B7B5B; margin-bottom: 10px; font-size: 28px; }
+    h2 { color: #9B7B5B; margin-top: 30px; margin-bottom: 15px; font-size: 20px; border-bottom: 2px solid #e0d9d3; padding-bottom: 5px; }
+    h3 { color: #555; margin-top: 20px; margin-bottom: 10px; font-size: 16px; }
+    p { margin-bottom: 10px; }
+    .subtitle { color: #666; margin-bottom: 30px; }
+    .date { color: #999; font-size: 14px; margin-bottom: 30px; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px; }
+    th, td { border: 1px solid #e0d9d3; padding: 10px 12px; text-align: left; }
+    th { background: #f8f5f2; font-weight: 600; }
+    tr:nth-child(even) { background: #fafafa; }
+    .highlight { background: #fff8e7; padding: 15px; border-left: 4px solid #9B7B5B; margin: 20px 0; }
+    .section { margin-bottom: 30px; }
+    ul { margin: 10px 0 10px 20px; }
+    li { margin-bottom: 5px; }
+    .tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 5px; }
+    .tag.warning { background: #fff3e0; color: #e65100; }
+    .tag.info { background: #e3f2fd; color: #1565c0; }
+    @media print {
+      body { padding: 20px; }
+      h2 { page-break-after: avoid; }
+      table { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Yibei Tea</h1>
+  <p class="subtitle">Technisch Overzicht voor Juridisch Adviseur</p>
+  <p class="date">Gegenereerd: januari 2026</p>
+
+  <div class="section">
+    <h2>1. Wat wordt er gebouwd?</h2>
+    <p><strong>Een webgebaseerd online bestelsysteem voor bubble tea met geïntegreerd loyaliteitsprogramma.</strong></p>
+
+    <h3>Componenten:</h3>
+    <ul>
+      <li><strong>Webapplicatie</strong> - Responsive website (Next.js framework), geen native mobile app</li>
+      <li><strong>Online bestelsysteem</strong> - Productcatalogus, winkelwagen, checkout flow</li>
+      <li><strong>Loyaliteitsprogramma</strong> - Punten verdienen/inwisselen, tier-systeem (Bronze/Silver/Gold)</li>
+      <li><strong>Admin dashboard</strong> - Orderbeheer, klantanalytics, productbeheer</li>
+      <li><strong>Nieuwsbrief systeem</strong> - Email marketing met opt-in/opt-out</li>
+    </ul>
+
+    <h3>Locatie:</h3>
+    <p>Fysieke winkel: Sint-Niklaasstraat 36, 9000 Gent, België</p>
+    <p>Website domein: yibeitea.be</p>
+  </div>
+
+  <div class="section">
+    <h2>2. Welke persoonsgegevens worden verzameld?</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Gegevenstype</th>
+          <th>Verplicht</th>
+          <th>Doel</th>
+          <th>Bewaartermijn</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Naam</td>
+          <td>Ja (bestelling)</td>
+          <td>Identificatie bij afhaal</td>
+          <td>Zolang account actief / 7 jaar voor orders (boekhoudwet)</td>
+        </tr>
+        <tr>
+          <td>E-mailadres</td>
+          <td>Ja</td>
+          <td>Orderbevestiging, account login, marketing (met consent)</td>
+          <td>Zolang account actief + 3 jaar na laatste activiteit</td>
+        </tr>
+        <tr>
+          <td>Telefoonnummer</td>
+          <td>Nee</td>
+          <td>Contact bij problemen met bestelling</td>
+          <td>Zolang account actief</td>
+        </tr>
+        <tr>
+          <td>Geboortedatum</td>
+          <td>Nee</td>
+          <td>Verjaardagsacties loyaliteitsprogramma</td>
+          <td>Zolang account actief</td>
+        </tr>
+        <tr>
+          <td>Adresgegevens</td>
+          <td>Nee</td>
+          <td>Opgeslagen adressen (straat, stad, postcode)</td>
+          <td>Zolang account actief</td>
+        </tr>
+        <tr>
+          <td>Wachtwoord</td>
+          <td>Ja (account)</td>
+          <td>Authenticatie - <strong>gehashed opgeslagen (bcrypt)</strong></td>
+          <td>Zolang account actief</td>
+        </tr>
+        <tr>
+          <td>Bestelgeschiedenis</td>
+          <td>Automatisch</td>
+          <td>Ordernummer, items, bedragen, datum/tijd</td>
+          <td>7 jaar (boekhoudkundige verplichting)</td>
+        </tr>
+        <tr>
+          <td>Loyaliteitspunten</td>
+          <td>Automatisch</td>
+          <td>Puntensaldo, transacties, tier-niveau</td>
+          <td>Zolang account actief</td>
+        </tr>
+        <tr>
+          <td>Favoriete producten</td>
+          <td>Optioneel</td>
+          <td>Door gebruiker gemarkeerde producten</td>
+          <td>Zolang account actief</td>
+        </tr>
+        <tr>
+          <td>Reviews</td>
+          <td>Optioneel</td>
+          <td>Productbeoordelingen (rating + tekst)</td>
+          <td>Tot verwijdering door gebruiker</td>
+        </tr>
+        <tr>
+          <td>Marketingvoorkeur</td>
+          <td>Ja</td>
+          <td>Newsletter opt-in status</td>
+          <td>Zolang account actief</td>
+        </tr>
+        <tr>
+          <td>Taalvoorkeur</td>
+          <td>Automatisch</td>
+          <td>Nederlands of Engels</td>
+          <td>Zolang account actief</td>
+        </tr>
+        <tr>
+          <td>Consent timestamps</td>
+          <td>Automatisch</td>
+          <td>Datum/tijd + IP bij toestemming</td>
+          <td>5 jaar na consent</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">
+      <strong>NIET opgeslagen door Yibei Tea:</strong>
+      <ul>
+        <li>Betalingsgegevens (creditcard, bankrekeningnummer) - alleen bij Mollie</li>
+        <li>IP-adressen (behalve bij newsletter consent voor bewijs)</li>
+        <li>Locatiegegevens / GPS</li>
+        <li>Cookies van derden / tracking pixels</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>3. Gebruikersaccounts</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Optie</th>
+          <th>Beschikbaar</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Guest checkout</td>
+          <td><span class="tag">Ja</span></td>
+          <td>Bestellen zonder account, geen loyaliteitspunten, rate-limited (5/uur per email)</td>
+        </tr>
+        <tr>
+          <td>Account registratie</td>
+          <td><span class="tag">Ja</span></td>
+          <td>Via e-mail + wachtwoord</td>
+        </tr>
+        <tr>
+          <td>Social login (Google)</td>
+          <td><span class="tag">Ja</span></td>
+          <td>OAuth 2.0 via Google</td>
+        </tr>
+        <tr>
+          <td>2FA voor admins</td>
+          <td><span class="tag">Ja</span></td>
+          <td>TOTP-based (Google Authenticator compatibel)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Registratie vereisten:</h3>
+    <ul>
+      <li>Expliciete checkbox voor akkoord met Algemene Voorwaarden</li>
+      <li>Expliciete checkbox voor akkoord met Privacybeleid</li>
+      <li>Newsletter opt-in is optioneel (standaard aan, maar duidelijk zichtbaar als toggle)</li>
+      <li>Wachtwoord vereisten: minimaal 8 tekens, 1 hoofdletter, 1 cijfer</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>4. Diensten van derden</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Vestiging</th>
+          <th>Doel</th>
+          <th>Gedeelde data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Mollie</strong></td>
+          <td>Nederland (EU)</td>
+          <td>Betalingsverwerking</td>
+          <td>Orderbedrag, ordernummer, redirect URL. Betalingsgegevens worden NIET doorgegeven aan Yibei Tea.</td>
+        </tr>
+        <tr>
+          <td><strong>Resend</strong></td>
+          <td>Verenigde Staten</td>
+          <td>Transactionele emails + nieuwsbrieven</td>
+          <td>E-mailadres, naam, orderinformatie (voor bevestigingsmails)</td>
+        </tr>
+        <tr>
+          <td><strong>Google OAuth</strong></td>
+          <td>Verenigde Staten</td>
+          <td>Optionele login methode</td>
+          <td>E-mail, naam, profielfoto (alleen indien gebruiker kiest voor Google login)</td>
+        </tr>
+        <tr>
+          <td><strong>Supabase</strong></td>
+          <td>AWS EU (Frankfurt)</td>
+          <td>Database hosting (PostgreSQL)</td>
+          <td>Alle klantdata (versleuteld opgeslagen)</td>
+        </tr>
+        <tr>
+          <td><strong>Vercel</strong></td>
+          <td>Verenigde Staten / EU edge</td>
+          <td>Webapplicatie hosting</td>
+          <td>Server logs (beperkt, geen persoonsgegevens)</td>
+        </tr>
+        <tr>
+          <td><strong>Cloudinary</strong> (optioneel)</td>
+          <td>Verenigde Staten</td>
+          <td>Productafbeeldingen CDN</td>
+          <td>Alleen productfoto's, geen klantdata</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">
+      <strong>NIET geïmplementeerd:</strong>
+      <ul>
+        <li>Google Analytics</li>
+        <li>Facebook Pixel / Meta tracking</li>
+        <li>Social media tracking widgets</li>
+        <li>Third-party cookies</li>
+        <li>Advertising networks</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>5. GDPR/AVG Maatregelen</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Vereiste</th>
+          <th>Artikel</th>
+          <th>Implementatie</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Recht op verwijdering</td>
+          <td>Art. 17</td>
+          <td>Account verwijderen via instellingen, vereist e-mail bevestiging. Orders worden geanonimiseerd (klantgegevens gewist, bedragen behouden voor boekhouding).</td>
+        </tr>
+        <tr>
+          <td>Recht op dataportabiliteit</td>
+          <td>Art. 20</td>
+          <td>Volledige JSON export van alle persoonlijke gegevens via account instellingen.</td>
+        </tr>
+        <tr>
+          <td>Consent tracking</td>
+          <td>Art. 7</td>
+          <td>Timestamp + IP-adres opgeslagen bij newsletter aanmelding.</td>
+        </tr>
+        <tr>
+          <td>Double opt-in</td>
+          <td>Best practice</td>
+          <td>Bevestigingsmail vereist voor newsletter activatie.</td>
+        </tr>
+        <tr>
+          <td>Uitschrijf mechanisme</td>
+          <td>Art. 7(3)</td>
+          <td>Uitschrijflink in elke marketing email, account instellingen.</td>
+        </tr>
+        <tr>
+          <td>Privacy by design</td>
+          <td>Art. 25</td>
+          <td>Minimale dataverzameling, gehashte wachtwoorden, geen onnodige tracking.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Beveiligingsmaatregelen:</h3>
+    <ul>
+      <li>Wachtwoorden: bcrypt hashing met salt</li>
+      <li>Wachtwoord vereisten: min. 8 tekens, hoofdletter, cijfer</li>
+      <li>2FA: TOTP-based voor admin accounts</li>
+      <li>Rate limiting: Bescherming tegen brute-force (5 pogingen per 15 min)</li>
+      <li>HTTPS: Verplicht voor alle verbindingen</li>
+      <li>Input validatie: Server-side validatie via Zod schemas</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>6. Benodigde juridische documenten</h2>
+
+    <p>De volgende pagina's zijn reeds geïmplementeerd op de website:</p>
+    <ul>
+      <li><strong>/privacy</strong> - Privacybeleid (NL/EN)</li>
+      <li><strong>/terms</strong> - Algemene Voorwaarden (NL/EN)</li>
+    </ul>
+
+    <h3>Te reviewen onderwerpen:</h3>
+    <ul>
+      <li>Cookiebeleid (momenteel geen cookies van derden, mogelijk cookie banner nodig voor sessiebeheer)</li>
+      <li>Data Processing Agreement (DPA) met Resend (VS gevestigd, SCCs nodig?)</li>
+      <li>Mollie verwerkersovereenkomst (standaard bij Mollie account)</li>
+      <li>Supabase DPA (standaard bij Supabase account)</li>
+    </ul>
+  </div>
+
+  <div class="section" style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #e0d9d3;">
+    <p style="color: #666; font-size: 12px;">
+      Dit document is gegenereerd op basis van de technische implementatie van de Yibei Tea webapplicatie.
+      Voor vragen over specifieke implementatiedetails kan contact opgenomen worden met het ontwikkelteam.
+    </p>
+  </div>
+</body>
+</html>

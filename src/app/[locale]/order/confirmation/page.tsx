@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
+import { useSession } from "next-auth/react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +17,8 @@ import {
   Loader2,
   AlertCircle,
   Crown,
+  UserPlus,
+  Gift,
 } from "lucide-react";
 
 export default function OrderConfirmationPage() {
@@ -23,6 +26,8 @@ export default function OrderConfirmationPage() {
   const locale = useLocale();
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get("orderNumber");
+  const { status: sessionStatus } = useSession();
+  const isLoggedIn = sessionStatus === "authenticated";
 
   const { data: order, isLoading, error } = api.orders.getByOrderNumber.useQuery(
     { orderNumber: orderNumber || "" },
@@ -133,7 +138,7 @@ export default function OrderConfirmationPage() {
                   <span>{locale === "nl" ? "Totaal" : "Total"}</span>
                   <span className="text-tea-600">{formatPrice(order.total)}</span>
                 </div>
-                {order.pointsEarned > 0 && (
+                {order.pointsEarned > 0 && isLoggedIn && (
                   <div className="flex items-center justify-center gap-2 mt-3 rounded-lg bg-matcha-50 p-3">
                     <Crown className="h-4 w-4 text-matcha-600" />
                     <span className="text-sm font-medium text-matcha-700">
@@ -141,6 +146,35 @@ export default function OrderConfirmationPage() {
                         ? `+${order.pointsEarned} loyaliteitspunten verdiend!`
                         : `+${order.pointsEarned} loyalty points earned!`}
                     </span>
+                  </div>
+                )}
+
+                {/* Guest Account Creation Prompt */}
+                {!isLoggedIn && sessionStatus !== "loading" && (
+                  <div className="mt-3 rounded-lg border border-tea-200 bg-gradient-to-r from-tea-50 to-cream-50 p-4 text-left">
+                    <div className="flex items-start gap-3">
+                      <div className="rounded-full bg-tea-100 p-2">
+                        <Gift className="h-4 w-4 text-tea-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-tea-800">
+                          {locale === "nl"
+                            ? "Maak een account aan"
+                            : "Create an account"}
+                        </p>
+                        <p className="mt-0.5 text-sm text-tea-600">
+                          {locale === "nl"
+                            ? "Verdien loyaliteitspunten bij je volgende bestelling en bekijk je bestelgeschiedenis."
+                            : "Earn loyalty points on your next order and view your order history."}
+                        </p>
+                        <Link href={`/register?email=${encodeURIComponent(order.customerEmail || "")}`}>
+                          <Button variant="tea" size="sm" className="mt-3">
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            {locale === "nl" ? "Account aanmaken" : "Create account"}
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -185,11 +219,13 @@ export default function OrderConfirmationPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/account/orders">
-              <Button variant="outline" size="lg">
-                {t("viewOrders")}
-              </Button>
-            </Link>
+            {isLoggedIn && (
+              <Link href="/account/orders">
+                <Button variant="outline" size="lg">
+                  {t("viewOrders")}
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

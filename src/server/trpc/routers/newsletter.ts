@@ -372,7 +372,7 @@ export const newsletterRouter = router({
       return { success: true };
     }),
 
-  // Admin: Send campaign (placeholder - would integrate with email service)
+  // Admin: Send campaign via Resend
   sendCampaign: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -394,11 +394,11 @@ export const newsletterRouter = router({
         });
       }
 
-      // Get all active subscribers
+      // Get all active subscribers with unsubscribe tokens
       const [subscribers, users] = await Promise.all([
         ctx.db.newsletterSubscriber.findMany({
           where: { status: "ACTIVE" },
-          select: { email: true, name: true, locale: true },
+          select: { email: true, name: true, locale: true, unsubscribeToken: true },
         }),
         ctx.db.user.findMany({
           where: { newsletterOptIn: true },
@@ -407,30 +407,53 @@ export const newsletterRouter = router({
       ]);
 
       const allRecipients = [
-        ...subscribers.map((s) => ({ email: s.email, name: s.name, locale: s.locale })),
-        ...users.map((u) => ({ email: u.email, name: u.name, locale: u.preferredLanguage })),
+        ...subscribers.map((s) => ({
+          email: s.email,
+          name: s.name,
+          locale: s.locale,
+          unsubscribeToken: s.unsubscribeToken || undefined,
+        })),
+        ...users.map((u) => ({
+          email: u.email,
+          name: u.name,
+          locale: u.preferredLanguage,
+          unsubscribeToken: undefined, // Users unsubscribe via account settings
+        })),
       ];
 
-      // Remove duplicates
+      // Remove duplicates (prefer subscriber record with unsubscribe token)
       const uniqueRecipients = Array.from(
         new Map(allRecipients.map((r) => [r.email, r])).values()
       );
 
-      // TODO: Integrate with email service (Resend, SendGrid, etc.)
-      // For now, just mark as sent
-      console.log(`Would send campaign "${campaign.subject}" to ${uniqueRecipients.length} recipients`);
+      if (uniqueRecipients.length === 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "no_recipients",
+        });
+      }
 
+      // Send newsletter via Resend
+      const { sendNewsletterCampaign } = await import("@/lib/email");
+      const result = await sendNewsletterCampaign({
+        subject: campaign.subject,
+        content: campaign.content,
+        recipients: uniqueRecipients,
+      });
+
+      // Update campaign with send stats
       await ctx.db.newsletterCampaign.update({
         where: { id: input.id },
         data: {
           sentAt: new Date(),
-          sentCount: uniqueRecipients.length,
+          sentCount: result.sent,
         },
       });
 
       return {
-        success: true,
-        recipientCount: uniqueRecipients.length,
+        success: result.success,
+        recipientCount: result.sent,
+        failedCount: result.failed,
       };
     }),
 

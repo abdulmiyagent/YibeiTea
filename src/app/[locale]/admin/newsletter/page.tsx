@@ -89,7 +89,18 @@ export default function NewsletterAdminPage() {
   const sendCampaignMutation = api.newsletter.sendCampaign.useMutation({
     onSuccess: (data) => {
       utils.newsletter.getCampaigns.invalidate();
-      alert(`Nieuwsbrief verstuurd naar ${data.recipientCount} ontvangers!`);
+      if (data.failedCount && data.failedCount > 0) {
+        alert(`Nieuwsbrief verstuurd naar ${data.recipientCount} ontvangers (${data.failedCount} mislukt).`);
+      } else {
+        alert(`Nieuwsbrief succesvol verstuurd naar ${data.recipientCount} ontvangers!`);
+      }
+    },
+    onError: (error) => {
+      if (error.message === "no_recipients") {
+        alert("Er zijn geen actieve abonnees om naar te versturen.");
+      } else {
+        alert(`Fout bij versturen: ${error.message}`);
+      }
     },
   });
 

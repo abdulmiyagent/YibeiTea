@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reactie op Juridische Beoordeling - Yibei Tea</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      font-size: 14px;
+    }
+    h1 { color: #333; margin-bottom: 5px; font-size: 22px; }
+    h2 { color: #9B7B5B; margin-top: 25px; margin-bottom: 12px; font-size: 16px; border-bottom: 1px solid #e0d9d3; padding-bottom: 5px; }
+    h3 { color: #555; margin-top: 15px; margin-bottom: 8px; font-size: 14px; }
+    p { margin-bottom: 10px; }
+    .header { border-bottom: 2px solid #9B7B5B; padding-bottom: 20px; margin-bottom: 25px; }
+    .subtitle { color: #666; font-size: 14px; }
+    .date { color: #999; font-size: 13px; margin-top: 5px; }
+    .meta { display: flex; justify-content: space-between; margin-top: 15px; font-size: 13px; color: #666; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    th, td { border: 1px solid #e0d9d3; padding: 8px 10px; text-align: left; }
+    th { background: #f8f5f2; font-weight: 600; }
+    ul, ol { margin: 10px 0 15px 20px; }
+    li { margin-bottom: 5px; }
+    .resolved { background: #d4edda; color: #155724; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .pending { background: #fff3cd; color: #856404; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .code { background: #f5f5f5; padding: 10px 15px; border-radius: 6px; font-family: monospace; font-size: 12px; margin: 10px 0; border-left: 3px solid #9B7B5B; }
+    .question-box { background: #e8f4fd; border: 1px solid #b8daff; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    .question-box h3 { color: #004085; margin-top: 0; }
+    .checklist { list-style: none; margin-left: 0; padding-left: 0; }
+    .checklist li { padding: 5px 0; padding-left: 25px; position: relative; }
+    .checklist li:before { content: "☐"; position: absolute; left: 0; color: #9B7B5B; }
+    .section { margin-bottom: 25px; }
+    .signature { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0d9d3; }
+    @media print {
+      body { padding: 20px; }
+      .question-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Reactie op Juridische Beoordeling</h1>
+  <p class="subtitle">Betreft: Yibei Tea - Online Bestelsysteem</p>
+  <div class="meta">
+    <span>Referentie: Preliminary Legal Assessment</span>
+    <span>Datum: Januari 2026</span>
+  </div>
+</div>
+
+<p>Geachte heer/mevrouw,</p>
+<p>Bedankt voor de grondige analyse van het Yibei Tea project. Hieronder mijn reactie op de aangekaarte punten.</p>
+
+<div class="section">
+  <h2>1. GDPR Rol Verduidelijking</h2>
+  <p><strong>Akkoord met uw analyse.</strong></p>
+  <p>Na oplevering zal ik geen toegang hebben tot productiedata, tenzij expliciet gevraagd voor onderhoud. In dat geval wordt een Data Processing Agreement (DPA) opgesteld.</p>
+  <p>Dit wordt gedocumenteerd in het overdrachtscontract met de volgende bepalingen:</p>
+  <ul>
+    <li>Geen toegang tot productiedatabase na oplevering</li>
+    <li>Bij eventueel onderhoud: DPA vereist + beperkte toegang op need-to-know basis</li>
+    <li>Logging van alle data-toegang</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>2. Newsletter Default Setting <span class="resolved">✓ OPGELOST</span></h2>
+  <p>U heeft gelijk dat de default "aan" niet voldoet aan GDPR Art. 7 en de Planet49-uitspraak (C-673/17).</p>
+
+  <p><strong>Wijziging doorgevoerd:</strong></p>
+  <div class="code">
+    // VOOR (non-compliant)<br>
+    newsletterOptIn: true<br><br>
+    // NA (GDPR compliant)<br>
+    newsletterOptIn: false // GDPR: default off, requires affirmative opt-in
+  </div>
+
+  <p>De gebruiker moet nu actief de toggle aanzetten om zich aan te melden. Dit constitueert een "clear affirmative act" zoals vereist onder de AVG.</p>
+</div>
+
+<div class="section">
+  <h2>3. International Data Transfers</h2>
+  <p>Uw analyse is correct. Overzicht van de huidige situatie:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Locatie</th>
+        <th>SCCs beschikbaar?</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Mollie</strong></td>
+        <td>Nederland (EU)</td>
+        <td>N.v.t.</td>
+        <td><span class="resolved">✓ OK</span></td>
+      </tr>
+      <tr>
+        <td><strong>Supabase</strong></td>
+        <td>AWS Frankfurt (EU)</td>
+        <td>N.v.t.</td>
+        <td><span class="resolved">✓ OK</span></td>
+      </tr>
+      <tr>
+        <td><strong>Resend</strong></td>
+        <td>Verenigde Staten</td>
+        <td>Ja, in DPA</td>
+        <td><span class="pending">TIA nodig</span></td>
+      </tr>
+      <tr>
+        <td><strong>Google OAuth</strong></td>
+        <td>Verenigde Staten</td>
+        <td>Ja, Google DPA</td>
+        <td><span class="pending">TIA nodig</span></td>
+      </tr>
+      <tr>
+        <td><strong>Vercel</strong></td>
+        <td>US / EU edge</td>
+        <td>Ja, in DPA</td>
+        <td><span class="pending">TIA nodig</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="question-box">
+    <h3>Vragen aan u:</h3>
+    <ol>
+      <li>Volstaat een standaard TIA-template, of moet deze specifiek worden opgesteld voor elke processor?</li>
+      <li>Adviseert u om Resend te vervangen door een EU-gebaseerde email provider?<br>
+          <em>Opties: Mailjet (FR), Sendinblue/Brevo (FR), Postmark (EU datacenter beschikbaar)</em><br>
+          <em>Technische implementatietijd: ~2-3 uur</em></li>
+      <li>Is Google OAuth acceptabel gezien de optionele aard (gebruiker kan ook email/wachtwoord gebruiken)?</li>
+    </ol>
+  </div>
+</div>
+
+<div class="section">
+  <h2>4. DPAs met Processors</h2>
+  <p>De winkeleigenaar (controller) dient DPAs aan te gaan met alle processors. Checklist:</p>
+
+  <ul class="checklist">
+    <li><strong>Mollie</strong> — Standaard DPA bij accountcreatie<br>
+        <em>Link: https://www.mollie.com/nl/privacy</em></li>
+    <li><strong>Supabase</strong> — DPA beschikbaar op aanvraag<br>
+        <em>Link: https://supabase.com/docs/company/privacy</em></li>
+    <li><strong>Resend</strong> — DPA op aanvraag via support<br>
+        <em>Contact: support@resend.com</em></li>
+    <li><strong>Google Cloud</strong> — Automatisch bij gebruik Google services<br>
+        <em>Link: https://cloud.google.com/terms/data-processing-addendum</em></li>
+    <li><strong>Vercel</strong> — DPA beschikbaar<br>
+        <em>Link: https://vercel.com/legal/dpa</em></li>
+  </ul>
+
+  <p>Ik stel een instructiedocument op voor de winkeleigenaar met stap-voor-stap begeleiding.</p>
+</div>
+
+<div class="section">
+  <h2>5. Privacy Policy & Terms Updates</h2>
+  <p>Op basis van uw feedback worden de volgende aanpassingen doorgevoerd:</p>
+
+  <h3>Privacy Policy — Toe te voegen:</h3>
+  <ul>
+    <li>Expliciete vermelding van internationale transfers naar VS</li>
+    <li>Rechtsgrond voor transfers (Standard Contractual Clauses)</li>
+    <li>Lijst van subverwerkers met contactgegevens</li>
+    <li>Verduidelijking cookiegebruik (alleen functioneel)</li>
+  </ul>
+
+  <h3>Terms of Service — Te corrigeren:</h3>
+  <ul>
+    <li>BTW-nummer invullen (op te vragen bij winkeleigenaar)</li>
+    <li>KBO/ondernemingsnummer toevoegen</li>
+  </ul>
+
+  <h3>Cookie Notice — Toe te voegen:</h3>
+  <ul>
+    <li>Vermelding dat alleen strikt noodzakelijke cookies worden gebruikt</li>
+    <li>Geen consent vereist voor functionele cookies (Art. 5(3) ePrivacy)</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>6. Aanvullende Vragen</h2>
+
+  <div class="question-box">
+    <h3>Graag uw advies over:</h3>
+    <ol>
+      <li><strong>DPA voor onderhoud:</strong> Is er een standaard template die ik kan gebruiken voor mijn eigen overeenkomst met de winkeleigenaar, voor het geval ik in de toekomst onderhoud moet uitvoeren?</li>
+      <li><strong>GBA registratie:</strong> Moet de winkeleigenaar zich registreren bij de Gegevensbeschermingsautoriteit (GBA) als verwerkingsverantwoordelijke?</li>
+      <li><strong>Cookie banner:</strong> Adviseert u een cookiebanner ondanks dat we uitsluitend functionele/strikt noodzakelijke cookies gebruiken?</li>
+      <li><strong>Verwerkingsregister:</strong> Is een verwerkingsregister (Art. 30 AVG) vereist voor een onderneming van deze omvang?</li>
+    </ol>
+  </div>
+</div>
+
+<div class="section">
+  <h2>7. Samenvatting Acties</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Verantwoordelijke</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Newsletter default → off</td>
+        <td>Developer</td>
+        <td><span class="resolved">✓ Afgerond</span></td>
+      </tr>
+      <tr>
+        <td>Privacy Policy updates</td>
+        <td>Developer + Adviseur</td>
+        <td><span class="pending">In afwachting</span></td>
+      </tr>
+      <tr>
+        <td>Terms BTW-nummer</td>
+        <td>Winkeleigenaar</td>
+        <td><span class="pending">Info nodig</span></td>
+      </tr>
+      <tr>
+        <td>TIA documentatie</td>
+        <td>Adviseur</td>
+        <td><span class="pending">Advies nodig</span></td>
+      </tr>
+      <tr>
+        <td>DPAs verzamelen</td>
+        <td>Winkeleigenaar</td>
+        <td><span class="pending">Checklist geleverd</span></td>
+      </tr>
+      <tr>
+        <td>EU email provider evaluatie</td>
+        <td>Developer + Adviseur</td>
+        <td><span class="pending">Advies nodig</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="signature">
+  <p>Ik zie uw reactie met interesse tegemoet.</p>
+  <p style="margin-top: 30px;">Met vriendelijke groet,</p>
+  <p style="margin-top: 40px; border-top: 1px solid #333; width: 200px; padding-top: 5px;">
+    [Naam]<br>
+    <span style="color: #666; font-size: 12px;">Freelance Developer</span>
+  </p>
+
+  <p style="margin-top: 30px; font-size: 12px; color: #666;">
+    <strong>Bijlagen:</strong><br>
+    1. legal-tech-overview.pdf — Technisch overzicht<br>
+    2. legal-documents.pdf — Huidige Privacy Policy & Terms
+  </p>
+</div>
+
+</body>
+</html>

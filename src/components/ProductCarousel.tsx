@@ -2,11 +2,12 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
-import { ChevronLeft, ChevronRight, Plus, Check } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { ChevronLeft, ChevronRight, Plus, Heart, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCartStore } from "@/stores/cart-store";
+import { api } from "@/lib/trpc";
 
 // Background colors for cards (inspired by the screenshot)
 const cardColors = [
@@ -49,18 +50,80 @@ interface Product {
 interface ProductCarouselProps {
   products: Product[];
   className?: string;
+  showFavoriteButton?: boolean;
 }
 
 export function ProductCarousel({
   products,
   className,
+  showFavoriteButton = false,
 }: ProductCarouselProps) {
   const locale = useLocale() as "nl" | "en";
+  const router = useRouter();
+  const { status } = useSession();
   const carouselRef = useRef<HTMLDivElement>(null);
   const [cardsPerView, setCardsPerView] = useState(5);
-  const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
   const [mounted, setMounted] = useState(false);
-  const addItem = useCartStore((state) => state.addItem);
+  const [loadingFavorites, setLoadingFavorites] = useState<Set<string>>(new Set());
+
+  const utils = api.useUtils();
+
+  // Favorites API
+  const { data: favorites } = api.users.getFavorites.useQuery(
+    { locale },
+    { enabled: status === "authenticated" && showFavoriteButton }
+  );
+
+  const addFavorite = api.users.addFavorite.useMutation({
+    onMutate: ({ productId }) => {
+      setLoadingFavorites((prev) => new Set(prev).add(productId));
+    },
+    onSuccess: () => {
+      utils.users.getFavorites.invalidate();
+    },
+    onSettled: (_, __, { productId }) => {
+      setLoadingFavorites((prev) => {
+        const next = new Set(prev);
+        next.delete(productId);
+        return next;
+      });
+    },
+  });
+
+  const removeFavorite = api.users.removeFavorite.useMutation({
+    onMutate: ({ productId }) => {
+      setLoadingFavorites((prev) => new Set(prev).add(productId));
+    },
+    onSuccess: () => {
+      utils.users.getFavorites.invalidate();
+    },
+    onSettled: (_, __, { productId }) => {
+      setLoadingFavorites((prev) => {
+        const next = new Set(prev);
+        next.delete(productId);
+        return next;
+      });
+    },
+  });
+
+  const isFavorite = (productId: string) =>
+    favorites?.some((fav) => fav.id === productId) ?? false;
+
+  const handleFavoriteClick = (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (status !== "authenticated") {
+      router.push("/login");
+      return;
+    }
+
+    if (isFavorite(productId)) {
+      removeFavorite.mutate({ productId });
+    } else {
+      addFavorite.mutate({ productId });
+    }
+  };
 
   // Calculate cards per view based on screen width
   useEffect(() => {
@@ -79,15 +142,18 @@ export function ProductCarousel({
     return () => window.removeEventListener("resize", updateCardsPerView);
   }, []);
 
-  // Infinite scroll: duplicate products for seamless looping
-  const extendedProducts = [...products, ...products, ...products];
+  // Only use infinite scroll if there are more products than visible cards
+  const shouldInfiniteScroll = products.length > Math.ceil(cardsPerView);
+  const extendedProducts = shouldInfiniteScroll
+    ? [...products, ...products, ...products]
+    : products;
   const singleSetWidth = useRef(0);
   const isResetting = useRef(false);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize scroll position to middle set
+  // Initialize scroll position to middle set (only for infinite scroll)
   useEffect(() => {
-    if (carouselRef.current && products.length > 0) {
+    if (carouselRef.current && products.length > 0 && shouldInfiniteScroll) {
       const carousel = carouselRef.current;
       // Calculate width of one set of products
       const cardWidth = carousel.scrollWidth / 3;
@@ -95,11 +161,11 @@ export function ProductCarousel({
       // Start at the middle set (no animation)
       carousel.scrollLeft = cardWidth;
     }
-  }, [products.length, cardsPerView]);
+  }, [products.length, cardsPerView, shouldInfiniteScroll]);
 
   // Handle infinite scroll looping - only reset when scrolling stops
   const handleScrollEnd = useCallback(() => {
-    if (!carouselRef.current || products.length === 0 || isResetting.current) return;
+    if (!carouselRef.current || products.length === 0 || isResetting.current || !shouldInfiniteScroll) return;
 
     const carousel = carouselRef.current;
     const scrollLeft = carousel.scrollLeft;
@@ -127,7 +193,7 @@ export function ProductCarousel({
         isResetting.current = false;
       });
     }
-  }, [products.length]);
+  }, [products.length, shouldInfiniteScroll]);
 
   // Debounced scroll handler - wait for scroll to stop before resetting
   const handleScroll = useCallback(() => {
@@ -158,32 +224,11 @@ export function ProductCarousel({
     }
   };
 
-  // Quick add to cart
-  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+  // Navigate to product page for customization modal
+  const handleAddClick = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const translation = product.translations[0];
-    addItem({
-      productId: product.id,
-      name: translation?.name || product.slug,
-      price: Number(product.price),
-      quantity: 1,
-      imageUrl: product.imageUrl || undefined,
-      customizations: {
-        sugarLevel: 100,
-        iceLevel: "normal",
-      },
-    });
-
-    setAddedProducts((prev) => new Set(prev).add(product.id));
-    setTimeout(() => {
-      setAddedProducts((prev) => {
-        const next = new Set(prev);
-        next.delete(product.id);
-        return next;
-      });
-    }, 2000);
+    router.push(`/menu/${product.slug}`);
   };
 
   // Calculate pagination dots
@@ -193,13 +238,23 @@ export function ProductCarousel({
   // Update current page based on scroll position
   useEffect(() => {
     const updateCurrentPage = () => {
-      if (carouselRef.current && singleSetWidth.current > 0) {
-        const scrollLeft = carouselRef.current.scrollLeft;
-        const setWidth = singleSetWidth.current;
-        // Get position within the middle set
-        const positionInSet = (scrollLeft % setWidth) / setWidth;
-        const page = Math.round(positionInSet * (totalPages - 1));
-        setCurrentPage(Math.max(0, Math.min(page, totalPages - 1)));
+      if (carouselRef.current) {
+        const carousel = carouselRef.current;
+        const scrollLeft = carousel.scrollLeft;
+
+        if (shouldInfiniteScroll && singleSetWidth.current > 0) {
+          const setWidth = singleSetWidth.current;
+          // Get position within the middle set
+          const positionInSet = (scrollLeft % setWidth) / setWidth;
+          const page = Math.round(positionInSet * (totalPages - 1));
+          setCurrentPage(Math.max(0, Math.min(page, totalPages - 1)));
+        } else {
+          // Simple pagination for non-infinite scroll
+          const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+          const progress = maxScroll > 0 ? scrollLeft / maxScroll : 0;
+          const page = Math.round(progress * (totalPages - 1));
+          setCurrentPage(Math.max(0, Math.min(page, totalPages - 1)));
+        }
       }
     };
 
@@ -208,41 +263,57 @@ export function ProductCarousel({
       carousel.addEventListener("scroll", updateCurrentPage);
       return () => carousel.removeEventListener("scroll", updateCurrentPage);
     }
-  }, [totalPages]);
+  }, [totalPages, shouldInfiniteScroll]);
 
   const scrollToPage = (page: number) => {
-    if (carouselRef.current && singleSetWidth.current > 0) {
-      const setWidth = singleSetWidth.current;
-      // Scroll to position within middle set
-      const targetScroll = setWidth + (page / (totalPages - 1)) * (setWidth - carouselRef.current.clientWidth);
-      carouselRef.current.scrollTo({ left: targetScroll, behavior: "smooth" });
+    if (carouselRef.current) {
+      const carousel = carouselRef.current;
+
+      if (shouldInfiniteScroll && singleSetWidth.current > 0) {
+        const setWidth = singleSetWidth.current;
+        // Scroll to position within middle set
+        const targetScroll = setWidth + (page / (totalPages - 1)) * (setWidth - carousel.clientWidth);
+        carousel.scrollTo({ left: targetScroll, behavior: "smooth" });
+      } else {
+        // Simple scroll for non-infinite
+        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+        const targetScroll = (page / (totalPages - 1)) * maxScroll;
+        carousel.scrollTo({ left: targetScroll, behavior: "smooth" });
+      }
     }
   };
 
+  // Determine if navigation arrows should be shown
+  const showNavigation = shouldInfiniteScroll || products.length > Math.floor(cardsPerView);
+
   return (
     <div className={cn("relative min-h-[460px]", className)}>
-      {/* Navigation Arrows - Always visible for infinite scroll */}
-      <button
-        onClick={() => scroll("left")}
-        className={cn(
-          "absolute -left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl",
-          !mounted && "opacity-0"
-        )}
-        aria-label="Previous"
-      >
-        <ChevronLeft className="h-6 w-6 text-gray-700" />
-      </button>
+      {/* Navigation Arrows - Only visible when there's content to scroll */}
+      {showNavigation && (
+        <>
+          <button
+            onClick={() => scroll("left")}
+            className={cn(
+              "absolute -left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl",
+              !mounted && "opacity-0"
+            )}
+            aria-label="Previous"
+          >
+            <ChevronLeft className="h-6 w-6 text-gray-700" />
+          </button>
 
-      <button
-        onClick={() => scroll("right")}
-        className={cn(
-          "absolute -right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl",
-          !mounted && "opacity-0"
-        )}
-        aria-label="Next"
-      >
-        <ChevronRight className="h-6 w-6 text-gray-700" />
-      </button>
+          <button
+            onClick={() => scroll("right")}
+            className={cn(
+              "absolute -right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl",
+              !mounted && "opacity-0"
+            )}
+            aria-label="Next"
+          >
+            <ChevronRight className="h-6 w-6 text-gray-700" />
+          </button>
+        </>
+      )}
 
       {/* Carousel Container */}
       <div
@@ -260,7 +331,8 @@ export function ProductCarousel({
           const bgColor =
             categoryColors[categorySlug] ||
             cardColors[originalIndex % cardColors.length];
-          const isAdded = addedProducts.has(product.id);
+          const productIsFavorite = isFavorite(product.id);
+          const isLoadingFavorite = loadingFavorites.has(product.id);
 
           return (
             <Link
@@ -279,14 +351,37 @@ export function ProductCarousel({
                   bgColor
                 )}
               >
-                {/* Product Name & Price */}
-                <div className="flex items-start justify-between gap-2">
+                {/* Favorite Button - Top Right */}
+                {showFavoriteButton && (
+                  <button
+                    onClick={(e) => handleFavoriteClick(e, product.id)}
+                    disabled={isLoadingFavorite}
+                    className={cn(
+                      "absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full transition-all",
+                      productIsFavorite
+                        ? "bg-white/30 text-red-400 hover:bg-white/40"
+                        : "bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
+                    )}
+                    aria-label={productIsFavorite ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    {isLoadingFavorite ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Heart
+                        className={cn(
+                          "h-5 w-5 transition-transform",
+                          productIsFavorite && "fill-current scale-110"
+                        )}
+                      />
+                    )}
+                  </button>
+                )}
+
+                {/* Product Name */}
+                <div className="flex items-start justify-between gap-2 pr-12">
                   <h3 className="font-serif text-xl font-bold uppercase leading-tight tracking-wide drop-shadow-md sm:text-2xl">
                     {translation?.name || product.slug}
                   </h3>
-                  <span className="flex-shrink-0 rounded-full bg-white/20 px-3 py-1 text-sm font-bold backdrop-blur-sm">
-                    €{Number(product.price).toFixed(2)}
-                  </span>
                 </div>
 
                 {/* Product Image */}
@@ -304,21 +399,20 @@ export function ProductCarousel({
                   )}
                 </div>
 
-                {/* Floating Add to Cart Button */}
+                {/* Price Badge - Bottom Left */}
+                <div className="absolute bottom-4 left-4">
+                  <span className="rounded-full bg-white/30 px-4 py-2 text-base font-bold backdrop-blur-sm shadow-sm">
+                    €{Number(product.price).toFixed(2)}
+                  </span>
+                </div>
+
+                {/* Floating Add to Cart Button - Opens customization modal */}
                 <button
-                  onClick={(e) => handleAddToCart(e, product)}
-                  className={cn(
-                    "absolute bottom-4 right-4 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all",
-                    isAdded
-                      ? "bg-matcha-500 text-white scale-110"
-                      : "bg-white text-tea-700 hover:bg-tea-600 hover:text-white hover:scale-110 hover:shadow-xl"
-                  )}
+                  onClick={(e) => handleAddClick(e, product)}
+                  className="absolute bottom-4 right-4 flex h-12 w-12 items-center justify-center rounded-full bg-white text-tea-700 shadow-lg transition-all hover:bg-tea-600 hover:text-white hover:scale-110 hover:shadow-xl"
+                  aria-label="Customize and add to cart"
                 >
-                  {isAdded ? (
-                    <Check className="h-6 w-6" />
-                  ) : (
-                    <Plus className="h-6 w-6" />
-                  )}
+                  <Plus className="h-6 w-6" />
                 </button>
               </motion.div>
             </Link>

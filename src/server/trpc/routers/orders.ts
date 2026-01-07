@@ -3,6 +3,43 @@ import { router, publicProcedure, protectedProcedure, adminProcedure } from "../
 import { generateOrderNumber, calculateLoyaltyTier } from "@/lib/utils";
 import { TRPCError } from "@trpc/server";
 
+// Simple in-memory rate limiter for guest orders
+// In production, use Redis or similar for distributed rate limiting
+const guestOrderAttempts = new Map<string, { count: number; resetAt: number }>();
+const GUEST_RATE_LIMIT = 5; // Max orders per email per hour
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in ms
+
+function checkGuestRateLimit(email: string): void {
+  const now = Date.now();
+  const key = email.toLowerCase();
+  const record = guestOrderAttempts.get(key);
+
+  if (record) {
+    if (now > record.resetAt) {
+      // Reset the window
+      guestOrderAttempts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    } else if (record.count >= GUEST_RATE_LIMIT) {
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: "Te veel bestellingen. Probeer het later opnieuw of maak een account aan.",
+      });
+    } else {
+      record.count++;
+    }
+  } else {
+    guestOrderAttempts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+  }
+
+  // Cleanup old entries periodically (simple approach)
+  if (guestOrderAttempts.size > 1000) {
+    Array.from(guestOrderAttempts.entries()).forEach(([k, v]) => {
+      if (now > v.resetAt) {
+        guestOrderAttempts.delete(k);
+      }
+    });
+  }
+}
+
 // Proper schema for customizations instead of z.any()
 const customizationsSchema = z.object({
   sugarLevel: z.number().min(0).max(100).optional(),
@@ -29,6 +66,14 @@ export const ordersRouter = router({
       rewardId: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      // Check if this is a guest order
+      const isGuest = !ctx.session?.user?.id;
+
+      // Apply rate limiting for guest orders
+      if (isGuest) {
+        checkGuestRateLimit(input.customerEmail);
+      }
+
       // Fetch product prices from database (security: never trust client prices)
       const productIds = input.items.map(item => item.productId);
       const products = await ctx.db.product.findMany({
@@ -164,6 +209,7 @@ export const ordersRouter = router({
           id: crypto.randomUUID(),
           orderNumber: generateOrderNumber(),
           userId: ctx.session?.user?.id,
+          isGuest,
           customerName: input.customerName,
           customerEmail: input.customerEmail,
           customerPhone: input.customerPhone,
@@ -172,7 +218,7 @@ export const ordersRouter = router({
           subtotal,
           discount,
           total,
-          pointsEarned,
+          pointsEarned: isGuest ? 0 : pointsEarned, // Guests don't earn points
           pointsRedeemed,
           updatedAt: new Date(),
           items: {

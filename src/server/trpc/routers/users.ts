@@ -141,4 +141,131 @@ export const usersRouter = router({
         data: { loyaltyPoints: newPoints, loyaltyTier: newTier },
       });
     }),
+
+  // GDPR: Export user data (Right to Data Portability - Art. 20)
+  exportData: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+      include: {
+        addresses: true,
+        favorites: {
+          include: {
+            product: {
+              include: { translations: true },
+            },
+          },
+        },
+        loyaltyTransactions: {
+          orderBy: { createdAt: "desc" },
+        },
+        orders: {
+          include: {
+            items: {
+              include: {
+                product: {
+                  include: { translations: true },
+                },
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        },
+        reviews: true,
+      },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    // Format data for export (exclude sensitive internal fields)
+    return {
+      exportedAt: new Date().toISOString(),
+      profile: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        dateOfBirth: user.dateOfBirth,
+        preferredLanguage: user.preferredLanguage,
+        createdAt: user.createdAt,
+      },
+      loyalty: {
+        points: user.loyaltyPoints,
+        tier: user.loyaltyTier,
+        transactions: user.loyaltyTransactions.map((t) => ({
+          type: t.type,
+          points: t.points,
+          description: t.description,
+          date: t.createdAt,
+        })),
+      },
+      addresses: user.addresses.map((a) => ({
+        name: a.name,
+        street: a.street,
+        city: a.city,
+        postalCode: a.postalCode,
+        country: a.country,
+        isDefault: a.isDefault,
+      })),
+      favorites: user.favorites.map((f) => ({
+        productName: f.product.translations[0]?.name || f.product.slug,
+        addedAt: f.createdAt,
+      })),
+      orders: user.orders.map((o) => ({
+        orderNumber: o.orderNumber,
+        status: o.status,
+        total: Number(o.total),
+        pointsEarned: o.pointsEarned,
+        pointsRedeemed: o.pointsRedeemed,
+        pickupTime: o.pickupTime,
+        createdAt: o.createdAt,
+        items: o.items.map((i) => ({
+          productName: i.product.translations[0]?.name || i.product.slug,
+          quantity: i.quantity,
+          price: Number(i.unitPrice),
+          customizations: i.customizations,
+        })),
+      })),
+      reviews: user.reviews.map((r) => ({
+        rating: r.rating,
+        comment: r.comment,
+        createdAt: r.createdAt,
+      })),
+    };
+  }),
+
+  // GDPR: Delete account (Right to Erasure - Art. 17)
+  deleteAccount: protectedProcedure
+    .input(z.object({
+      confirmEmail: z.string().email(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: { id: ctx.session.user.id },
+      });
+
+      if (!user) throw new Error("User not found");
+
+      // Verify email matches for confirmation
+      if (user.email.toLowerCase() !== input.confirmEmail.toLowerCase()) {
+        throw new Error("Email does not match. Please enter your email correctly to confirm deletion.");
+      }
+
+      // Anonymize orders (keep for accounting, but remove personal data)
+      await ctx.db.order.updateMany({
+        where: { userId: ctx.session.user.id },
+        data: {
+          userId: null,
+          customerName: "Deleted User",
+          customerEmail: null,
+          customerPhone: null,
+          notes: null,
+        },
+      });
+
+      // Delete user (cascades to: accounts, sessions, addresses, favorites, loyaltyTransactions, reviews)
+      await ctx.db.user.delete({
+        where: { id: ctx.session.user.id },
+      });
+
+      return { success: true };
+    }),
 });

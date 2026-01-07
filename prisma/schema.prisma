@@ -164,6 +164,7 @@ model Order {
   id              String        @id
   orderNumber     String        @unique
   userId          String?
+  isGuest         Boolean       @default(false)
   status          OrderStatus   @default(PENDING)
   paymentStatus   PaymentStatus @default(PENDING)
   molliePaymentId String?
