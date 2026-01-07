@@ -427,7 +427,14 @@
       "title": "Blijf op de hoogte",
       "placeholder": "Je e-mailadres",
       "subscribe": "Inschrijven",
-      "description": "Ontvang exclusieve aanbiedingen en nieuws over seizoensspecials."
+      "description": "Ontvang exclusieve aanbiedingen en nieuws over seizoensspecials.",
+      "messages": {
+        "confirmation_sent": "Controleer je e-mail om je inschrijving te bevestigen.",
+        "confirmation_pending": "Je hebt al een bevestigingsmail ontvangen. Check je inbox.",
+        "subscribed_as_user": "Je bent nu ingeschreven voor de nieuwsbrief!",
+        "already_subscribed": "Je bent al ingeschreven voor onze nieuwsbrief.",
+        "error": "Er is een fout opgetreden. Probeer het later opnieuw."
+      }
     },
     "legal": {
       "privacy": "Privacybeleid",

@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, newsletterOptIn } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -35,6 +35,7 @@ export async function POST(request: Request) {
         id: userId,
         name,
         email,
+        newsletterOptIn: newsletterOptIn ?? false,
         updatedAt: new Date(),
         accounts: {
           create: {

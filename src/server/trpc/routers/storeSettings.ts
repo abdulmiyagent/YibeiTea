@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { router, publicProcedure, superAdminProcedure } from "../trpc";
 
+// Default social links
+const defaultSocialLinks = [
+  { platform: "instagram", href: "https://instagram.com/yibeitea", isActive: true },
+  { platform: "tiktok", href: "https://tiktok.com/@yibeitea", isActive: true },
+  { platform: "facebook", href: "https://facebook.com/yibeitea", isActive: true },
+  { platform: "email", href: "mailto:info@yibeitea.be", isActive: true },
+];
+
 export const storeSettingsRouter = router({
   // Get store settings (public - needed for checkout)
   get: publicProcedure.query(async ({ ctx }) => {
@@ -24,10 +32,14 @@ export const storeSettingsRouter = router({
         minPickupMinutes: 15,
         maxAdvanceOrderDays: 7,
         pointsPerEuro: 10,
+        socialLinks: defaultSocialLinks,
       };
     }
 
-    return settings;
+    return {
+      ...settings,
+      socialLinks: settings.socialLinks || defaultSocialLinks,
+    };
   }),
 
   // Update store settings (SUPER_ADMIN only)
@@ -45,6 +57,15 @@ export const storeSettingsRouter = router({
         minPickupMinutes: z.number().int().min(5).max(120).optional(),
         maxAdvanceOrderDays: z.number().int().min(1).max(30).optional(),
         pointsPerEuro: z.number().int().min(1).max(100).optional(),
+        socialLinks: z
+          .array(
+            z.object({
+              platform: z.string(),
+              href: z.string(),
+              isActive: z.boolean(),
+            })
+          )
+          .optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -68,6 +89,7 @@ export const storeSettingsRouter = router({
           minPickupMinutes: input.minPickupMinutes || 15,
           maxAdvanceOrderDays: input.maxAdvanceOrderDays || 7,
           pointsPerEuro: input.pointsPerEuro || 10,
+          socialLinks: input.socialLinks || defaultSocialLinks,
           updatedAt: new Date(),
         },
       });

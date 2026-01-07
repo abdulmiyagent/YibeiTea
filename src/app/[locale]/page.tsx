@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useCartStore } from "@/stores/cart-store";
+import { ProductCarousel } from "@/components/ProductCarousel";
 
 // Gradient mappings for categories
 const categoryGradients: Record<string, string> = {
@@ -520,69 +521,12 @@ export default function HomePage() {
             </div>
           ) : (
             <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              variants={staggerContainer}
-              className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-16"
             >
-              {(featuredProducts ?? []).map((product) => {
-                const translation = product.translations[0];
-                const categorySlug = product.category?.slug || "";
-                const gradient = categoryGradients[categorySlug] || "from-tea-200 via-cream-100 to-cream-50";
-                const categoryTranslation = product.category?.translations[0];
-
-                const isAdded = addedProducts.has(product.id);
-
-                return (
-                  <motion.div key={product.id} variants={scaleIn}>
-                    <Link href={`/menu/${product.slug}`}>
-                      <div className="product-card group cursor-pointer overflow-hidden rounded-2xl border border-cream-200 bg-white transition-all hover:shadow-lg hover:shadow-tea-500/10 hover:-translate-y-1">
-                        <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${gradient}`}>
-                          <div className="product-image absolute inset-0 flex items-center justify-center p-4">
-                            {product.imageUrl ? (
-                              <img
-                                src={product.imageUrl}
-                                alt={translation?.name || product.slug}
-                                className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
-                              />
-                            ) : (
-                              <span className="text-7xl transition-transform group-hover:scale-105">🧋</span>
-                            )}
-                          </div>
-                          {/* Price tag */}
-                          <div className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
-                            €{Number(product.price).toFixed(2)}
-                          </div>
-                          {/* Quick add button */}
-                          <button
-                            onClick={(e) => handleQuickAdd(e, product)}
-                            className={`absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full shadow-md transition-all duration-200 ${
-                              isAdded
-                                ? "bg-matcha-500 text-white"
-                                : "bg-white/90 text-tea-600 opacity-0 group-hover:opacity-100 hover:bg-tea-600 hover:text-white"
-                            }`}
-                          >
-                            {isAdded ? (
-                              <Check className="h-4 w-4" />
-                            ) : (
-                              <ShoppingCart className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                        <div className="p-4">
-                          <h3 className="font-serif text-base font-medium text-tea-900 transition-colors group-hover:text-tea-600">
-                            {translation?.name || product.slug}
-                          </h3>
-                          <p className="mt-0.5 text-xs text-muted-foreground">
-                            {categoryTranslation?.name || categorySlug}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                );
-              })}
+              <ProductCarousel products={featuredProducts ?? []} />
             </motion.div>
           )}
 
@@ -635,72 +579,12 @@ export default function HomePage() {
               </div>
             ) : userFavorites && userFavorites.length > 0 ? (
               <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-                variants={staggerContainer}
-                className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mt-16"
               >
-                {userFavorites.slice(0, 4).map((product) => {
-                  const translation = product.translations[0];
-                  const categorySlug = product.category?.slug || "";
-                  const gradient = categoryGradients[categorySlug] || "from-tea-200 via-cream-100 to-cream-50";
-                  const categoryTranslation = product.category?.translations[0];
-                  const isAdded = addedProducts.has(product.id);
-
-                  return (
-                    <motion.div key={product.id} variants={scaleIn}>
-                      <Link href={`/menu/${product.slug}`}>
-                        <div className="product-card group cursor-pointer overflow-hidden rounded-2xl border border-rose-200 bg-white transition-all hover:shadow-lg hover:shadow-rose-500/10 hover:-translate-y-1">
-                          <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${gradient}`}>
-                            <div className="product-image absolute inset-0 flex items-center justify-center p-4">
-                              {product.imageUrl ? (
-                                <img
-                                  src={product.imageUrl}
-                                  alt={translation?.name || product.slug}
-                                  className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
-                                />
-                              ) : (
-                                <span className="text-7xl transition-transform group-hover:scale-105">🧋</span>
-                              )}
-                            </div>
-                            {/* Favorite heart icon */}
-                            <div className="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-rose-500 shadow-sm backdrop-blur-sm">
-                              <Heart className="h-3.5 w-3.5 fill-current" />
-                            </div>
-                            {/* Price tag */}
-                            <div className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-sm font-semibold text-tea-700 shadow-sm backdrop-blur-sm">
-                              €{Number(product.price).toFixed(2)}
-                            </div>
-                            {/* Quick add button */}
-                            <button
-                              onClick={(e) => handleQuickAdd(e, product as NonNullable<typeof featuredProducts>[number])}
-                              className={`absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full shadow-md transition-all duration-200 ${
-                                isAdded
-                                  ? "bg-matcha-500 text-white"
-                                  : "bg-white/90 text-tea-600 opacity-0 group-hover:opacity-100 hover:bg-tea-600 hover:text-white"
-                              }`}
-                            >
-                              {isAdded ? (
-                                <Check className="h-4 w-4" />
-                              ) : (
-                                <ShoppingCart className="h-4 w-4" />
-                              )}
-                            </button>
-                          </div>
-                          <div className="p-4">
-                            <h3 className="font-serif text-base font-medium text-tea-900 transition-colors group-hover:text-tea-600">
-                              {translation?.name || product.slug}
-                            </h3>
-                            <p className="mt-0.5 text-xs text-muted-foreground">
-                              {categoryTranslation?.name || categorySlug}
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
+                <ProductCarousel products={userFavorites} showFavoriteIcon />
               </motion.div>
             ) : (
               <motion.div

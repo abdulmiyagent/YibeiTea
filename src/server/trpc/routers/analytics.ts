@@ -215,6 +215,63 @@ export const analyticsRouter = router({
         }));
     }),
 
+  // Bottom products (least sold)
+  getBottomProducts: adminProcedure
+    .input(z.object({ days: z.number().default(30), limit: z.number().default(10) }).optional())
+    .query(async ({ ctx, input }) => {
+      const days = input?.days || 30;
+      const limit = input?.limit || 10;
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      // Get all available products
+      const allProducts = await ctx.db.product.findMany({
+        where: { isAvailable: true },
+        include: { translations: { where: { locale: "nl" } } },
+      });
+
+      // Get order items for the period
+      const orderItems = await ctx.db.orderItem.findMany({
+        where: {
+          order: {
+            createdAt: { gte: startDate },
+            status: { not: "CANCELLED" },
+          },
+        },
+        select: {
+          productId: true,
+          quantity: true,
+          totalPrice: true,
+        },
+      });
+
+      // Build stats for all products (including those with 0 sales)
+      const productStats: Record<string, { name: string; revenue: number; quantity: number }> = {};
+
+      // Initialize all active products with 0
+      allProducts.forEach((product) => {
+        const productName = product.translations[0]?.name || product.slug;
+        productStats[product.id] = { name: productName, revenue: 0, quantity: 0 };
+      });
+
+      // Add actual sales data
+      orderItems.forEach((item) => {
+        if (productStats[item.productId]) {
+          productStats[item.productId].revenue += Number(item.totalPrice);
+          productStats[item.productId].quantity += item.quantity;
+        }
+      });
+
+      // Sort ascending (least sold first) and take limit
+      return Object.values(productStats)
+        .sort((a, b) => a.quantity - b.quantity)
+        .slice(0, limit)
+        .map((stat) => ({
+          ...stat,
+          revenue: Math.round(stat.revenue * 100) / 100,
+        }));
+    }),
+
   // Peak hours analysis
   getPeakHours: adminProcedure
     .input(z.object({ days: z.number().default(30) }).optional())

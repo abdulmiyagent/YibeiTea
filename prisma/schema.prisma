@@ -308,6 +308,7 @@ model StoreSettings {
   minPickupMinutes    Int      @default(15)
   maxAdvanceOrderDays Int      @default(7)
   pointsPerEuro       Int      @default(10)
+  socialLinks         Json?    // Array of { platform, href, isActive }
   updatedAt           DateTime
 }
 
@@ -347,6 +348,7 @@ model User {
   loyaltyPoints       Int                  @default(0)
   loyaltyTier         LoyaltyTier          @default(BRONZE)
   preferredLanguage   String               @default("nl")
+  newsletterOptIn     Boolean              @default(false)
   createdAt           DateTime             @default(now())
   updatedAt           DateTime
   accounts            Account[]
@@ -356,6 +358,33 @@ model User {
   orders              Order[]
   reviews             Review[]
   sessions            Session[]
+}
+
+// Newsletter subscriber (for non-users who subscribe via footer)
+model NewsletterSubscriber {
+  id              String                    @id @default(cuid())
+  email           String                    @unique
+  name            String?
+  locale          String                    @default("nl")
+  status          NewsletterStatus          @default(PENDING)
+  consentAt       DateTime?
+  consentIp       String?
+  unsubscribedAt  DateTime?
+  unsubscribeToken String                   @unique @default(cuid())
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+}
+
+// Newsletter campaign tracking
+model NewsletterCampaign {
+  id          String   @id @default(cuid())
+  subject     String
+  content     String   @db.Text
+  sentAt      DateTime?
+  sentCount   Int      @default(0)
+  openedCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model VerificationToken {
@@ -412,4 +441,10 @@ enum UserRole {
   USER
   ADMIN
   SUPER_ADMIN
+}
+
+enum NewsletterStatus {
+  PENDING
+  ACTIVE
+  UNSUBSCRIBED
 }

@@ -427,7 +427,14 @@
       "title": "Stay Updated",
       "placeholder": "Your email address",
       "subscribe": "Subscribe",
-      "description": "Receive exclusive offers and news about seasonal specials."
+      "description": "Receive exclusive offers and news about seasonal specials.",
+      "messages": {
+        "confirmation_sent": "Check your email to confirm your subscription.",
+        "confirmation_pending": "You've already received a confirmation email. Check your inbox.",
+        "subscribed_as_user": "You're now subscribed to the newsletter!",
+        "already_subscribed": "You're already subscribed to our newsletter.",
+        "error": "An error occurred. Please try again later."
+      }
     },
     "legal": {
       "privacy": "Privacy Policy",

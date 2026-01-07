@@ -18,7 +18,6 @@ import {
   Gift,
   ArrowLeft,
   Loader2,
-  Coffee,
   Calendar,
 } from "lucide-react";
 import Link from "next/link";
@@ -76,6 +75,11 @@ export default function AnalyticsPage() {
     { enabled: status === "authenticated" && isAdmin }
   );
 
+  const { data: bottomProducts, isLoading: bottomProductsLoading } = api.analytics.getBottomProducts.useQuery(
+    { days: timeRange, limit: 10 },
+    { enabled: status === "authenticated" && isAdmin }
+  );
+
   const { data: peakHours, isLoading: peakLoading } = api.analytics.getPeakHours.useQuery(
     { days: timeRange },
     { enabled: status === "authenticated" && isAdmin }
@@ -97,7 +101,7 @@ export default function AnalyticsPage() {
   );
 
   const isLoading = summaryLoading || revenueLoading || categoryLoading || productsLoading ||
-                    peakLoading || loyaltyLoading || customerLoading || statusLoading;
+                    bottomProductsLoading || peakLoading || loyaltyLoading || customerLoading || statusLoading;
 
   if (status === "loading") {
     return (
@@ -326,7 +330,7 @@ export default function AnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Coffee className="h-5 w-5" />
+                <TrendingUp className="h-5 w-5 text-matcha-600" />
                 Top 10 Producten
               </CardTitle>
             </CardHeader>
@@ -339,7 +343,7 @@ export default function AnalyticsPage() {
                 <div className="space-y-3">
                   {topProducts.map((product, index) => (
                     <div key={product.name} className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tea-100 text-sm font-medium text-tea-700">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-matcha-100 text-sm font-medium text-matcha-700">
                         {index + 1}
                       </div>
                       <div className="flex-1">
@@ -348,7 +352,7 @@ export default function AnalyticsPage() {
                           {product.quantity}x verkocht
                         </p>
                       </div>
-                      <p className="font-medium text-tea-600">€{product.revenue.toFixed(2)}</p>
+                      <p className="font-medium text-matcha-600">€{product.revenue.toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
@@ -360,6 +364,46 @@ export default function AnalyticsPage() {
             </CardContent>
           </Card>
 
+          {/* Bottom Products (Least Sold) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingDown className="h-5 w-5 text-red-500" />
+                Minst Verkochte Producten
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {bottomProductsLoading ? (
+                <div className="flex h-48 items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-tea-600" />
+                </div>
+              ) : bottomProducts && bottomProducts.length > 0 ? (
+                <div className="space-y-3">
+                  {bottomProducts.map((product, index) => (
+                    <div key={product.name} className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-sm font-medium text-red-700">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">{product.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {product.quantity}x verkocht
+                        </p>
+                      </div>
+                      <p className="font-medium text-red-600">€{product.revenue.toFixed(2)}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="py-12 text-center text-muted-foreground">
+                  Geen productdata beschikbaar
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mb-8 grid gap-6 lg:grid-cols-2">
           {/* Sales by Category */}
           <Card>
             <CardHeader>

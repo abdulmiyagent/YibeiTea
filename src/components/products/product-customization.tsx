@@ -15,7 +15,9 @@ import {
   ShoppingCart,
   Check,
   ArrowLeft,
+  Heart,
 } from "lucide-react";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 // =============================================================================
 // TYPES - Shared across modal and page
@@ -412,13 +414,23 @@ export function ProductCustomization({
       <div className="flex flex-col gap-6 py-4">
         {/* Header */}
         <div>
-          {categoryName && (
-            <p className="text-xs font-medium text-tea-600 mb-1">{categoryName}</p>
-          )}
-          <h2 className="text-3xl font-bold">{productName}</h2>
-          <p className="text-xl font-bold text-tea-600 mt-1">
-            €{Number(product.price).toFixed(2)}
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              {categoryName && (
+                <p className="text-xs font-medium text-tea-600 mb-1">{categoryName}</p>
+              )}
+              <h2 className="text-3xl font-bold">{productName}</h2>
+              <p className="text-xl font-bold text-tea-600 mt-1">
+                €{Number(product.price).toFixed(2)}
+              </p>
+            </div>
+            <FavoriteButton
+              productId={product.id}
+              size="default"
+              variant="outline"
+              className="h-10 w-10"
+            />
+          </div>
           {productDescription && (
             <p className="text-muted-foreground mt-2">{productDescription}</p>
           )}

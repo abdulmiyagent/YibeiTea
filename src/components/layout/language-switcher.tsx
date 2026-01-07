@@ -56,13 +56,13 @@ export function LanguageSwitcher() {
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 px-2 py-1"
+        className="flex items-center gap-0.5 px-1.5 py-1 h-8 md:h-9 md:px-2 md:gap-1"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
-        <span className="text-sm font-medium uppercase">{locale}</span>
+        <span className="text-xs md:text-sm font-medium uppercase">{locale}</span>
         <ChevronDown
-          className={`h-3 w-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`h-2.5 w-2.5 md:h-3 md:w-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         />
       </Button>
 

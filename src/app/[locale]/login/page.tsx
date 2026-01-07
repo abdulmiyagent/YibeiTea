@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Newspaper } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 export default function LoginPage() {
   const t = useTranslations("auth.login");
@@ -25,6 +26,7 @@ export default function LoginPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    newsletterOptIn: true,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,6 +49,7 @@ export default function LoginPage() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          newsletterOptIn: formData.newsletterOptIn,
         }),
       });
 
@@ -214,6 +217,29 @@ export default function LoginPage() {
                         )}
                       </button>
                     </div>
+                  </div>
+                )}
+
+                {isRegister && (
+                  <div className="flex items-center justify-between rounded-lg border p-3">
+                    <div className="flex items-center gap-3">
+                      <Newspaper className="h-4 w-4 text-muted-foreground" />
+                      <div className="space-y-0.5">
+                        <Label htmlFor="newsletter" className="cursor-pointer text-sm font-medium">
+                          Nieuwsbrief
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Ontvang aanbiedingen en nieuws
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="newsletter"
+                      checked={formData.newsletterOptIn}
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, newsletterOptIn: checked })
+                      }
+                    />
                   </div>
                 )}
 

@@ -12,11 +12,11 @@ import { api } from "@/lib/trpc";
 import {
   Search,
   Plus,
-  Heart,
   Leaf,
   Coffee,
   Loader2,
 } from "lucide-react";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 export default function MenuPage() {
   const t = useTranslations("menu");
@@ -179,6 +179,11 @@ export default function MenuPage() {
                           €{Number(product.price).toFixed(2)}
                         </span>
                       </div>
+                      {/* Favorite button */}
+                      <FavoriteButton
+                        productId={product.id}
+                        className="h-8 w-8 flex-shrink-0"
+                      />
                       {/* Add button */}
                       <Button
                         size="icon"

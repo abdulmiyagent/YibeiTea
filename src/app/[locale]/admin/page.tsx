@@ -26,6 +26,7 @@ import {
   Tag,
   Gift,
   Coins,
+  Mail,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -448,6 +449,23 @@ export default function AdminDashboardPage() {
                   <p className="font-medium">Klanten</p>
                   <p className="text-sm text-muted-foreground">
                     Punten en klantbeheer
+                  </p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/admin/newsletter">
+            <Card className="cursor-pointer transition-colors hover:bg-muted/50">
+              <CardContent className="flex items-center gap-4 pt-6">
+                <div className="rounded-full bg-blue-100 p-3">
+                  <Mail className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Nieuwsbrief</p>
+                  <p className="text-sm text-muted-foreground">
+                    Abonnees en campagnes
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
