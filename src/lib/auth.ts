@@ -6,6 +6,12 @@ import { db } from "./db";
 import { compare, hash } from "bcryptjs";
 import { Adapter } from "next-auth/adapters";
 import { verifyTwoFactorToken } from "./two-factor";
+import { checkRateLimit, rateLimiters } from "./rate-limit";
+
+function checkLoginRateLimit(email: string): { allowed: boolean; resetIn?: number } {
+  const result = checkRateLimit(`login:${email}`, rateLimiters.login);
+  return { allowed: result.success, resetIn: result.resetIn };
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db) as Adapter,
@@ -32,6 +38,12 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null;
+        }
+
+        // Rate limiting check
+        const rateLimitCheck = checkLoginRateLimit(credentials.email);
+        if (!rateLimitCheck.allowed) {
+          throw new Error(`RATE_LIMITED:${rateLimitCheck.resetIn}`);
         }
 
         const user = await db.user.findUnique({

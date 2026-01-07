@@ -20,7 +20,11 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
-    const folder = (formData.get("folder") as string) || "products";
+    const rawFolder = (formData.get("folder") as string) || "products";
+
+    // Validate folder to prevent path traversal
+    const allowedFolders = ["products", "categories", "banners", "avatars"];
+    const folder = allowedFolders.includes(rawFolder) ? rawFolder : "products";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });

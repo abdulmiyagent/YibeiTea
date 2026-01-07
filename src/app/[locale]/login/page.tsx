@@ -92,6 +92,15 @@ export default function LoginPage() {
         return;
       }
 
+      // Handle rate limiting
+      if (result.error?.includes("RATE_LIMITED")) {
+        const resetIn = result.error.split(":")[1];
+        const minutes = Math.ceil(parseInt(resetIn) / 60);
+        setError(`Te veel inlogpogingen. Probeer opnieuw over ${minutes} minuten.`);
+        setIsLoading(false);
+        return;
+      }
+
       setError("Ongeldige inloggegevens");
       setIsLoading(false);
       return;
