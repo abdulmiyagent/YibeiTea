@@ -29,12 +29,31 @@ export default function LoginPage() {
     newsletterOptIn: true,
   });
 
+  // Password validation helper
+  const validatePassword = (password: string) => {
+    const errors: string[] = [];
+    if (password.length < 8) errors.push("minimaal 8 tekens");
+    if (!/[A-Z]/.test(password)) errors.push("één hoofdletter");
+    if (!/[0-9]/.test(password)) errors.push("één cijfer");
+    return errors;
+  };
+
+  const passwordErrors = isRegister ? validatePassword(formData.password) : [];
+  const isPasswordValid = passwordErrors.length === 0;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     if (isRegister) {
+      // Client-side password validation
+      if (!isPasswordValid) {
+        setError(`Wachtwoord vereist: ${passwordErrors.join(", ")}`);
+        setIsLoading(false);
+        return;
+      }
+
       if (formData.password !== formData.confirmPassword) {
         setError("Wachtwoorden komen niet overeen");
         setIsLoading(false);
@@ -194,6 +213,19 @@ export default function LoginPage() {
                       )}
                     </button>
                   </div>
+                  {isRegister && formData.password && (
+                    <div className="text-xs space-y-1">
+                      <div className={`flex items-center gap-1 ${formData.password.length >= 8 ? "text-green-600" : "text-muted-foreground"}`}>
+                        {formData.password.length >= 8 ? "✓" : "○"} Minimaal 8 tekens
+                      </div>
+                      <div className={`flex items-center gap-1 ${/[A-Z]/.test(formData.password) ? "text-green-600" : "text-muted-foreground"}`}>
+                        {/[A-Z]/.test(formData.password) ? "✓" : "○"} Eén hoofdletter
+                      </div>
+                      <div className={`flex items-center gap-1 ${/[0-9]/.test(formData.password) ? "text-green-600" : "text-muted-foreground"}`}>
+                        {/[0-9]/.test(formData.password) ? "✓" : "○"} Eén cijfer
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {isRegister && (
