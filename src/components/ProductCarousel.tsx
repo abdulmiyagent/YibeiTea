@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
-import { ChevronLeft, ChevronRight, Heart, Plus, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/stores/cart-store";
 
@@ -48,19 +48,18 @@ interface Product {
 
 interface ProductCarouselProps {
   products: Product[];
-  showFavoriteIcon?: boolean;
   className?: string;
 }
 
 export function ProductCarousel({
   products,
-  showFavoriteIcon = false,
   className,
 }: ProductCarouselProps) {
   const locale = useLocale() as "nl" | "en";
   const carouselRef = useRef<HTMLDivElement>(null);
   const [cardsPerView, setCardsPerView] = useState(5);
   const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
+  const [mounted, setMounted] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
   // Calculate cards per view based on screen width
@@ -75,6 +74,7 @@ export function ProductCarousel({
     };
 
     updateCardsPerView();
+    setMounted(true);
     window.addEventListener("resize", updateCardsPerView);
     return () => window.removeEventListener("resize", updateCardsPerView);
   }, []);
@@ -220,11 +220,14 @@ export function ProductCarousel({
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative min-h-[460px]", className)}>
       {/* Navigation Arrows - Always visible for infinite scroll */}
       <button
         onClick={() => scroll("left")}
-        className="absolute -left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl"
+        className={cn(
+          "absolute -left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl",
+          !mounted && "opacity-0"
+        )}
         aria-label="Previous"
       >
         <ChevronLeft className="h-6 w-6 text-gray-700" />
@@ -232,7 +235,10 @@ export function ProductCarousel({
 
       <button
         onClick={() => scroll("right")}
-        className="absolute -right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl"
+        className={cn(
+          "absolute -right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl",
+          !mounted && "opacity-0"
+        )}
         aria-label="Next"
       >
         <ChevronRight className="h-6 w-6 text-gray-700" />
@@ -241,7 +247,10 @@ export function ProductCarousel({
       {/* Carousel Container */}
       <div
         ref={carouselRef}
-        className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide"
+        className={cn(
+          "flex gap-4 overflow-x-auto pb-4 scrollbar-hide transition-opacity duration-200",
+          !mounted && "opacity-0"
+        )}
         style={{ scrollBehavior: "auto" }}
       >
         {extendedProducts.map((product, index) => {
@@ -270,13 +279,6 @@ export function ProductCarousel({
                   bgColor
                 )}
               >
-                {/* Favorite Icon */}
-                {showFavoriteIcon && (
-                  <div className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                    <Heart className="h-4 w-4 fill-current text-white" />
-                  </div>
-                )}
-
                 {/* Product Name & Price */}
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-serif text-xl font-bold uppercase leading-tight tracking-wide drop-shadow-md sm:text-2xl">
@@ -326,7 +328,10 @@ export function ProductCarousel({
 
       {/* Pagination Dots */}
       {totalPages > 1 && (
-        <div className="mt-6 flex justify-center gap-2">
+        <div className={cn(
+          "mt-6 flex justify-center gap-2 transition-opacity duration-200",
+          !mounted && "opacity-0"
+        )}>
           {Array.from({ length: totalPages }).map((_, index) => (
             <button
               key={index}

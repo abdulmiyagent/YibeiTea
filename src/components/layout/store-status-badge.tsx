@@ -145,7 +145,92 @@ export function StoreStatusBadge() {
   );
 }
 
-// Mobile version of the store status badge
+// Compact mobile version - shows in header bar (minimalist: just dot + time)
+export function CompactStoreStatusBadge() {
+  const { data: storeSettings } = api.storeSettings.get.useQuery();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const status = useMemo(() => {
+    if (!storeSettings?.openingHours) {
+      return { isOpen: false, time: null };
+    }
+
+    const openingHours = storeSettings.openingHours as OpeningHours;
+    const now = currentTime;
+    const currentDay = DAY_NAMES[now.getDay()];
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    const todayHours = openingHours[currentDay];
+
+    if (todayHours && todayHours.open && todayHours.close) {
+      const isOpen = isWithinHours(
+        currentHours,
+        currentMinutes,
+        todayHours.open,
+        todayHours.close
+      );
+
+      if (isOpen) {
+        return { isOpen: true, time: todayHours.close };
+      }
+
+      const openTime = parseTime(todayHours.open);
+      const currentTotalMinutes = currentHours * 60 + currentMinutes;
+      const openTotalMinutes = openTime.hours * 60 + openTime.minutes;
+
+      if (currentTotalMinutes < openTotalMinutes) {
+        return { isOpen: false, time: todayHours.open };
+      }
+    }
+
+    // Find next opening
+    for (let i = 1; i <= 7; i++) {
+      const nextDayIndex = (now.getDay() + i) % 7;
+      const nextDay = DAY_NAMES[nextDayIndex];
+      const nextDayHours = openingHours[nextDay];
+
+      if (nextDayHours && nextDayHours.open) {
+        return { isOpen: false, time: nextDayHours.open };
+      }
+    }
+
+    return { isOpen: false, time: null };
+  }, [storeSettings, currentTime]);
+
+  // Fixed width container to prevent layout shift
+  return (
+    <div
+      className={cn(
+        "flex md:hidden items-center gap-1 text-[10px] font-medium tabular-nums min-w-[38px]",
+        status.isOpen ? "text-green-600" : "text-muted-foreground"
+      )}
+    >
+      {status.time ? (
+        <>
+          <span
+            className={cn(
+              "h-1.5 w-1.5 rounded-full flex-shrink-0",
+              status.isOpen ? "bg-green-500 animate-pulse" : "bg-muted-foreground/50"
+            )}
+          />
+          <span>{status.time}</span>
+        </>
+      ) : (
+        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30 flex-shrink-0" />
+      )}
+    </div>
+  );
+}
+
+// Mobile version of the store status badge (full version for menu)
 export function MobileStoreStatusBadge() {
   const t = useTranslations("storeStatus");
   const { data: storeSettings } = api.storeSettings.get.useQuery();

@@ -584,7 +584,7 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 className="mt-16"
               >
-                <ProductCarousel products={userFavorites} showFavoriteIcon />
+                <ProductCarousel products={userFavorites} />
               </motion.div>
             ) : (
               <motion.div

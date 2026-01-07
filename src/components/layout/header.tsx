@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { LanguageSwitcher } from "./language-switcher";
 import { CartDrawer } from "@/components/cart/cart-drawer";
-import { StoreStatusBadge, MobileStoreStatusBadge } from "./store-status-badge";
+import { StoreStatusBadge, MobileStoreStatusBadge, CompactStoreStatusBadge } from "./store-status-badge";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/trpc";
 
@@ -135,14 +135,17 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container-custom">
         <div className="flex h-14 md:h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <img
-              src="/images/logo.png"
-              alt="Yibei Tea"
-              className="h-10 md:h-14 w-auto"
-            />
-          </Link>
+          {/* Logo + Mobile Store Status */}
+          <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center">
+              <img
+                src="/images/logo.png"
+                alt="Yibei Tea"
+                className="h-10 md:h-14 w-auto"
+              />
+            </Link>
+            <CompactStoreStatusBadge />
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex md:items-center md:space-x-6">
