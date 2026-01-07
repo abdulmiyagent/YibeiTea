@@ -1,41 +1,20 @@
 import { z } from "zod";
 import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc";
 import { generateOrderNumber, calculateLoyaltyTier } from "@/lib/utils";
+import { checkRateLimit, rateLimiters } from "@/lib/rate-limit";
 import { TRPCError } from "@trpc/server";
 
-// Simple in-memory rate limiter for guest orders
-// In production, use Redis or similar for distributed rate limiting
-const guestOrderAttempts = new Map<string, { count: number; resetAt: number }>();
-const GUEST_RATE_LIMIT = 5; // Max orders per email per hour
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in ms
+/**
+ * Check rate limit for guest orders using shared rate limiter (Upstash Redis or in-memory fallback)
+ */
+async function checkGuestOrderRateLimit(email: string): Promise<void> {
+  const identifier = `guest-order:${email.toLowerCase()}`;
+  const result = await checkRateLimit(identifier, rateLimiters.guestOrder);
 
-function checkGuestRateLimit(email: string): void {
-  const now = Date.now();
-  const key = email.toLowerCase();
-  const record = guestOrderAttempts.get(key);
-
-  if (record) {
-    if (now > record.resetAt) {
-      // Reset the window
-      guestOrderAttempts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
-    } else if (record.count >= GUEST_RATE_LIMIT) {
-      throw new TRPCError({
-        code: "TOO_MANY_REQUESTS",
-        message: "Te veel bestellingen. Probeer het later opnieuw of maak een account aan.",
-      });
-    } else {
-      record.count++;
-    }
-  } else {
-    guestOrderAttempts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
-  }
-
-  // Cleanup old entries periodically (simple approach)
-  if (guestOrderAttempts.size > 1000) {
-    Array.from(guestOrderAttempts.entries()).forEach(([k, v]) => {
-      if (now > v.resetAt) {
-        guestOrderAttempts.delete(k);
-      }
+  if (!result.success) {
+    throw new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: "Te veel bestellingen. Probeer het later opnieuw of maak een account aan.",
     });
   }
 }
@@ -71,7 +50,7 @@ export const ordersRouter = router({
 
       // Apply rate limiting for guest orders
       if (isGuest) {
-        checkGuestRateLimit(input.customerEmail);
+        await checkGuestOrderRateLimit(input.customerEmail);
       }
 
       // Fetch product prices from database (security: never trust client prices)

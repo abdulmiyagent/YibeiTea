@@ -8,8 +8,8 @@ import { Adapter } from "next-auth/adapters";
 import { verifyTwoFactorToken } from "./two-factor";
 import { checkRateLimit, rateLimiters } from "./rate-limit";
 
-function checkLoginRateLimit(email: string): { allowed: boolean; resetIn?: number } {
-  const result = checkRateLimit(`login:${email}`, rateLimiters.login);
+async function checkLoginRateLimit(email: string): Promise<{ allowed: boolean; resetIn?: number }> {
+  const result = await checkRateLimit(`login:${email}`, rateLimiters.login);
   return { allowed: result.success, resetIn: result.resetIn };
 }
 
@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Rate limiting check
-        const rateLimitCheck = checkLoginRateLimit(credentials.email);
+        const rateLimitCheck = await checkLoginRateLimit(credentials.email);
         if (!rateLimitCheck.allowed) {
           throw new Error(`RATE_LIMITED:${rateLimitCheck.resetIn}`);
         }
