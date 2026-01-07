@@ -173,14 +173,4 @@ export const promoCodesRouter = router({
         where: { id: input.id },
       });
     }),
-
-  // Internal: Increment usage count (called during order creation)
-  incrementUsage: publicProcedure
-    .input(z.object({ code: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.promoCode.update({
-        where: { code: input.code.toUpperCase() },
-        data: { usedCount: { increment: 1 } },
-      });
-    }),
 });

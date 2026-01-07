@@ -24,6 +24,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Address {
@@ -38,6 +39,8 @@ model Address {
   createdAt  DateTime @default(now())
   updatedAt  DateTime
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Allergen {
@@ -152,6 +155,9 @@ model LoyaltyTransaction {
   description String?
   createdAt   DateTime               @default(now())
   user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model Order {
@@ -175,6 +181,11 @@ model Order {
   updatedAt       DateTime
   user            User?         @relation(fields: [userId], references: [id])
   items           OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([customerEmail])
 }
 
 model OrderItem {
@@ -187,6 +198,9 @@ model OrderItem {
   customizations Json?
   order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product        Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Product {
@@ -213,6 +227,10 @@ model Product {
   allergens               ProductAllergen[]
   customizationConfigs    ProductCustomizationConfig[]
   translations            ProductTranslation[]
+
+  @@index([categoryId])
+  @@index([isAvailable])
+  @@index([isFeatured])
 }
 
 model ProductAllergen {

@@ -3,28 +3,63 @@ import { router, publicProcedure, protectedProcedure, adminProcedure } from "../
 import { generateOrderNumber, calculateLoyaltyTier } from "@/lib/utils";
 import { TRPCError } from "@trpc/server";
 
+// Proper schema for customizations instead of z.any()
+const customizationsSchema = z.object({
+  sugarLevel: z.number().min(0).max(100).optional(),
+  iceLevel: z.string().optional(),
+  toppings: z.array(z.string()).optional(),
+  milkType: z.string().optional(),
+  size: z.string().optional(),
+}).optional();
+
 export const ordersRouter = router({
   create: publicProcedure
     .input(z.object({
       items: z.array(z.object({
         productId: z.string(),
-        quantity: z.number().positive(),
-        unitPrice: z.number().positive(),
-        customizations: z.any().optional(),
+        quantity: z.number().positive().int().max(99),
+        customizations: customizationsSchema,
       })),
-      customerName: z.string(),
-      customerEmail: z.string().email(),
-      customerPhone: z.string().optional(),
+      customerName: z.string().min(1).max(100),
+      customerEmail: z.string().email().max(255),
+      customerPhone: z.string().max(20).optional(),
       pickupTime: z.string(),
-      notes: z.string().optional(),
-      promoCode: z.string().optional(),
-      rewardId: z.string().optional(), // Selected reward to redeem at checkout
+      notes: z.string().max(500).optional(),
+      promoCode: z.string().max(20).optional(),
+      rewardId: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const subtotal = input.items.reduce(
-        (sum, item) => sum + item.unitPrice * item.quantity,
-        0
-      );
+      // Fetch product prices from database (security: never trust client prices)
+      const productIds = input.items.map(item => item.productId);
+      const products = await ctx.db.product.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true, price: true, isAvailable: true },
+      });
+
+      const productMap = new Map(products.map(p => [p.id, p]));
+
+      // Validate all products exist and are available
+      for (const item of input.items) {
+        const product = productMap.get(item.productId);
+        if (!product) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Product niet gevonden: ${item.productId}`,
+          });
+        }
+        if (!product.isAvailable) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Een of meer producten zijn niet beschikbaar",
+          });
+        }
+      }
+
+      // Calculate subtotal from database prices
+      const subtotal = input.items.reduce((sum, item) => {
+        const product = productMap.get(item.productId)!;
+        return sum + Number(product.price) * item.quantity;
+      }, 0);
 
       let discount = 0;
       let pointsRedeemed = 0;
@@ -141,52 +176,73 @@ export const ordersRouter = router({
           pointsRedeemed,
           updatedAt: new Date(),
           items: {
-            create: input.items.map((item) => ({
-              id: crypto.randomUUID(),
-              productId: item.productId,
-              quantity: item.quantity,
-              unitPrice: item.unitPrice,
-              totalPrice: item.unitPrice * item.quantity,
-              customizations: item.customizations,
-            })),
+            create: input.items.map((item) => {
+              const product = productMap.get(item.productId)!;
+              const unitPrice = Number(product.price);
+              return {
+                id: crypto.randomUUID(),
+                productId: item.productId,
+                quantity: item.quantity,
+                unitPrice,
+                totalPrice: unitPrice * item.quantity,
+                customizations: item.customizations,
+              };
+            }),
           },
         },
         include: { items: true },
       });
 
-      // Process REDEEMED points immediately (to prevent double-use)
+      // Process REDEEMED points immediately using atomic operation (to prevent race conditions)
       // EARNED points are handled by the Mollie webhook after successful payment
       if (ctx.session?.user?.id && pointsRedeemed > 0) {
-        const user = await ctx.db.user.findUnique({
+        // Use atomic decrement with WHERE clause to prevent double-spending
+        // This ensures the user still has enough points at the moment of deduction
+        const updateResult = await ctx.db.user.updateMany({
+          where: {
+            id: ctx.session.user.id,
+            loyaltyPoints: { gte: pointsRedeemed }, // Only update if they still have enough points
+          },
+          data: {
+            loyaltyPoints: { decrement: pointsRedeemed },
+          },
+        });
+
+        // If no rows were updated, the user no longer has enough points (race condition)
+        if (updateResult.count === 0) {
+          // Rollback: delete the order that was just created
+          await ctx.db.order.delete({ where: { id: order.id } });
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Je hebt niet meer genoeg punten voor deze beloning",
+          });
+        }
+
+        // Fetch updated points to recalculate tier
+        const updatedUser = await ctx.db.user.findUnique({
           where: { id: ctx.session.user.id },
           select: { loyaltyPoints: true },
         });
 
-        if (user) {
-          const newPoints = Math.max(0, user.loyaltyPoints - pointsRedeemed);
-          const newTier = calculateLoyaltyTier(newPoints);
-
-          // Deduct redeemed points
+        if (updatedUser) {
+          const newTier = calculateLoyaltyTier(updatedUser.loyaltyPoints);
           await ctx.db.user.update({
             where: { id: ctx.session.user.id },
-            data: {
-              loyaltyPoints: newPoints,
-              loyaltyTier: newTier,
-            },
-          });
-
-          // Create REDEEM transaction
-          await ctx.db.loyaltyTransaction.create({
-            data: {
-              id: crypto.randomUUID(),
-              userId: ctx.session.user.id,
-              points: -pointsRedeemed,
-              type: "REDEEM",
-              description: `Ingewisseld: ${rewardName} (Bestelling ${order.orderNumber})`,
-              orderId: order.id,
-            },
+            data: { loyaltyTier: newTier },
           });
         }
+
+        // Create REDEEM transaction
+        await ctx.db.loyaltyTransaction.create({
+          data: {
+            id: crypto.randomUUID(),
+            userId: ctx.session.user.id,
+            points: -pointsRedeemed,
+            type: "REDEEM",
+            description: `Ingewisseld: ${rewardName} (Bestelling ${order.orderNumber})`,
+            orderId: order.id,
+          },
+        });
       }
       // Note: EARN transactions are created by the Mollie webhook after payment confirmation
 
