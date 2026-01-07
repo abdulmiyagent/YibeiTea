@@ -2,7 +2,7 @@
 
 > **Version:** 1.2.0
 > **Last Updated:** 2026-01-07
-> **Status:** Production Ready
+> **Status:** In Development
 > **Repository:** github.com/abdulmiyagent/YibeiTea
 
 ---
@@ -13,7 +13,7 @@
 
 **Stack:** Next.js 14 + TypeScript + Tailwind + tRPC + Prisma + Supabase
 
-**Status:** Meer dan MVP. Productie-klaar met betalingen (Mollie), e-mail (Brevo), loyaliteitspunten, promotiecode systeem, newsletter campaigns, GDPR compliance en admin dashboard. Juridisch gereviewed.
+**Status:** Feature-complete. Betalingen (Mollie), e-mail (Brevo), loyaliteitspunten, promotiecode systeem, newsletter campaigns, GDPR compliance en admin dashboard. Deployment en finale compliance-check pending.
 
 **Key beslissingen:**
 - Horizontale compacte kaarten op menu (6-7 items zichtbaar per scherm)
@@ -375,7 +375,7 @@ src/app/[locale]/
 | Account deletion (Art. 17) | Account settings → Delete account (email confirmation required) |
 | Newsletter consent (Art. 7) | Opt-in default OFF, explicit toggle required |
 | Consent tracking | Timestamp + IP stored on newsletter signup |
-| International transfers | SCCs with US-based processors (Google, Vercel) |
+| International transfers | Pending: Accept DPAs for Google OAuth and Vercel hosting before launch |
 | Privacy Policy | /privacy page (NL/EN), lists all processors |
 | Terms of Service | /terms page (NL/EN), Belgian law |
 
@@ -682,4 +682,3 @@ yibei-tea/
 
 ### Not Started
 - [ ] Birthday rewards automation
-- [ ] Production deployment
