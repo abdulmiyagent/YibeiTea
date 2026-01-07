@@ -7,6 +7,8 @@ import { locales } from "@/i18n/request";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -24,12 +26,13 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://yibeitea.be"),
   title: {
     default: "Yibei Tea - Premium Bubble Tea in Gent",
     template: "%s | Yibei Tea",
   },
   description:
-    "Ontdek de beste bubble tea in Gent. Vers bereid met premium ingrediënten. Bestel online en haal af!",
+    "Bestel verse, handgemaakte bubble tea online. Pas je drankje aan met suikerniveau, ijs en toppings. Afhalen in Gent. Loyaliteitspunten bij elke bestelling.",
   keywords: [
     "bubble tea",
     "boba",
@@ -40,12 +43,40 @@ export const metadata: Metadata = {
     "Belgium",
     "taro",
     "matcha",
+    "online bestellen",
+    "afhalen",
+    "tapioca",
   ],
+  authors: [{ name: "Yibei Tea" }],
+  creator: "Yibei Tea",
   openGraph: {
     type: "website",
     locale: "nl_BE",
     alternateLocale: "en_GB",
+    url: "https://yibeitea.be",
     siteName: "Yibei Tea",
+    title: "Yibei Tea - Premium Bubble Tea in Gent",
+    description:
+      "Bestel verse, handgemaakte bubble tea online. Pas je drankje aan en haal af in Gent.",
+    images: [
+      {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Yibei Tea - Bubble Tea in Gent",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Yibei Tea - Premium Bubble Tea in Gent",
+    description:
+      "Bestel verse, handgemaakte bubble tea online. Afhalen in Gent.",
+    images: ["/images/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -86,6 +117,8 @@ export default async function RootLayout({
             {modal}
           </Providers>
         </NextIntlClientProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

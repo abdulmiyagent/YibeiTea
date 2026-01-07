@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and private routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout/
+Disallow: /order/
+
+Sitemap: https://yibeitea.be/sitemap.xml
