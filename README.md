@@ -1,7 +1,7 @@
 # Yibei Tea - Project Documentation
 
 > **Version:** 1.1.0
-> **Last Updated:** 2026-01-06
+> **Last Updated:** 2026-01-07
 > **Status:** Active Development
 > **Repository:** github.com/abdulmiyagent/YibeiTea
 
@@ -617,6 +617,11 @@ yibei-tea/
 - [ ] Production deployment
 
 ### Recently Completed
+- [x] Social media links system: admin-configurable priority order, mobile dropdown, desktop inline icons, footer integration (Jan 2026)
+- [x] Compact mobile header: smaller icons (32px), reduced spacing, sleeker look on mobile devices (Jan 2026)
+- [x] Product carousel: infinite scroll, floating add-to-cart buttons, category-based colors (Jan 2026)
+- [x] Favorites system: users can mark products as favorites, dedicated favorites page (Jan 2026)
+- [x] Newsletter subscription: footer signup form, admin subscriber management (Jan 2026)
 - [x] Store status badge in header: shows "Open tot XX:XX" (green) or "Opent om XX:XX" (red) with dynamic opening hours from database (Jan 2026)
 - [x] Pre-order flow: customers can order when store is closed, with amber pre-order banner in checkout and automatic date/time slot selection (Jan 2026)
 - [x] Dynamic time slot filtering: filters out past time slots, auto-switches to tomorrow if no slots available today (Jan 2026)
