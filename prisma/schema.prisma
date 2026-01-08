@@ -327,8 +327,24 @@ model StoreSettings {
   minPickupMinutes    Int      @default(15)
   maxAdvanceOrderDays Int      @default(7)
   pointsPerEuro       Int      @default(10)
+  slotsPerTimeWindow  Int      @default(10) // Orders allowed per 30-min window
   socialLinks         Json?    // Array of { platform, href, isActive }
   updatedAt           DateTime
+}
+
+// Time slot overrides for admin to disable or limit capacity
+model TimeSlotOverride {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date // The date this override applies to
+  time        String   // Time slot (e.g., "14:00")
+  isDisabled  Boolean  @default(false) // If true, slot is completely disabled
+  maxCapacity Int?     // Optional override for capacity (null = use default)
+  reason      String?  // Optional reason for the override
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([date, time])
+  @@index([date])
 }
 
 model Topping {

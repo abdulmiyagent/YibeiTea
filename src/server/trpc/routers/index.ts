@@ -12,6 +12,7 @@ import { paymentsRouter } from "./payments";
 import { promoCodesRouter } from "./promoCodes";
 import { storeSettingsRouter } from "./storeSettings";
 import { newsletterRouter } from "./newsletter";
+import { timeSlotsRouter } from "./timeSlots";
 
 export const appRouter = router({
   products: productsRouter,
@@ -27,6 +28,7 @@ export const appRouter = router({
   promoCodes: promoCodesRouter,
   storeSettings: storeSettingsRouter,
   newsletter: newsletterRouter,
+  timeSlots: timeSlotsRouter,
 });
 
 export type AppRouter = typeof appRouter;

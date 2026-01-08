@@ -153,6 +153,12 @@ export default function CheckoutPage() {
     notes: "",
   });
 
+  // Fetch slot availability for selected date (must be after formData is defined)
+  const { data: slotAvailability } = api.timeSlots.getAvailability.useQuery(
+    { date: formData.pickupDate },
+    { enabled: !!formData.pickupDate }
+  );
+
   const subtotal = getSubtotal();
   const userPoints = loyaltyInfo?.loyaltyPoints ?? 0;
 
@@ -183,6 +189,42 @@ export default function CheckoutPage() {
     const minPickupMinutes = storeSettings?.minPickupMinutes ?? 15;
     return filterValidTimeSlots(slots, formData.pickupDate, minPickupMinutes);
   }, [formData.pickupDate, storeSettings]);
+
+  // Calculate slot status for each time slot
+  const slotStatus = useMemo(() => {
+    if (!slotAvailability) return {};
+
+    const { defaultCapacity, orderCounts, overrides } = slotAvailability;
+    const status: Record<string, {
+      available: number;
+      capacity: number;
+      isDisabled: boolean;
+      isFull: boolean;
+      isLimited: boolean;
+      reason?: string | null;
+    }> = {};
+
+    timeSlots.forEach((time) => {
+      const override = overrides[time];
+      const currentOrders = orderCounts[time] || 0;
+      const capacity = override?.maxCapacity ?? defaultCapacity;
+      const isDisabled = override?.isDisabled ?? false;
+      const available = Math.max(0, capacity - currentOrders);
+      const isFull = available === 0;
+      const isLimited = available > 0 && available <= 3;
+
+      status[time] = {
+        available,
+        capacity,
+        isDisabled,
+        isFull,
+        isLimited,
+        reason: override?.reason,
+      };
+    });
+
+    return status;
+  }, [slotAvailability, timeSlots]);
 
   // Auto-switch to tomorrow if no valid time slots today
   useEffect(() => {
@@ -545,18 +587,55 @@ export default function CheckoutPage() {
                     </div>
                     <div className="space-y-2">
                       <Label>{t("pickup.selectTime")}</Label>
-                      <div className="grid grid-cols-4 gap-2 md:grid-cols-6">
-                        {timeSlots.map((time) => (
-                          <Button
-                            key={time}
-                            variant={formData.pickupTime === time ? "tea" : "outline"}
-                            size="sm"
-                            className="rounded-full"
-                            onClick={() => updateFormData("pickupTime", time)}
-                          >
-                            {time}
-                          </Button>
-                        ))}
+                      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                        {timeSlots.map((time) => {
+                          const status = slotStatus[time];
+                          const isDisabled = status?.isDisabled || status?.isFull;
+                          const isSelected = formData.pickupTime === time;
+                          const isLimited = status?.isLimited;
+
+                          return (
+                            <Button
+                              key={time}
+                              variant={isSelected ? "tea" : "outline"}
+                              size="sm"
+                              className={cn(
+                                "rounded-full relative flex flex-col items-center gap-0.5 h-auto py-2",
+                                isDisabled && "opacity-50 cursor-not-allowed line-through",
+                                isLimited && !isSelected && "border-amber-300 bg-amber-50 hover:bg-amber-100",
+                                status?.isFull && "bg-gray-100 hover:bg-gray-100"
+                              )}
+                              onClick={() => !isDisabled && updateFormData("pickupTime", time)}
+                              disabled={isDisabled}
+                            >
+                              <span>{time}</span>
+                              {status && !status.isDisabled && (
+                                <span className={cn(
+                                  "text-[10px] font-normal",
+                                  status.isFull
+                                    ? "text-red-500"
+                                    : status.isLimited
+                                    ? "text-amber-600"
+                                    : isSelected
+                                    ? "text-white/80"
+                                    : "text-muted-foreground"
+                                )}>
+                                  {status.isFull
+                                    ? (locale === "nl" ? "vol" : "full")
+                                    : status.isLimited
+                                    ? `${status.available} ${locale === "nl" ? "over" : "left"}`
+                                    : `${status.available}/${status.capacity}`
+                                  }
+                                </span>
+                              )}
+                              {status?.isDisabled && (
+                                <span className="text-[10px] text-gray-400">
+                                  {locale === "nl" ? "gesloten" : "closed"}
+                                </span>
+                              )}
+                            </Button>
+                          );
+                        })}
                       </div>
                       {timeSlots.length === 0 && (
                         <p className="text-xs text-amber-600">
@@ -566,11 +645,27 @@ export default function CheckoutPage() {
                         </p>
                       )}
                       {timeSlots.length > 0 && (
-                        <p className="text-xs text-muted-foreground">
-                          {locale === "nl"
-                            ? `Minimale bereidingstijd: ${storeSettings?.minPickupMinutes ?? 15} minuten`
-                            : `Minimum preparation time: ${storeSettings?.minPickupMinutes ?? 15} minutes`}
-                        </p>
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground">
+                            {locale === "nl"
+                              ? `Minimale bereidingstijd: ${storeSettings?.minPickupMinutes ?? 15} minuten`
+                              : `Minimum preparation time: ${storeSettings?.minPickupMinutes ?? 15} minutes`}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <span className="h-2 w-2 rounded-full bg-matcha-500"></span>
+                              {locale === "nl" ? "Beschikbaar" : "Available"}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <span className="h-2 w-2 rounded-full bg-amber-400"></span>
+                              {locale === "nl" ? "Bijna vol" : "Almost full"}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <span className="h-2 w-2 rounded-full bg-gray-300"></span>
+                              {locale === "nl" ? "Vol" : "Full"}
+                            </span>
+                          </div>
+                        </div>
                       )}
                     </div>
                     <div className="space-y-2">

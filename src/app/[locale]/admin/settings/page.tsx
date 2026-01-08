@@ -107,6 +107,7 @@ export default function SettingsPage() {
   const [minPickupMinutes, setMinPickupMinutes] = useState(15);
   const [maxAdvanceOrderDays, setMaxAdvanceOrderDays] = useState(7);
   const [pointsPerEuro, setPointsPerEuro] = useState(10);
+  const [slotsPerTimeWindow, setSlotsPerTimeWindow] = useState(10);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
 
   const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
@@ -132,6 +133,7 @@ export default function SettingsPage() {
       setMinPickupMinutes(settings.minPickupMinutes);
       setMaxAdvanceOrderDays(settings.maxAdvanceOrderDays);
       setPointsPerEuro(settings.pointsPerEuro);
+      setSlotsPerTimeWindow(settings.slotsPerTimeWindow);
       setSocialLinks((settings.socialLinks as SocialLink[]) || []);
     }
   }, [settings]);
@@ -160,6 +162,7 @@ export default function SettingsPage() {
       minPickupMinutes,
       maxAdvanceOrderDays,
       pointsPerEuro,
+      slotsPerTimeWindow,
       socialLinks,
     });
   };
@@ -296,6 +299,27 @@ export default function SettingsPage() {
                 />
                 <p className="text-xs text-muted-foreground">
                   Hoeveel dagen vooruit kan een klant bestellen
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>Bestellingen per 30 min tijdslot</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={slotsPerTimeWindow}
+                  onChange={(e) => setSlotsPerTimeWindow(parseInt(e.target.value) || 10)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Hoeveel bestellingen per 30 minuten toegestaan
+                </p>
+              </div>
+              <div className="rounded-lg border border-tea-200 bg-tea-50/50 p-3">
+                <p className="text-sm text-tea-700">
+                  💡 Beheer specifieke tijdsloten via{" "}
+                  <Link href="/admin/time-slots" className="font-medium underline">
+                    Tijdsloten Beheer
+                  </Link>
                 </p>
               </div>
             </CardContent>

@@ -32,6 +32,7 @@ export const storeSettingsRouter = router({
         minPickupMinutes: 15,
         maxAdvanceOrderDays: 7,
         pointsPerEuro: 10,
+        slotsPerTimeWindow: 10,
         socialLinks: defaultSocialLinks,
       };
     }
@@ -57,6 +58,7 @@ export const storeSettingsRouter = router({
         minPickupMinutes: z.number().int().min(5).max(120).optional(),
         maxAdvanceOrderDays: z.number().int().min(1).max(30).optional(),
         pointsPerEuro: z.number().int().min(1).max(100).optional(),
+        slotsPerTimeWindow: z.number().int().min(1).max(100).optional(),
         socialLinks: z
           .array(
             z.object({
@@ -89,6 +91,7 @@ export const storeSettingsRouter = router({
           minPickupMinutes: input.minPickupMinutes || 15,
           maxAdvanceOrderDays: input.maxAdvanceOrderDays || 7,
           pointsPerEuro: input.pointsPerEuro || 10,
+          slotsPerTimeWindow: input.slotsPerTimeWindow || 10,
           socialLinks: input.socialLinks || defaultSocialLinks,
           updatedAt: new Date(),
         },
