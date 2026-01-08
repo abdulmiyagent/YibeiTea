@@ -145,7 +145,7 @@ export function StoreStatusBadge() {
   );
 }
 
-// Compact mobile version - shows in header bar (minimalist: just dot + time)
+// Compact mobile version - shows in header bar with clear open/closed indication
 export function CompactStoreStatusBadge() {
   const { data: storeSettings } = api.storeSettings.get.useQuery();
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -205,26 +205,27 @@ export function CompactStoreStatusBadge() {
     return { isOpen: false, time: null };
   }, [storeSettings, currentTime]);
 
-  // Fixed width container to prevent layout shift
+  // Show clear open/closed badge with time context
   return (
     <div
       className={cn(
-        "flex md:hidden items-center gap-1 text-[10px] font-medium tabular-nums min-w-[38px]",
-        status.isOpen ? "text-green-600" : "text-muted-foreground"
+        "flex md:hidden items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium",
+        status.isOpen
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-700"
       )}
     >
-      {status.time ? (
-        <>
-          <span
-            className={cn(
-              "h-1.5 w-1.5 rounded-full flex-shrink-0",
-              status.isOpen ? "bg-green-500 animate-pulse" : "bg-muted-foreground/50"
-            )}
-          />
-          <span>{status.time}</span>
-        </>
+      <span
+        className={cn(
+          "h-1.5 w-1.5 rounded-full flex-shrink-0",
+          status.isOpen ? "bg-green-500 animate-pulse" : "bg-red-500"
+        )}
+      />
+      <Clock className="h-2.5 w-2.5" />
+      {status.isOpen ? (
+        <span className="tabular-nums">{status.time}</span>
       ) : (
-        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30 flex-shrink-0" />
+        <span className="tabular-nums">Opens {status.time}</span>
       )}
     </div>
   );

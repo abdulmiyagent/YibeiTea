@@ -296,7 +296,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className="relative min-h-screen overflow-hidden bg-gradient-to-b from-cream-100 via-cream-50 to-background"
+        className="relative min-h-[auto] lg:min-h-screen overflow-hidden bg-gradient-to-b from-cream-100 via-cream-50 to-background"
       >
         {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -311,9 +311,9 @@ export default function HomePage() {
 
         <motion.div
           style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
-          className="container-custom relative flex min-h-screen flex-col justify-center py-20"
+          className="container-custom relative flex flex-col justify-center py-16 lg:min-h-screen lg:py-20"
         >
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="grid items-center gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-16">
             {/* Left content */}
             <motion.div
               initial="hidden"
@@ -598,12 +598,12 @@ export default function HomePage() {
             </motion.div>
           </div>
 
-          {/* Scroll hint */}
+          {/* Scroll hint - hidden on mobile */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2"
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 hidden lg:block"
           >
             <motion.div
               animate={{ y: [0, 8, 0] }}
