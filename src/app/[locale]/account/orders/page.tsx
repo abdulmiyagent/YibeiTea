@@ -157,55 +157,69 @@ export default function AccountOrdersPage() {
                     {/* Order Items */}
                     <div className="px-4 py-3">
                       <div className="space-y-2">
-                        {order.items.map((item, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center justify-between text-sm"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-tea-600">
-                                {item.quantity}x
-                              </span>
-                              <span className="text-gray-700">
-                                {item.product?.translations?.[0]?.name ||
-                                  item.product?.slug ||
-                                  "Product"}
-                              </span>
-                            </div>
-                            <span className="text-gray-600">
-                              €{Number(item.totalPrice).toFixed(2)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                        {order.items.map((item, idx) => {
+                          const customizations = item.customizations as {
+                            sugarLevel?: number;
+                            iceLevel?: string;
+                            toppings?: string[];
+                          } | null;
 
-                      {/* Order customizations summary */}
-                      {order.items.some((item) => item.customizations) && (
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {order.items.map((item, idx) => {
-                            const customizations = item.customizations as {
-                              sugarLevel?: number;
-                              iceLevel?: string;
-                              toppings?: string[];
-                            } | null;
-                            if (!customizations) return null;
-                            return (
-                              <div key={idx} className="flex gap-1">
-                                {customizations.sugarLevel !== undefined && (
-                                  <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-700">
-                                    {customizations.sugarLevel}%
+                          // Only show non-default customizations
+                          const hasCustomizations =
+                            customizations &&
+                            ((customizations.sugarLevel !== undefined && customizations.sugarLevel !== 100) ||
+                              (customizations.iceLevel && customizations.iceLevel !== "NORMAL_ICE" && customizations.iceLevel !== "normal") ||
+                              (customizations.toppings && customizations.toppings.length > 0));
+
+                          return (
+                            <div
+                              key={idx}
+                              className="flex items-start justify-between text-sm gap-2"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-tea-600 shrink-0">
+                                    {item.quantity}x
                                   </span>
-                                )}
-                                {customizations.iceLevel && (
-                                  <span className="rounded-full bg-sky-50 px-2 py-0.5 text-xs text-sky-700">
-                                    {customizations.iceLevel}
+                                  <span className="text-gray-700">
+                                    {item.product?.translations?.[0]?.name ||
+                                      item.product?.slug ||
+                                      "Product"}
                                   </span>
+                                </div>
+                                {/* Inline customizations - only non-defaults */}
+                                {hasCustomizations && (
+                                  <p className="text-xs text-gray-400 mt-0.5 ml-7">
+                                    {[
+                                      customizations.sugarLevel !== undefined &&
+                                        customizations.sugarLevel !== 100 &&
+                                        `${customizations.sugarLevel}% ${locale === "nl" ? "suiker" : "sugar"}`,
+                                      customizations.iceLevel &&
+                                        customizations.iceLevel !== "NORMAL_ICE" &&
+                                        customizations.iceLevel !== "normal" &&
+                                        (customizations.iceLevel === "NO_ICE"
+                                          ? locale === "nl" ? "geen ijs" : "no ice"
+                                          : customizations.iceLevel === "LESS_ICE"
+                                          ? locale === "nl" ? "minder ijs" : "less ice"
+                                          : customizations.iceLevel === "EXTRA_ICE"
+                                          ? locale === "nl" ? "extra ijs" : "extra ice"
+                                          : customizations.iceLevel),
+                                      customizations.toppings &&
+                                        customizations.toppings.length > 0 &&
+                                        `+${customizations.toppings.length} topping${customizations.toppings.length > 1 ? "s" : ""}`,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" · ")}
+                                  </p>
                                 )}
                               </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                              <span className="text-gray-600 shrink-0">
+                                €{Number(item.totalPrice).toFixed(2)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
 
                     {/* Order Footer */}

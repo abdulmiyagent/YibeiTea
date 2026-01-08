@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
@@ -10,22 +11,22 @@ import { api } from "@/lib/trpc";
 import {
   Heart,
   Loader2,
-  Plus,
   Trash2,
   ArrowLeft,
   ShoppingBag,
   Leaf,
 } from "lucide-react";
-import { useCartStore } from "@/stores/cart-store";
+import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
 
 export default function FavoritesPage() {
   const t = useTranslations("account");
-  const tMenu = useTranslations("menu");
   const locale = useLocale() as "nl" | "en";
   const { data: session, status } = useSession();
   const router = useRouter();
-  const addItem = useCartStore((state) => state.addItem);
   const utils = api.useUtils();
+
+  // State for customize dialog
+  const [selectedProduct, setSelectedProduct] = useState<NonNullable<typeof favorites>[0] | null>(null);
 
   const { data: favorites, isLoading } = api.users.getFavorites.useQuery(
     { locale },
@@ -55,22 +56,8 @@ export default function FavoritesPage() {
     return null;
   }
 
-  const handleAddToCart = (product: NonNullable<typeof favorites>[0]) => {
-    const translation = product.translations[0];
-    addItem({
-      productId: product.id,
-      name: translation?.name || product.slug,
-      price: Number(product.price),
-      quantity: 1,
-      imageUrl: product.imageUrl || undefined,
-      customizations: {
-        sugarLevel: 100,
-        iceLevel: "normal",
-      },
-    });
-  };
-
-  const handleRemoveFavorite = (productId: string) => {
+  const handleRemoveFavorite = (productId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     removeFavorite.mutate({ productId });
   };
 
@@ -106,14 +93,12 @@ export default function FavoritesPage() {
               return (
                 <Card
                   key={product.id}
-                  className="group overflow-hidden transition-all hover:shadow-md"
+                  className="group overflow-hidden transition-all hover:shadow-md cursor-pointer"
+                  onClick={() => setSelectedProduct(product)}
                 >
                   <div className="flex items-center gap-3 p-3">
                     {/* Thumbnail */}
-                    <Link
-                      href={`/menu/${product.slug}`}
-                      className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-tea-50 to-taro-50"
-                    >
+                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-tea-50 to-taro-50">
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
@@ -125,7 +110,7 @@ export default function FavoritesPage() {
                           <span className="text-2xl">🧋</span>
                         </div>
                       )}
-                    </Link>
+                    </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
@@ -137,36 +122,24 @@ export default function FavoritesPage() {
                           <Leaf className="h-3 w-3 text-matcha-500" />
                         )}
                       </div>
-                      <Link href={`/menu/${product.slug}`}>
-                        <h3 className="font-semibold text-sm mt-0.5 line-clamp-1 hover:text-tea-600">
-                          {translation?.name || product.slug}
-                        </h3>
-                      </Link>
+                      <h3 className="font-semibold text-sm mt-0.5 line-clamp-1 group-hover:text-tea-600 transition-colors">
+                        {translation?.name || product.slug}
+                      </h3>
                       <span className="text-sm font-bold text-tea-600 mt-0.5 block">
                         €{Number(product.price).toFixed(2)}
                       </span>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex flex-col gap-1.5">
-                      <Button
-                        size="icon"
-                        variant="tea"
-                        className="h-8 w-8 rounded-full"
-                        onClick={() => handleAddToCart(product)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50"
-                        onClick={() => handleRemoveFavorite(product.id)}
-                        disabled={removeFavorite.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    {/* Delete button */}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50"
+                      onClick={(e) => handleRemoveFavorite(product.id, e)}
+                      disabled={removeFavorite.isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </Card>
               );
@@ -188,6 +161,15 @@ export default function FavoritesPage() {
               </Button>
             </Link>
           </Card>
+        )}
+
+        {/* Product Customize Dialog */}
+        {selectedProduct && (
+          <ProductCustomizeDialog
+            product={selectedProduct}
+            open={!!selectedProduct}
+            onOpenChange={(open) => !open && setSelectedProduct(null)}
+          />
         )}
       </div>
     </div>
