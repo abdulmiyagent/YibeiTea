@@ -91,7 +91,7 @@ export function MenuPageContent() {
     },
     {
       staleTime: 2 * 60 * 1000, // 2 minutes
-      placeholderData: (prev) => prev, // Keep previous data while fetching new
+      keepPreviousData: true, // Keep previous data while fetching new
     }
   );
 
