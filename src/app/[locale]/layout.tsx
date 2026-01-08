@@ -109,6 +109,12 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        {/* Preload critical assets for faster LCP */}
+        <link rel="preload" href="/images/logo.png" as="image" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+      </head>
       <body
         className={`${cormorant.variable} ${dmSans.variable} font-sans antialiased`}
       >
