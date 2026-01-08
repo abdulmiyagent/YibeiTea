@@ -103,6 +103,8 @@ export default function CartPage() {
                           src={item.imageUrl}
                           alt={item.name}
                           className="h-16 w-16 object-contain"
+                          loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <span className="text-4xl">🧋</span>

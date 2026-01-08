@@ -1,21 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/trpc";
 import {
   Search,
   Plus,
   Leaf,
   Coffee,
-  Loader2,
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
+
+// Skeleton loader for product cards
+function ProductCardSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      <div className="flex items-center gap-3 p-3">
+        <Skeleton className="h-16 w-16 flex-shrink-0 rounded-xl" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-4 w-14" />
+        </div>
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-9 w-9 rounded-full" />
+      </div>
+    </Card>
+  );
+}
+
+// Skeleton loader for category buttons
+function CategorySkeleton() {
+  return (
+    <div className="flex gap-2">
+      <Skeleton className="h-8 w-24 rounded-md" />
+      <Skeleton className="h-8 w-20 rounded-md" />
+      <Skeleton className="h-8 w-28 rounded-md" />
+      <Skeleton className="h-8 w-24 rounded-md" />
+    </div>
+  );
+}
 
 interface Product {
   id: string;
@@ -46,33 +76,46 @@ export function MenuPageContent() {
   const [showCaffeineFree, setShowCaffeineFree] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Fetch categories
-  const { data: categories, isLoading: categoriesLoading } = api.categories.getAll.useQuery({
-    locale,
-  });
+  // Fetch categories with stale-while-revalidate
+  const { data: categories, isLoading: categoriesLoading } = api.categories.getAll.useQuery(
+    { locale },
+    { staleTime: 5 * 60 * 1000 } // 5 minutes
+  );
 
-  // Fetch products
-  const { data: products, isLoading: productsLoading } = api.products.getAll.useQuery({
-    locale,
-    categorySlug: selectedCategory || undefined,
-    onlyAvailable: true,
-  });
+  // Fetch products with stale-while-revalidate and keep previous data for smooth transitions
+  const { data: products, isLoading: productsLoading, isFetching } = api.products.getAll.useQuery(
+    {
+      locale,
+      categorySlug: selectedCategory || undefined,
+      onlyAvailable: true,
+    },
+    {
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      placeholderData: (prev) => prev, // Keep previous data while fetching new
+    }
+  );
 
-  const isLoading = categoriesLoading || productsLoading;
+  const isInitialLoading = categoriesLoading || (productsLoading && !products);
 
-  // Filter products based on search and dietary filters
-  const filteredProducts = products?.filter((product) => {
-    const productName = product.translations[0]?.name || "";
-    const productDescription = product.translations[0]?.description || "";
+  // Filter products based on search and dietary filters - memoized for performance
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
 
-    const matchesSearch =
-      productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      productDescription.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesVegan = !showVeganOnly || product.vegan;
-    const matchesCaffeine = !showCaffeineFree || !product.caffeine;
+    const searchLower = searchQuery.toLowerCase();
 
-    return matchesSearch && matchesVegan && matchesCaffeine;
-  }) || [];
+    return products.filter((product) => {
+      const productName = product.translations[0]?.name || "";
+      const productDescription = product.translations[0]?.description || "";
+
+      const matchesSearch =
+        productName.toLowerCase().includes(searchLower) ||
+        productDescription.toLowerCase().includes(searchLower);
+      const matchesVegan = !showVeganOnly || product.vegan;
+      const matchesCaffeine = !showCaffeineFree || !product.caffeine;
+
+      return matchesSearch && matchesVegan && matchesCaffeine;
+    });
+  }, [products, searchQuery, showVeganOnly, showCaffeineFree]);
 
   return (
     <div className="section-padding">
@@ -104,28 +147,34 @@ export function MenuPageContent() {
 
             {/* Category Tabs - Horizontal scroll on mobile */}
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
-              <Button
-                variant={selectedCategory === null ? "tea" : "outline"}
-                size="sm"
-                className="flex-shrink-0"
-                onClick={() => setSelectedCategory(null)}
-              >
-                {locale === "nl" ? "Alle Drankjes" : "All Drinks"}
-              </Button>
-              {categories?.map((category) => {
-                const translation = category.translations[0];
-                return (
+              {categoriesLoading ? (
+                <CategorySkeleton />
+              ) : (
+                <>
                   <Button
-                    key={category.id}
-                    variant={selectedCategory === category.slug ? "tea" : "outline"}
+                    variant={selectedCategory === null ? "tea" : "outline"}
                     size="sm"
-                    className="flex-shrink-0"
-                    onClick={() => setSelectedCategory(category.slug)}
+                    className="flex-shrink-0 transition-all"
+                    onClick={() => setSelectedCategory(null)}
                   >
-                    {translation?.name || formatSlug(category.slug)}
+                    {locale === "nl" ? "Alle Drankjes" : "All Drinks"}
                   </Button>
-                );
-              })}
+                  {categories?.map((category) => {
+                    const translation = category.translations[0];
+                    return (
+                      <Button
+                        key={category.id}
+                        variant={selectedCategory === category.slug ? "tea" : "outline"}
+                        size="sm"
+                        className="flex-shrink-0 transition-all"
+                        onClick={() => setSelectedCategory(category.slug)}
+                      >
+                        {translation?.name || formatSlug(category.slug)}
+                      </Button>
+                    );
+                  })}
+                </>
+              )}
             </div>
 
             {/* Filter toggles */}
@@ -150,16 +199,18 @@ export function MenuPageContent() {
           </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="mt-12 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
+        {/* Initial Loading State - Skeleton Grid */}
+        {isInitialLoading && (
+          <div className="mt-8 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(9)].map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
           </div>
         )}
 
         {/* Products Grid */}
-        {!isLoading && (
-          <div className="mt-8 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {!isInitialLoading && (
+          <div className={`mt-8 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 transition-opacity duration-200 ${isFetching ? 'opacity-70' : 'opacity-100'}`}>
             {filteredProducts.map((product) => {
               const translation = product.translations[0];
               const categoryTranslation = product.category?.translations[0];
@@ -179,6 +230,8 @@ export function MenuPageContent() {
                             src={product.imageUrl}
                             alt={translation?.name || product.slug}
                             className="h-full w-full object-cover"
+                            loading="lazy"
+                            decoding="async"
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center">
@@ -228,7 +281,7 @@ export function MenuPageContent() {
           </div>
         )}
 
-        {!isLoading && filteredProducts.length === 0 && (
+        {!isInitialLoading && filteredProducts.length === 0 && (
           <div className="mt-12 text-center">
             <p className="text-muted-foreground">
               {locale === "nl"

@@ -133,6 +133,8 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                             src={item.imageUrl}
                             alt={item.name}
                             className="h-12 w-12 object-contain"
+                            loading="lazy"
+                            decoding="async"
                           />
                         ) : (
                           <span className="text-2xl">🧋</span>
