@@ -2,12 +2,13 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight, Plus, Heart, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/trpc";
+import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
 
 // Background colors for cards (inspired by the screenshot)
 const cardColors = [
@@ -65,6 +66,7 @@ export function ProductCarousel({
   const [cardsPerView, setCardsPerView] = useState(5);
   const [mounted, setMounted] = useState(false);
   const [loadingFavorites, setLoadingFavorites] = useState<Set<string>>(new Set());
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const utils = api.useUtils();
 
@@ -224,11 +226,11 @@ export function ProductCarousel({
     }
   };
 
-  // Navigate to product page for customization modal
-  const handleAddClick = (e: React.MouseEvent, product: Product) => {
+  // Open customize dialog
+  const handleProductClick = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/menu/${product.slug}`);
+    setSelectedProduct(product);
   };
 
   // Calculate pagination dots
@@ -335,13 +337,13 @@ export function ProductCarousel({
           const isLoadingFavorite = loadingFavorites.has(product.id);
 
           return (
-            <Link
+            <div
               key={`${product.id}-${index}`}
-              href={`/menu/${product.slug}`}
-              className="flex-shrink-0"
+              className="flex-shrink-0 cursor-pointer"
               style={{
                 width: `calc((100% - ${(Math.floor(cardsPerView) - 1) * 16}px) / ${cardsPerView})`,
               }}
+              onClick={(e) => handleProductClick(e, product)}
             >
               <motion.div
                 whileHover={{ scale: 1.02 }}
@@ -408,14 +410,14 @@ export function ProductCarousel({
 
                 {/* Floating Add to Cart Button - Opens customization modal */}
                 <button
-                  onClick={(e) => handleAddClick(e, product)}
+                  onClick={(e) => handleProductClick(e, product)}
                   className="absolute bottom-4 right-4 flex h-12 w-12 items-center justify-center rounded-full bg-white text-tea-700 shadow-lg transition-all hover:bg-tea-600 hover:text-white hover:scale-110 hover:shadow-xl"
                   aria-label="Customize and add to cart"
                 >
                   <Plus className="h-6 w-6" />
                 </button>
               </motion.div>
-            </Link>
+            </div>
           );
         })}
       </div>
@@ -440,6 +442,15 @@ export function ProductCarousel({
             />
           ))}
         </div>
+      )}
+
+      {/* Product Customize Dialog */}
+      {selectedProduct && (
+        <ProductCustomizeDialog
+          product={selectedProduct}
+          open={!!selectedProduct}
+          onOpenChange={(open) => !open && setSelectedProduct(null)}
+        />
       )}
     </div>
   );
