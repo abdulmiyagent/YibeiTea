@@ -217,12 +217,12 @@ export function ProductCustomization({
   const productDescription = product.translations[0]?.description;
   const categoryName = product.category?.translations[0]?.name || (product.category?.slug && formatSlug(product.category.slug));
 
-  // Modal variant: modern, clean card with product image
+  // Modal variant: clean, spacious, easy to tap
   if (variant === "modal") {
     return (
       <div className="flex flex-col">
-        {/* Product Image Header */}
-        <div className="relative h-32 w-full overflow-hidden bg-gradient-to-br from-tea-100 via-taro-50 to-cream-100">
+        {/* Product Image Header - Larger, more appetizing */}
+        <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-cream-100 via-tea-50 to-taro-50">
           {product.imageUrl ? (
             <img
               src={product.imageUrl}
@@ -231,40 +231,41 @@ export function ProductCustomization({
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <span className="text-5xl">🧋</span>
+              <span className="text-6xl">🧋</span>
             </div>
           )}
-          {/* Gradient overlay for text readability */}
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />
         </div>
 
         {/* Content */}
-        <div className="px-4 pb-4 -mt-6 relative">
+        <div className="px-5 pb-5 -mt-8 relative">
           {/* Product Info */}
-          <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="flex items-start justify-between gap-3 mb-4">
             <div className="min-w-0 flex-1">
-              <h2 className="text-base font-bold leading-tight text-gray-900 line-clamp-2">{productName}</h2>
+              <h2 className="text-lg font-semibold leading-tight text-gray-900 line-clamp-2">{productName}</h2>
               {categoryName && (
-                <p className="text-xs text-tea-600 font-medium mt-0.5 truncate">{categoryName}</p>
+                <p className="text-sm text-tea-600 font-medium mt-1">{categoryName}</p>
               )}
             </div>
-            <span className="text-lg font-bold text-tea-600 shrink-0">
+            <span className="text-xl font-bold text-tea-600 shrink-0">
               €{Number(product.price).toFixed(2)}
             </span>
           </div>
 
-          {/* Customization Options */}
+          {/* Customization Options - Larger touch targets */}
           {filteredCustomizationGroups.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {filteredCustomizationGroups.map((group) => (
                 <div key={group.id}>
-                  <label className="mb-1.5 block text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                  <label className="mb-2 block text-sm font-semibold text-gray-700">
                     {getGroupLabel(group.type)}
                   </label>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {group.values.map((option) => {
                       const label = option.translations[0]?.label || option.value;
                       const isSelected = selectedOptions[group.type] === option.value;
+                      const hasModifier = Number(option.priceModifier) > 0;
 
                       return (
                         <button
@@ -276,13 +277,18 @@ export function ProductCustomization({
                             })
                           }
                           className={cn(
-                            "rounded-full px-3 py-1 text-xs font-medium transition-all border",
+                            "rounded-full px-4 py-2 text-sm font-medium transition-all border min-h-[40px]",
                             isSelected
-                              ? "bg-tea-500 text-white border-tea-500 shadow-sm"
-                              : "bg-white text-gray-600 border-gray-200 hover:border-tea-300 hover:bg-tea-50"
+                              ? "bg-tea-600 text-white border-tea-600 shadow-sm"
+                              : "bg-white text-gray-700 border-gray-200 hover:border-tea-300 hover:bg-tea-50 active:bg-tea-100"
                           )}
                         >
                           {label}
+                          {hasModifier && (
+                            <span className={cn("ml-1", isSelected ? "text-white/70" : "text-gray-400")}>
+                              +€{Number(option.priceModifier).toFixed(2)}
+                            </span>
+                          )}
                         </button>
                       );
                     })}
@@ -292,13 +298,16 @@ export function ProductCustomization({
             </div>
           )}
 
-          {/* Toppings */}
+          {/* Toppings - Clearer pricing, better touch targets */}
           {filteredToppings.length > 0 && (
-            <div className="mt-3">
-              <label className="mb-1.5 block text-xs font-semibold text-gray-700 uppercase tracking-wide">
+            <div className="mt-4">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 {t("customize.toppings")}
+                <span className="ml-1 text-xs font-normal text-gray-400">
+                  ({locale === "nl" ? "optioneel" : "optional"})
+                </span>
               </label>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {filteredToppings.map((topping) => {
                   const isSelected = selectedToppings.includes(topping.id);
                   return (
@@ -312,15 +321,15 @@ export function ProductCustomization({
                         )
                       }
                       className={cn(
-                        "rounded-full px-3 py-1 text-xs font-medium transition-all border flex items-center gap-1",
+                        "rounded-full px-4 py-2 text-sm font-medium transition-all border flex items-center gap-2 min-h-[40px]",
                         isSelected
-                          ? "bg-tea-500 text-white border-tea-500 shadow-sm"
-                          : "bg-white text-gray-600 border-gray-200 hover:border-tea-300 hover:bg-tea-50"
+                          ? "bg-tea-600 text-white border-tea-600 shadow-sm"
+                          : "bg-white text-gray-700 border-gray-200 hover:border-tea-300 hover:bg-tea-50 active:bg-tea-100"
                       )}
                     >
-                      {isSelected && <Check className="h-3 w-3" />}
-                      {topping.translations[0]?.name || formatSlug(topping.slug)}
-                      <span className={cn("text-[10px]", isSelected ? "text-white/80" : "text-gray-400")}>
+                      {isSelected && <Check className="h-4 w-4" />}
+                      <span>{topping.translations[0]?.name || formatSlug(topping.slug)}</span>
+                      <span className={cn("text-sm", isSelected ? "text-white/70" : "text-gray-400")}>
                         +€{Number(topping.price).toFixed(2)}
                       </span>
                     </button>
@@ -330,51 +339,50 @@ export function ProductCustomization({
             </div>
           )}
 
-          {/* Footer: Quantity + Add Button */}
-          <div className="mt-4 flex items-center gap-3 pt-3 border-t border-gray-100">
-            {/* Quantity controls */}
+          {/* Footer: Quantity + Add Button - More prominent */}
+          <div className="mt-5 flex items-center gap-3 pt-4 border-t border-gray-100">
+            {/* Quantity controls - Larger */}
             <div className="flex items-center rounded-full bg-gray-100 border border-gray-200">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={quantity <= 1}
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full transition-all",
-                  quantity <= 1 ? "text-gray-300" : "text-gray-600 hover:bg-white"
+                  "flex h-10 w-10 items-center justify-center rounded-full transition-all",
+                  quantity <= 1 ? "text-gray-300" : "text-gray-600 hover:bg-white active:bg-gray-50"
                 )}
               >
-                <Minus className="h-4 w-4" />
+                <Minus className="h-5 w-5" />
               </button>
-              <span className="w-6 text-center text-sm font-bold">{quantity}</span>
+              <span className="w-8 text-center text-base font-bold">{quantity}</span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-all hover:bg-white"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition-all hover:bg-white active:bg-gray-50"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Add to Cart Button */}
+            {/* Add to Cart Button - More prominent */}
             <button
               onClick={handleAddToCart}
               disabled={isAddedToCart}
               className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-sm font-bold transition-all shadow-sm",
+                "flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-base font-semibold transition-all",
                 isAddedToCart
-                  ? "bg-green-500 text-white shadow-green-200"
-                  : "bg-tea-500 text-white hover:bg-tea-600 shadow-tea-200 hover:shadow-md"
+                  ? "bg-matcha-500 text-white"
+                  : "bg-tea-600 text-white hover:bg-tea-700 active:bg-tea-800 shadow-lg shadow-tea-600/20"
               )}
             >
               {isAddedToCart ? (
                 <>
-                  <Check className="h-4 w-4" />
+                  <Check className="h-5 w-5" />
                   <span>{locale === "nl" ? "Toegevoegd!" : "Added!"}</span>
                 </>
               ) : (
                 <>
-                  <ShoppingCart className="h-4 w-4" />
-                  <span>{locale === "nl" ? "Toevoegen" : "Add"}</span>
-                  <span className="mx-1 h-4 w-px bg-white/40" />
-                  <span className="tabular-nums">€{totalPrice.toFixed(2)}</span>
+                  <span>{locale === "nl" ? "Toevoegen" : "Add to cart"}</span>
+                  <span className="mx-1.5 h-5 w-px bg-white/30" />
+                  <span className="tabular-nums font-bold">€{totalPrice.toFixed(2)}</span>
                 </>
               )}
             </button>

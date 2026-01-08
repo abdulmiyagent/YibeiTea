@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCartStore } from "@/stores/cart-store";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   ShoppingBag,
   ArrowRight,
 } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, cn } from "@/lib/utils";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -23,6 +23,7 @@ interface CartDrawerProps {
 
 export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const t = useTranslations("cart");
+  const locale = useLocale() as "nl" | "en";
   const [mounted, setMounted] = useState(false);
 
   const items = useCartStore((state) => state.items);
@@ -124,85 +125,90 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   {items.map((item) => (
                     <div
                       key={item.id}
-                      className="flex gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm"
+                      className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
                     >
-                      {/* Product Image */}
-                      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-tea-50 to-cream-50">
-                        {item.imageUrl ? (
-                          <img
-                            src={item.imageUrl}
-                            alt={item.name}
-                            className="h-12 w-12 object-contain"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <span className="text-2xl">🧋</span>
-                        )}
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="flex flex-1 flex-col">
-                        <div className="flex items-start justify-between">
-                          <h3 className="font-medium text-tea-900 leading-tight line-clamp-2">
-                            {item.name}
-                          </h3>
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="ml-2 text-gray-400 transition-colors hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                      <div className="flex gap-3">
+                        {/* Product Image */}
+                        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cream-50 to-tea-50 overflow-hidden">
+                          {item.imageUrl ? (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <span className="text-2xl">🧋</span>
+                          )}
                         </div>
 
-                        {/* Customizations */}
-                        {item.customizations && (
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {item.customizations.sugarLevel !== undefined && (
-                              <span className="rounded bg-cream-100 px-1.5 py-0.5 text-[10px] text-cream-700">
-                                {item.customizations.sugarLevel}% suiker
-                              </span>
-                            )}
-                            {item.customizations.iceLevel && (
-                              <span className="rounded bg-sky-100 px-1.5 py-0.5 text-[10px] text-sky-700">
-                                {item.customizations.iceLevel} ijs
-                              </span>
-                            )}
-                            {item.customizations.toppings && item.customizations.toppings.length > 0 && (
-                              <span className="rounded bg-taro-100 px-1.5 py-0.5 text-[10px] text-taro-700">
-                                +{item.customizations.toppings.length} topping{item.customizations.toppings.length > 1 ? "s" : ""}
-                              </span>
-                            )}
+                        {/* Product Info */}
+                        <div className="flex flex-1 flex-col min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="font-medium text-gray-900 leading-tight line-clamp-2">
+                              {item.name}
+                            </h3>
+                            <button
+                              onClick={() => removeItem(item.id)}
+                              className="flex-shrink-0 p-1 text-gray-400 transition-colors hover:text-red-500"
+                              aria-label={locale === "nl" ? "Verwijderen" : "Remove"}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
-                        )}
 
-                        {/* Price & Quantity */}
-                        <div className="mt-2 flex items-center justify-between">
-                          <span className="font-semibold text-tea-600">
+                          {/* Customizations - More readable */}
+                          {item.customizations && (
+                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                              {item.customizations.sugarLevel !== undefined && (
+                                <span className="rounded-full bg-cream-100 px-2 py-0.5 text-xs font-medium text-cream-800">
+                                  {item.customizations.sugarLevel}% {locale === "nl" ? "suiker" : "sugar"}
+                                </span>
+                              )}
+                              {item.customizations.iceLevel && (
+                                <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700">
+                                  {item.customizations.iceLevel} {locale === "nl" ? "ijs" : "ice"}
+                                </span>
+                              )}
+                              {item.customizations.toppings && item.customizations.toppings.length > 0 && (
+                                <span className="rounded-full bg-taro-100 px-2 py-0.5 text-xs font-medium text-taro-700">
+                                  +{item.customizations.toppings.length} topping{item.customizations.toppings.length > 1 ? "s" : ""}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Price */}
+                          <span className="mt-1.5 font-semibold text-tea-600">
                             {formatPrice(item.price * item.quantity)}
                           </span>
+                        </div>
+                      </div>
 
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="flex h-6 w-6 items-center justify-center rounded-full
-                                border border-gray-200 text-gray-500 transition-colors
-                                hover:border-tea-300 hover:bg-tea-50 hover:text-tea-600"
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-                            <span className="w-6 text-center text-sm font-medium">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="flex h-6 w-6 items-center justify-center rounded-full
-                                border border-gray-200 text-gray-500 transition-colors
-                                hover:border-tea-300 hover:bg-tea-50 hover:text-tea-600"
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
-                          </div>
+                      {/* Quantity Controls - Larger, separate row for clarity */}
+                      <div className="mt-3 flex items-center justify-end">
+                        <div className="flex items-center rounded-full bg-gray-100 border border-gray-200">
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className={cn(
+                              "flex h-8 w-8 items-center justify-center rounded-full transition-all",
+                              item.quantity <= 1
+                                ? "text-gray-300"
+                                : "text-gray-600 hover:bg-white active:bg-gray-50"
+                            )}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="w-8 text-center text-sm font-semibold">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-all hover:bg-white active:bg-gray-50"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
                     </div>

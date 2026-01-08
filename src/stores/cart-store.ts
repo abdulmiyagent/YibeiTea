@@ -19,6 +19,55 @@ export interface CartItem {
   customizations?: CartItemCustomization;
 }
 
+// Recent order for quick reorder feature
+interface RecentOrderItem {
+  productId: string;
+  name: string;
+  imageUrl?: string;
+  price: number;
+  customizations?: CartItemCustomization;
+  orderedAt: number;
+}
+
+const RECENT_ORDERS_KEY = "yibei-recent-orders";
+const MAX_RECENT_ORDERS = 5;
+
+// Helper to save recent orders
+function saveRecentOrder(item: Omit<CartItem, "id" | "quantity">) {
+  if (typeof window === "undefined") return;
+  try {
+    const stored = localStorage.getItem(RECENT_ORDERS_KEY);
+    const orders: RecentOrderItem[] = stored ? JSON.parse(stored) : [];
+
+    // Check if this exact product+customization already exists
+    const existingIndex = orders.findIndex(
+      (o) => o.productId === item.productId &&
+        JSON.stringify(o.customizations) === JSON.stringify(item.customizations)
+    );
+
+    // Remove existing if found (we'll add it fresh to the front)
+    if (existingIndex !== -1) {
+      orders.splice(existingIndex, 1);
+    }
+
+    // Add new order to the front
+    orders.unshift({
+      productId: item.productId,
+      name: item.name,
+      imageUrl: item.imageUrl,
+      price: item.price,
+      customizations: item.customizations,
+      orderedAt: Date.now(),
+    });
+
+    // Keep only last N orders
+    const trimmed = orders.slice(0, MAX_RECENT_ORDERS);
+    localStorage.setItem(RECENT_ORDERS_KEY, JSON.stringify(trimmed));
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
 interface CartState {
   items: CartItem[];
   promoCode: string | null;
@@ -47,6 +96,15 @@ export const useCartStore = create<CartState>()(
 
       addItem: (item) => {
         const id = `${item.productId}-${JSON.stringify(item.customizations || {})}`;
+
+        // Save to recent orders for quick reorder feature
+        saveRecentOrder({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          imageUrl: item.imageUrl,
+          customizations: item.customizations,
+        });
 
         set((state) => {
           const existingItem = state.items.find((i) => i.id === id);

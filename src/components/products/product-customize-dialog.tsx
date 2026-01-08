@@ -18,6 +18,12 @@ interface ProductCustomizeDialogProps {
     slug: string;
     price: number | string | { toString(): string };
     imageUrl: string | null;
+    vegan: boolean;
+    caffeine: boolean;
+    calories: number | null;
+    allowSugarCustomization: boolean;
+    allowIceCustomization: boolean;
+    allowToppings: boolean;
     translations: Array<{ name: string; description?: string | null }>;
     category?: {
       slug: string;
@@ -35,16 +41,28 @@ export function ProductCustomizeDialog({
 }: ProductCustomizeDialogProps) {
   const locale = useLocale() as "nl" | "en";
 
-  // Fetch full product details (cache for 2 min, prefetch on hover would be nice)
-  const { data: fullProduct, isLoading: productLoading } = api.products.getBySlug.useQuery(
-    { slug: product.slug, locale },
-    {
-      enabled: open,
-      staleTime: 2 * 60 * 1000, // 2 minutes cache
-    }
-  );
+  // Product data is now passed directly - no fetch needed!
+  // Build ProductData from passed product (convert Decimal to number, normalize types)
+  const productData: ProductData = {
+    id: product.id,
+    slug: product.slug,
+    price: Number(product.price),
+    imageUrl: product.imageUrl,
+    vegan: product.vegan,
+    caffeine: product.caffeine,
+    calories: product.calories,
+    allowSugarCustomization: product.allowSugarCustomization,
+    allowIceCustomization: product.allowIceCustomization,
+    allowToppings: product.allowToppings,
+    translations: product.translations.map(t => ({
+      name: t.name,
+      description: t.description ?? null,
+    })),
+    category: product.category ?? null,
+  };
 
   // Fetch customization options (cache longer - these rarely change)
+  // These are pre-fetched on menu page, so should be instant from cache
   const { data: customizationGroups, isLoading: customizationsLoading } =
     api.customizations.getAll.useQuery(
       { locale },
@@ -55,6 +73,7 @@ export function ProductCustomizeDialog({
     );
 
   // Fetch toppings (cache longer - these rarely change)
+  // These are pre-fetched on menu page, so should be instant from cache
   const { data: toppings, isLoading: toppingsLoading } = api.toppings.getAll.useQuery(
     { locale, onlyAvailable: true },
     {
@@ -63,25 +82,7 @@ export function ProductCustomizeDialog({
     }
   );
 
-  const isLoading = productLoading || customizationsLoading || toppingsLoading;
-
-  // Build ProductData from fullProduct (convert Decimal to number)
-  const productData: ProductData | null = fullProduct
-    ? {
-        id: fullProduct.id,
-        slug: fullProduct.slug,
-        price: Number(fullProduct.price),
-        imageUrl: fullProduct.imageUrl,
-        vegan: fullProduct.vegan,
-        caffeine: fullProduct.caffeine,
-        calories: fullProduct.calories,
-        allowSugarCustomization: fullProduct.allowSugarCustomization,
-        allowIceCustomization: fullProduct.allowIceCustomization,
-        allowToppings: fullProduct.allowToppings,
-        translations: fullProduct.translations,
-        category: fullProduct.category,
-      }
-    : null;
+  const isLoading = customizationsLoading || toppingsLoading;
 
   // Convert customization groups (Decimal to number)
   const convertedCustomizationGroups: CustomizationGroup[] | undefined = customizationGroups?.map((group) => ({
@@ -108,19 +109,21 @@ export function ProductCustomizeDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="max-w-sm p-0 gap-0 overflow-hidden rounded-2xl !fixed !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 !bottom-auto !right-auto">
+        className="max-w-md w-[calc(100vw-2rem)] p-0 gap-0 overflow-hidden rounded-3xl !fixed !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 !bottom-auto !right-auto max-h-[90vh] overflow-y-auto">
         <DialogTitle className="sr-only">
           {product.translations[0]?.name || product.slug}
         </DialogTitle>
         <DialogDescription className="sr-only">
-          Pas je drankje aan met suiker, ijs en toppings
+          {locale === "nl"
+            ? "Pas je drankje aan met suiker, ijs en toppings"
+            : "Customize your drink with sugar, ice, and toppings"}
         </DialogDescription>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-tea-600" />
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-7 w-7 animate-spin text-tea-600" />
           </div>
-        ) : productData && convertedCustomizationGroups && convertedToppings ? (
+        ) : convertedCustomizationGroups && convertedToppings ? (
           <ProductCustomization
             product={productData}
             customizationGroups={convertedCustomizationGroups}
@@ -128,11 +131,7 @@ export function ProductCustomizeDialog({
             variant="modal"
             onClose={() => onOpenChange(false)}
           />
-        ) : (
-          <div className="flex items-center justify-center py-12 text-gray-500">
-            Product niet gevonden
-          </div>
-        )}
+        ) : null}
       </DialogContent>
     </Dialog>
   );
