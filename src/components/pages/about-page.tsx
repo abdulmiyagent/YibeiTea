@@ -34,6 +34,8 @@ export function AboutPageContent() {
     { key: "icedCoffee", icon: "☕" },
     { key: "icedTea", icon: "🍹" },
     { key: "warmCoffee", icon: "🫖" },
+    { key: "sweets", icon: "🍰" },
+    { key: "noodles", icon: "🍜" },
   ];
 
   return (

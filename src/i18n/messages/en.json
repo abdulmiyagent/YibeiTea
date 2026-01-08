@@ -100,7 +100,9 @@
         "classic": "Classic bubble teas with milk and tapioca",
         "icedCoffee": "Creative iced coffee varieties",
         "icedTea": "Refreshing fruity iced teas and mojito-style drinks",
-        "warmCoffee": "Warm coffees and lattes"
+        "warmCoffee": "Warm coffees and lattes",
+        "sweets": "Pastries and sweets",
+        "noodles": "Instant noodles to prepare on the spot"
       },
       "closing": "Whether you choose a trusted classic or feel like discovering something new, there's something for everyone.",
       "viewMenu": "View Menu"
