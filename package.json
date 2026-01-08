@@ -27,6 +27,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@getbrevo/brevo": "^3.0.1",
+    "@imgly/background-removal": "^1.7.0",
     "@mollie/api-client": "^3.7.0",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-avatar": "^1.1.0",
