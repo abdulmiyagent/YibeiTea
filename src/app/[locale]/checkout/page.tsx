@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -71,6 +71,7 @@ const paymentMethods = [
 
 export default function CheckoutPage() {
   const t = useTranslations("checkout");
+  const locale = useLocale();
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
   const { items, getSubtotal, clearCart } = useCartStore();
@@ -529,7 +530,18 @@ export default function CheckoutPage() {
                         value={formData.pickupDate}
                         onChange={(e) => updateFormData("pickupDate", e.target.value)}
                         min={new Date().toISOString().split("T")[0]}
+                        max={(() => {
+                          const maxDays = storeSettings?.maxAdvanceOrderDays ?? 7;
+                          const maxDate = new Date();
+                          maxDate.setDate(maxDate.getDate() + maxDays);
+                          return maxDate.toISOString().split("T")[0];
+                        })()}
                       />
+                      <p className="text-xs text-muted-foreground">
+                        {locale === "nl"
+                          ? `Je kunt maximaal ${storeSettings?.maxAdvanceOrderDays ?? 7} dagen vooruit bestellen`
+                          : `You can order up to ${storeSettings?.maxAdvanceOrderDays ?? 7} days in advance`}
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <Label>{t("pickup.selectTime")}</Label>
@@ -546,6 +558,20 @@ export default function CheckoutPage() {
                           </Button>
                         ))}
                       </div>
+                      {timeSlots.length === 0 && (
+                        <p className="text-xs text-amber-600">
+                          {locale === "nl"
+                            ? "Geen beschikbare tijdslots voor deze dag. Kies een andere datum."
+                            : "No available time slots for this day. Please choose another date."}
+                        </p>
+                      )}
+                      {timeSlots.length > 0 && (
+                        <p className="text-xs text-muted-foreground">
+                          {locale === "nl"
+                            ? `Minimale bereidingstijd: ${storeSettings?.minPickupMinutes ?? 15} minuten`
+                            : `Minimum preparation time: ${storeSettings?.minPickupMinutes ?? 15} minutes`}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="notes">{t("notes.label")}</Label>
@@ -745,6 +771,12 @@ export default function CheckoutPage() {
                         onChange={(e) => {
                           setPromoCodeInput(e.target.value.toUpperCase());
                           setPromoCodeError(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && promoCodeInput.trim() && !isValidatingPromo) {
+                            e.preventDefault();
+                            handleApplyPromoCode();
+                          }
                         }}
                         placeholder="CODE"
                         className="flex-1 font-mono"

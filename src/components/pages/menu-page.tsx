@@ -409,8 +409,8 @@ export function MenuPageContent() {
                         </div>
                       )}
 
-                      {/* Favorite button - top right */}
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Favorite button - top right - always visible */}
+                      <div className="absolute top-2 right-2">
                         <FavoriteButton
                           productId={product.id}
                           className="h-8 w-8 bg-white/90 backdrop-blur-sm shadow-sm"
