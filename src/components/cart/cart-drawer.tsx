@@ -73,7 +73,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
       {/* Drawer */}
       <div
-        className="fixed right-0 top-0 z-50 h-screen w-full max-w-md
+        className="fixed right-0 top-0 z-50 h-[100dvh] w-full max-w-md
           flex flex-col
           border-l border-white/20 bg-white/95 backdrop-blur-xl
           shadow-[-8px_0_32px_rgba(0,0,0,0.1)]
@@ -209,7 +209,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </div>
 
               {/* Footer */}
-              <div className="flex-shrink-0 border-t border-gray-100 bg-white/80 p-4 backdrop-blur-sm">
+              <div className="flex-shrink-0 border-t border-gray-100 bg-white/80 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur-sm">
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-muted-foreground">{t("subtotal")}</span>
                   <span className="text-lg font-bold text-tea-900">
