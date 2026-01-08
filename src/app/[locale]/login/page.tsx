@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export default function LoginPage() {
   const t = useTranslations("auth.login");
+  const tv = useTranslations("auth.verification");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -209,25 +210,24 @@ export default function LoginPage() {
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-tea-100">
                   <Mail className="h-6 w-6 text-tea-600" />
                 </div>
-                <CardTitle className="text-2xl">Bevestig je e-mailadres</CardTitle>
+                <CardTitle className="text-2xl">{tv("title")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="rounded-lg bg-tea-50 p-4 text-center">
                   <p className="text-sm text-tea-800">
-                    We hebben een verificatie-email gestuurd naar:
+                    {tv("sentTo")}
                   </p>
                   <p className="mt-1 font-medium text-tea-900">{formData.email}</p>
                 </div>
 
                 <p className="text-center text-sm text-muted-foreground">
-                  Klik op de link in de email om je account te activeren.
-                  Controleer ook je spam folder als je de email niet ziet.
+                  {tv("clickLink")}
                 </p>
 
                 {resendSuccess && (
                   <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-700">
                     <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-                    Nieuwe verificatie-email verzonden!
+                    {tv("resendSuccess")}
                   </div>
                 )}
 
@@ -248,10 +248,10 @@ export default function LoginPage() {
                     {isResendingVerification ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Verzenden...
+                        {tv("resending")}
                       </>
                     ) : (
-                      "Verificatie-email opnieuw verzenden"
+                      tv("resendButton")
                     )}
                   </Button>
 
@@ -264,7 +264,7 @@ export default function LoginPage() {
                       setError("");
                     }}
                   >
-                    Terug naar inloggen
+                    {tv("backToLogin")}
                   </Button>
                 </div>
               </CardContent>

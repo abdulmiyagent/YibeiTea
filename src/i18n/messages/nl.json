@@ -422,6 +422,26 @@
       "emailExists": "Dit e-mailadres is al geregistreerd",
       "weakPassword": "Wachtwoord is te zwak",
       "passwordMismatch": "Wachtwoorden komen niet overeen"
+    },
+    "verification": {
+      "title": "Bevestig je e-mailadres",
+      "sentTo": "We hebben een verificatie-email gestuurd naar:",
+      "clickLink": "Klik op de link in de email om je account te activeren. Controleer ook je spam folder als je de email niet ziet.",
+      "resendButton": "Verificatie-email opnieuw verzenden",
+      "resending": "Verzenden...",
+      "resendSuccess": "Nieuwe verificatie-email verzonden!",
+      "resendError": "Kon verificatie-email niet verzenden. Probeer het later opnieuw.",
+      "backToLogin": "Terug naar inloggen",
+      "verifying": "E-mail verifiëren...",
+      "verifyingWait": "Even geduld terwijl we je e-mailadres verifiëren...",
+      "success": "E-mail bevestigd!",
+      "successMessage": "Je e-mailadres is succesvol bevestigd. Je kunt nu inloggen en genieten van alle voordelen van je Yibei Tea account.",
+      "goToLogin": "Naar inloggen",
+      "alreadyVerified": "Al bevestigd",
+      "alreadyVerifiedMessage": "Je e-mailadres was al bevestigd. Je kunt direct inloggen.",
+      "failed": "Verificatie mislukt",
+      "failedMessage": "De verificatielink kan verlopen zijn of is al gebruikt. Probeer opnieuw in te loggen om een nieuwe verificatie-email aan te vragen.",
+      "noToken": "Geen verificatietoken gevonden in de URL."
     }
   },
   "footer": {

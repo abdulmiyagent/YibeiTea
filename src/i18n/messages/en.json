@@ -422,6 +422,26 @@
       "emailExists": "This email is already registered",
       "weakPassword": "Password is too weak",
       "passwordMismatch": "Passwords don't match"
+    },
+    "verification": {
+      "title": "Verify your email",
+      "sentTo": "We have sent a verification email to:",
+      "clickLink": "Click the link in the email to activate your account. Also check your spam folder if you don't see the email.",
+      "resendButton": "Resend verification email",
+      "resending": "Sending...",
+      "resendSuccess": "New verification email sent!",
+      "resendError": "Could not send verification email. Please try again later.",
+      "backToLogin": "Back to login",
+      "verifying": "Verifying email...",
+      "verifyingWait": "Please wait while we verify your email address...",
+      "success": "Email verified!",
+      "successMessage": "Your email address has been successfully verified. You can now log in and enjoy all the benefits of your Yibei Tea account.",
+      "goToLogin": "Go to login",
+      "alreadyVerified": "Already verified",
+      "alreadyVerifiedMessage": "Your email address was already verified. You can log in directly.",
+      "failed": "Verification failed",
+      "failedMessage": "The verification link may have expired or has already been used. Try logging in again to request a new verification email.",
+      "noToken": "No verification token found in the URL."
     }
   },
   "footer": {

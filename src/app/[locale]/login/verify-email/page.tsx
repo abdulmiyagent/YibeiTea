@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { CheckCircle2, XCircle, Loader2, Mail } from "lucide-react";
 type VerificationStatus = "loading" | "success" | "already_verified" | "error";
 
 export default function VerifyEmailPage() {
+  const t = useTranslations("auth.verification");
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [status, setStatus] = useState<VerificationStatus>("loading");
@@ -18,7 +20,7 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     if (!token) {
       setStatus("error");
-      setErrorMessage("Geen verificatietoken gevonden in de URL.");
+      setErrorMessage(t("noToken"));
       return;
     }
 
@@ -40,16 +42,16 @@ export default function VerifyEmailPage() {
           }
         } else {
           setStatus("error");
-          setErrorMessage(data.error || "Verificatie mislukt");
+          setErrorMessage(data.error || t("failed"));
         }
       } catch {
         setStatus("error");
-        setErrorMessage("Er is een fout opgetreden bij het verifiëren");
+        setErrorMessage(t("failed"));
       }
     };
 
     verifyEmail();
-  }, [token]);
+  }, [token, t]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-tea-50 to-cream-50 flex items-center justify-center p-4">
@@ -60,7 +62,7 @@ export default function VerifyEmailPage() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-tea-100">
                 <Loader2 className="h-8 w-8 text-tea-600 animate-spin" />
               </div>
-              <CardTitle className="text-2xl">E-mail verifiëren...</CardTitle>
+              <CardTitle className="text-2xl">{t("verifying")}</CardTitle>
             </>
           )}
 
@@ -70,7 +72,7 @@ export default function VerifyEmailPage() {
                 <CheckCircle2 className="h-8 w-8 text-green-600" />
               </div>
               <CardTitle className="text-2xl text-green-700">
-                E-mail bevestigd!
+                {t("success")}
               </CardTitle>
             </>
           )}
@@ -81,7 +83,7 @@ export default function VerifyEmailPage() {
                 <Mail className="h-8 w-8 text-tea-600" />
               </div>
               <CardTitle className="text-2xl">
-                Al bevestigd
+                {t("alreadyVerified")}
               </CardTitle>
             </>
           )}
@@ -92,7 +94,7 @@ export default function VerifyEmailPage() {
                 <XCircle className="h-8 w-8 text-red-600" />
               </div>
               <CardTitle className="text-2xl text-red-700">
-                Verificatie mislukt
+                {t("failed")}
               </CardTitle>
             </>
           )}
@@ -101,19 +103,18 @@ export default function VerifyEmailPage() {
         <CardContent className="space-y-4">
           {status === "loading" && (
             <p className="text-center text-muted-foreground">
-              Even geduld terwijl we je e-mailadres verifiëren...
+              {t("verifyingWait")}
             </p>
           )}
 
           {status === "success" && (
             <>
               <p className="text-center text-muted-foreground">
-                Je e-mailadres is succesvol bevestigd. Je kunt nu inloggen en
-                genieten van alle voordelen van je Yibei Tea account.
+                {t("successMessage")}
               </p>
               <Link href="/login" className="block">
                 <Button variant="tea" className="w-full">
-                  Naar inloggen
+                  {t("goToLogin")}
                 </Button>
               </Link>
             </>
@@ -122,11 +123,11 @@ export default function VerifyEmailPage() {
           {status === "already_verified" && (
             <>
               <p className="text-center text-muted-foreground">
-                Je e-mailadres was al bevestigd. Je kunt direct inloggen.
+                {t("alreadyVerifiedMessage")}
               </p>
               <Link href="/login" className="block">
                 <Button variant="tea" className="w-full">
-                  Naar inloggen
+                  {t("goToLogin")}
                 </Button>
               </Link>
             </>
@@ -138,12 +139,11 @@ export default function VerifyEmailPage() {
                 <p className="text-sm text-red-700">{errorMessage}</p>
               </div>
               <p className="text-center text-sm text-muted-foreground">
-                De verificatielink kan verlopen zijn of is al gebruikt.
-                Probeer opnieuw in te loggen om een nieuwe verificatie-email aan te vragen.
+                {t("failedMessage")}
               </p>
               <Link href="/login" className="block">
                 <Button variant="outline" className="w-full">
-                  Terug naar inloggen
+                  {t("backToLogin")}
                 </Button>
               </Link>
             </>
