@@ -169,8 +169,8 @@ export function Header() {
           <div className="flex items-center space-x-0 md:space-x-2">
             <StoreStatusBadge />
 
-            {/* User Menu - Always show icon (FIRST on mobile) */}
-            <div className="relative order-first md:order-none">
+            {/* User Menu - Always show icon (SECOND on mobile) */}
+            <div className="relative">
               {session ? (
                 <>
                   <Button
@@ -271,8 +271,8 @@ export function Header() {
               )}
             </div>
 
-            {/* Quick Menu link - mobile only (SECOND) */}
-            <Link href="/menu" className="md:hidden">
+            {/* Quick Menu link - mobile only (FIRST) */}
+            <Link href="/menu" className="order-first md:order-none md:hidden">
               <Button
                 variant="ghost"
                 size="sm"
