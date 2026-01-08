@@ -407,9 +407,9 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-              className="relative hidden lg:block"
+              className="relative"
             >
-              <div className="relative mx-auto aspect-square max-w-lg">
+              <div className="relative mx-auto aspect-square max-w-[280px] sm:max-w-[320px] lg:max-w-lg">
                 {/* Outer glow rings - Logo Colors */}
                 <motion.div
                   animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -419,7 +419,7 @@ export default function HomePage() {
                 />
 
                 {/* Stylized Bubble Tea Cup - Logo Colors with Gradients */}
-                <div className="absolute inset-8 flex items-center justify-center">
+                <div className="absolute inset-4 lg:inset-8 flex items-center justify-center scale-[0.6] sm:scale-75 lg:scale-100">
                   <div className="relative">
                     {/* Cup body */}
                     <motion.div
@@ -508,33 +508,33 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Floating Boba Pearls around - Logo Colors */}
+                {/* Floating Boba Pearls around - Logo Colors (hidden on mobile) */}
                 <motion.div
                   animate={{ y: [-15, 15, -15], x: [-5, 5, -5], rotate: [0, 360] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -right-2 top-20 h-10 w-10 rounded-full shadow-lg"
+                  className="absolute -right-2 top-20 hidden h-10 w-10 rounded-full shadow-lg lg:block"
                   style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
                 />
                 <motion.div
                   animate={{ y: [10, -15, 10], x: [5, -5, 5] }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                  className="absolute -left-4 top-32 h-8 w-8 rounded-full shadow-lg"
+                  className="absolute -left-4 top-32 hidden h-8 w-8 rounded-full shadow-lg lg:block"
                   style={{ background: "linear-gradient(135deg, #FF9900 0%, #E68A00 100%)" }}
                 />
                 <motion.div
                   animate={{ y: [-10, 20, -10], rotate: [0, -360] }}
                   transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                  className="absolute bottom-24 right-4 h-7 w-7 rounded-full shadow-lg"
+                  className="absolute bottom-24 right-4 hidden h-7 w-7 rounded-full shadow-lg lg:block"
                   style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
                 />
                 <motion.div
                   animate={{ y: [15, -10, 15], x: [-3, 3, -3] }}
                   transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-                  className="absolute bottom-32 -left-6 h-6 w-6 rounded-full shadow-lg"
+                  className="absolute bottom-32 -left-6 hidden h-6 w-6 rounded-full shadow-lg lg:block"
                   style={{ background: "linear-gradient(135deg, #FF9900 0%, #CC7A00 100%)" }}
                 />
 
-                {/* Floating icons - slow irregular crossing movement */}
+                {/* Floating icons - slow irregular crossing movement (hidden on mobile) */}
                 <motion.div
                   animate={{
                     y: [-60, 80, -30, 100, -80, 40, -60],
@@ -543,7 +543,7 @@ export default function HomePage() {
                     scale: [1, 1.15, 0.95, 1.1, 1, 1.2, 1]
                   }}
                   transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute left-1/4 top-1/4"
+                  className="absolute left-1/4 top-1/4 hidden lg:block"
                 >
                   <span className="text-4xl drop-shadow-lg">🧋</span>
                 </motion.div>
@@ -555,7 +555,7 @@ export default function HomePage() {
                     scale: [1.1, 0.9, 1.2, 1, 1.15, 0.95, 1.1]
                   }}
                   transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                  className="absolute right-1/4 top-1/3"
+                  className="absolute right-1/4 top-1/3 hidden lg:block"
                 >
                   <span className="text-3xl drop-shadow-lg">🍃</span>
                 </motion.div>
@@ -567,7 +567,7 @@ export default function HomePage() {
                     scale: [1, 1.25, 0.9, 1.1, 1, 1.15, 1]
                   }}
                   transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-                  className="absolute left-1/3 bottom-1/4"
+                  className="absolute left-1/3 bottom-1/4 hidden lg:block"
                 >
                   <span className="text-3xl drop-shadow-lg">✨</span>
                 </motion.div>
@@ -579,7 +579,7 @@ export default function HomePage() {
                     scale: [1.1, 1, 1.2, 0.9, 1.15, 1, 1.1]
                   }}
                   transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 6 }}
-                  className="absolute right-1/3 bottom-1/3"
+                  className="absolute right-1/3 bottom-1/3 hidden lg:block"
                 >
                   {/* Custom Coffee Bean SVG */}
                   <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-lg">
