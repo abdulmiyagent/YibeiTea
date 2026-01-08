@@ -381,7 +381,7 @@ export function ProductCarousel({
 
                 {/* Product Name */}
                 <div className="flex items-start justify-between gap-2 pr-12">
-                  <h3 className="font-serif text-xl font-bold uppercase leading-tight tracking-wide drop-shadow-md sm:text-2xl">
+                  <h3 className="font-serif text-xl font-bold uppercase leading-tight tracking-wide drop-shadow-md sm:text-2xl line-clamp-2">
                     {translation?.name || product.slug}
                   </h3>
                 </div>

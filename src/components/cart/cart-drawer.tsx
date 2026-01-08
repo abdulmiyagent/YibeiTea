@@ -144,7 +144,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       {/* Product Info */}
                       <div className="flex flex-1 flex-col">
                         <div className="flex items-start justify-between">
-                          <h3 className="font-medium text-tea-900 leading-tight">
+                          <h3 className="font-medium text-tea-900 leading-tight line-clamp-2">
                             {item.name}
                           </h3>
                           <button

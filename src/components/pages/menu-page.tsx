@@ -131,7 +131,7 @@ export function MenuPageContent() {
         </div>
 
         {/* Sticky Filters */}
-        <div className="sticky top-16 z-40 -mx-4 px-4 py-3 bg-white/95 backdrop-blur-sm border-b border-transparent [&:not(:first-child)]:mt-6 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.05)]">
+        <div className="sticky top-14 md:top-16 z-40 -mx-4 px-4 py-3 bg-white border-b border-gray-100 [&:not(:first-child)]:mt-6 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.08)]">
           <div className="space-y-3">
             {/* Search */}
             <div className="relative">
@@ -242,7 +242,7 @@ export function MenuPageContent() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <p className="text-xs text-tea-600 font-medium">
+                          <p className="text-xs text-tea-600 font-medium truncate">
                             {categoryTranslation?.name || (product.category?.slug && formatSlug(product.category.slug))}
                           </p>
                           {product.vegan && (

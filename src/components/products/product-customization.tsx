@@ -243,9 +243,9 @@ export function ProductCustomization({
           {/* Product Info */}
           <div className="flex items-start justify-between gap-2 mb-3">
             <div className="min-w-0 flex-1">
-              <h2 className="text-base font-bold leading-tight text-gray-900">{productName}</h2>
+              <h2 className="text-base font-bold leading-tight text-gray-900 line-clamp-2">{productName}</h2>
               {categoryName && (
-                <p className="text-xs text-tea-600 font-medium mt-0.5">{categoryName}</p>
+                <p className="text-xs text-tea-600 font-medium mt-0.5 truncate">{categoryName}</p>
               )}
             </div>
             <span className="text-lg font-bold text-tea-600 shrink-0">

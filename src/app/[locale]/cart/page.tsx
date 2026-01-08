@@ -112,8 +112,8 @@ export default function CartPage() {
                     </div>
 
                     {/* Product Info */}
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{item.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold line-clamp-2">{item.name}</h3>
                       {item.customizations && (
                         <div className="mt-1 flex flex-wrap gap-1">
                           {item.customizations.sugarLevel !== undefined && (
