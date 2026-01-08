@@ -1,7 +1,7 @@
 {
   "common": {
     "brandName": "Yibei Tea",
-    "tagline": "The Best Bubble Tea in Ghent",
+    "tagline": "Yibei Tea — Ghent",
     "loading": "Loading...",
     "error": "An error occurred",
     "retry": "Try again",
@@ -195,7 +195,13 @@
       "benefit1": "Earn 10 points per euro",
       "benefit2": "Free drink on your birthday",
       "benefit3": "Exclusive seasonal offers",
-      "cta": "Create Free Account"
+      "cta": "Create Free Account",
+      "welcomeTitle": "Welcome to the Yibei Family!",
+      "welcomeSubtitle": "Thank you for being part of our tea family",
+      "welcomeBenefit1": "You're earning points",
+      "welcomeBenefit2": "Check your rewards",
+      "welcomeBenefit3": "View your benefits",
+      "welcomeCta": "My Account"
     },
     "location": {
       "title": "Visit Us",

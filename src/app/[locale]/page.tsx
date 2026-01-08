@@ -936,7 +936,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Loyalty CTA Section */}
+      {/* Loyalty CTA Section - Different content for logged in vs logged out */}
       <section className="section-padding relative overflow-hidden bg-gradient-to-br from-tea-600 via-tea-700 to-tea-800">
         {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -952,39 +952,84 @@ export default function HomePage() {
             variants={staggerContainer}
             className="mx-auto max-w-3xl text-center"
           >
-            <motion.h2 variants={fadeInUp} className="heading-2 text-white">
-              {t("loyalty.title")}
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="mt-4 text-lg text-tea-100">
-              {t("loyalty.subtitle")}
-            </motion.p>
+            {session?.user ? (
+              <>
+                {/* Welcome message for logged-in users */}
+                <motion.div variants={fadeInUp} className="mb-4 flex justify-center">
+                  <span className="text-4xl">🧋</span>
+                </motion.div>
+                <motion.h2 variants={fadeInUp} className="heading-2 text-white">
+                  {t("loyalty.welcomeTitle")}
+                </motion.h2>
+                <motion.p variants={fadeInUp} className="mt-4 text-lg text-tea-100">
+                  {t("loyalty.welcomeSubtitle")}
+                </motion.p>
 
-            <motion.div
-              variants={fadeInUp}
-              className="mt-10 flex flex-wrap justify-center gap-4"
-            >
-              {["benefit1", "benefit2", "benefit3"].map((benefit) => (
-                <div
-                  key={benefit}
-                  className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 backdrop-blur-sm"
+                <motion.div
+                  variants={fadeInUp}
+                  className="mt-10 flex flex-wrap justify-center gap-4"
                 >
-                  <Sparkles className="h-4 w-4 text-tea-200" />
-                  <span className="text-sm font-medium text-white">{t(`loyalty.${benefit}`)}</span>
-                </div>
-              ))}
-            </motion.div>
+                  {["welcomeBenefit1", "welcomeBenefit2", "welcomeBenefit3"].map((benefit) => (
+                    <div
+                      key={benefit}
+                      className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 backdrop-blur-sm"
+                    >
+                      <Heart className="h-4 w-4 text-tea-200" />
+                      <span className="text-sm font-medium text-white">{t(`loyalty.${benefit}`)}</span>
+                    </div>
+                  ))}
+                </motion.div>
 
-            <motion.div variants={fadeInUp} className="mt-12">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="group h-14 rounded-full bg-white px-10 text-base font-semibold text-tea-700 shadow-lg transition-all hover:bg-cream-50 hover:shadow-xl"
+                <motion.div variants={fadeInUp} className="mt-12">
+                  <Link href="/account">
+                    <Button
+                      size="lg"
+                      className="group h-14 rounded-full bg-white px-10 text-base font-semibold text-tea-700 shadow-lg transition-all hover:bg-cream-50 hover:shadow-xl"
+                    >
+                      {t("loyalty.welcomeCta")}
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  </Link>
+                </motion.div>
+              </>
+            ) : (
+              <>
+                {/* Sign up CTA for non-logged-in users */}
+                <motion.h2 variants={fadeInUp} className="heading-2 text-white">
+                  {t("loyalty.title")}
+                </motion.h2>
+                <motion.p variants={fadeInUp} className="mt-4 text-lg text-tea-100">
+                  {t("loyalty.subtitle")}
+                </motion.p>
+
+                <motion.div
+                  variants={fadeInUp}
+                  className="mt-10 flex flex-wrap justify-center gap-4"
                 >
-                  {t("loyalty.cta")}
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-            </motion.div>
+                  {["benefit1", "benefit2", "benefit3"].map((benefit) => (
+                    <div
+                      key={benefit}
+                      className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 backdrop-blur-sm"
+                    >
+                      <Sparkles className="h-4 w-4 text-tea-200" />
+                      <span className="text-sm font-medium text-white">{t(`loyalty.${benefit}`)}</span>
+                    </div>
+                  ))}
+                </motion.div>
+
+                <motion.div variants={fadeInUp} className="mt-12">
+                  <Link href="/register">
+                    <Button
+                      size="lg"
+                      className="group h-14 rounded-full bg-white px-10 text-base font-semibold text-tea-700 shadow-lg transition-all hover:bg-cream-50 hover:shadow-xl"
+                    >
+                      {t("loyalty.cta")}
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  </Link>
+                </motion.div>
+              </>
+            )}
           </motion.div>
         </div>
       </section>
