@@ -324,7 +324,15 @@ export const ordersRouter = router({
   getMyOrders: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.order.findMany({
       where: { userId: ctx.session.user.id },
-      include: { items: { include: { product: true } } },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: { translations: true },
+            },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
   }),
