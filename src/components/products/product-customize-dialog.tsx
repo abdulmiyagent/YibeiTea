@@ -35,20 +35,32 @@ export function ProductCustomizeDialog({
 }: ProductCustomizeDialogProps) {
   const locale = useLocale() as "nl" | "en";
 
-  // Fetch full product details
+  // Fetch full product details (cache for 2 min, prefetch on hover would be nice)
   const { data: fullProduct, isLoading: productLoading } = api.products.getBySlug.useQuery(
     { slug: product.slug, locale },
-    { enabled: open }
+    {
+      enabled: open,
+      staleTime: 2 * 60 * 1000, // 2 minutes cache
+    }
   );
 
-  // Fetch customization options
+  // Fetch customization options (cache longer - these rarely change)
   const { data: customizationGroups, isLoading: customizationsLoading } =
-    api.customizations.getAll.useQuery({ locale }, { enabled: open });
+    api.customizations.getAll.useQuery(
+      { locale },
+      {
+        enabled: open,
+        staleTime: 10 * 60 * 1000, // 10 minutes cache - rarely changes
+      }
+    );
 
-  // Fetch toppings
+  // Fetch toppings (cache longer - these rarely change)
   const { data: toppings, isLoading: toppingsLoading } = api.toppings.getAll.useQuery(
     { locale, onlyAvailable: true },
-    { enabled: open }
+    {
+      enabled: open,
+      staleTime: 10 * 60 * 1000, // 10 minutes cache - rarely changes
+    }
   );
 
   const isLoading = productLoading || customizationsLoading || toppingsLoading;

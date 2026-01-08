@@ -70,11 +70,20 @@ function formatSlug(slug: string): string {
 export function MenuPageContent() {
   const t = useTranslations("menu");
   const locale = useLocale() as "nl" | "en";
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showVeganOnly, setShowVeganOnly] = useState(false);
   const [showCaffeineFree, setShowCaffeineFree] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Toggle category selection (multi-select with OR logic)
+  const toggleCategory = (slug: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(slug)
+        ? prev.filter((s) => s !== slug) // Deselect
+        : [...prev, slug] // Add to selection
+    );
+  };
 
   // Fetch categories with stale-while-revalidate
   const { data: categories, isLoading: categoriesLoading } = api.categories.getAll.useQuery(
@@ -82,11 +91,10 @@ export function MenuPageContent() {
     { staleTime: 5 * 60 * 1000 } // 5 minutes
   );
 
-  // Fetch products with stale-while-revalidate and keep previous data for smooth transitions
+  // Fetch ALL products (no category filter in API, filter client-side for OR logic)
   const { data: products, isLoading: productsLoading, isFetching } = api.products.getAll.useQuery(
     {
       locale,
-      categorySlug: selectedCategory || undefined,
       onlyAvailable: true,
     },
     {
@@ -95,9 +103,19 @@ export function MenuPageContent() {
     }
   );
 
+  // Pre-fetch shared data for popup (customizations and toppings) - makes popup instant
+  api.customizations.getAll.useQuery(
+    { locale },
+    { staleTime: 10 * 60 * 1000 } // 10 minutes - rarely changes
+  );
+  api.toppings.getAll.useQuery(
+    { locale, onlyAvailable: true },
+    { staleTime: 10 * 60 * 1000 } // 10 minutes - rarely changes
+  );
+
   const isInitialLoading = categoriesLoading || (productsLoading && !products);
 
-  // Filter products based on search and dietary filters - memoized for performance
+  // Filter products: Categories use OR logic, Vegan/Caffeine use AND logic
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
@@ -107,15 +125,23 @@ export function MenuPageContent() {
       const productName = product.translations[0]?.name || "";
       const productDescription = product.translations[0]?.description || "";
 
+      // Search filter
       const matchesSearch =
         productName.toLowerCase().includes(searchLower) ||
         productDescription.toLowerCase().includes(searchLower);
+
+      // Category filter: OR logic (if any category selected, product must be in one of them)
+      const matchesCategory =
+        selectedCategories.length === 0 || // No filter = show all
+        selectedCategories.includes(product.category?.slug || "");
+
+      // Dietary filters: AND logic (both must match if enabled)
       const matchesVegan = !showVeganOnly || product.vegan;
       const matchesCaffeine = !showCaffeineFree || !product.caffeine;
 
-      return matchesSearch && matchesVegan && matchesCaffeine;
+      return matchesSearch && matchesCategory && matchesVegan && matchesCaffeine;
     });
-  }, [products, searchQuery, showVeganOnly, showCaffeineFree]);
+  }, [products, searchQuery, selectedCategories, showVeganOnly, showCaffeineFree]);
 
   return (
     <div className="section-padding">
@@ -145,29 +171,30 @@ export function MenuPageContent() {
               />
             </div>
 
-            {/* Category Tabs - Horizontal scroll on mobile */}
+            {/* Category Tabs - Horizontal scroll on mobile, multi-select with OR logic */}
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
               {categoriesLoading ? (
                 <CategorySkeleton />
               ) : (
                 <>
                   <Button
-                    variant={selectedCategory === null ? "tea" : "outline"}
+                    variant={selectedCategories.length === 0 ? "tea" : "outline"}
                     size="sm"
                     className="flex-shrink-0 transition-all"
-                    onClick={() => setSelectedCategory(null)}
+                    onClick={() => setSelectedCategories([])}
                   >
                     {locale === "nl" ? "Alle Drankjes" : "All Drinks"}
                   </Button>
                   {categories?.map((category) => {
                     const translation = category.translations[0];
+                    const isSelected = selectedCategories.includes(category.slug);
                     return (
                       <Button
                         key={category.id}
-                        variant={selectedCategory === category.slug ? "tea" : "outline"}
+                        variant={isSelected ? "tea" : "outline"}
                         size="sm"
                         className="flex-shrink-0 transition-all"
-                        onClick={() => setSelectedCategory(category.slug)}
+                        onClick={() => toggleCategory(category.slug)}
                       >
                         {translation?.name || formatSlug(category.slug)}
                       </Button>

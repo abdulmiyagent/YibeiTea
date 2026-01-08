@@ -414,6 +414,71 @@ src/app/[locale]/
 - Reviews and ratings
 - Homepage section reordering (drag & drop UI for super admin, softcoded section order in DB)
 
+### Future Extension: Seasonal & Special Edition Products
+
+**Context:** Bubble tea shops often have seasonal items (Pumpkin Spice Latte in autumn, Sakura drinks in spring) or limited-time collaborations. Three implementation options are proposed:
+
+#### Option 1: Simple Category Approach
+**How:** Create a "Seasonal" or "Special Edition" category in admin.
+
+| Pros | Cons |
+|------|------|
+| Zero development effort | No automatic expiry |
+| Works with existing system | Must manually move products |
+| Admin already knows how to use it | No special homepage prominence |
+
+**Best for:** Quick start, minimal seasonal items (<5 per season)
+
+#### Option 2: Product Flag + Expiry Date
+**How:** Add `isSeasonal: Boolean` and `seasonalEndDate: DateTime?` to Product schema.
+
+```prisma
+model Product {
+  // ...existing fields
+  isSeasonal        Boolean   @default(false)
+  seasonalStartDate DateTime?
+  seasonalEndDate   DateTime?
+}
+```
+
+| Pros | Cons |
+|------|------|
+| Automatic show/hide based on dates | Schema migration required |
+| Can add "Limited Time" badge | Extra admin UI for dates |
+| Products stay in original category | ~4 hours development |
+| Searchable/filterable on menu |  |
+
+**Best for:** Regular seasonal rotations (quarterly), multiple items per season
+
+#### Option 3: Seasonal Collection System
+**How:** New `SeasonalCollection` model with many-to-many Product relation.
+
+```prisma
+model SeasonalCollection {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  imageUrl    String?   // Collection hero image
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean   @default(true)
+  priority    Int       @default(0)  // For homepage display order
+  products    Product[] @relation("SeasonalProducts")
+  translations SeasonalCollectionTranslation[]
+}
+```
+
+| Pros | Cons |
+|------|------|
+| Rich metadata (hero image, description) | Most complex (~8-12 hours) |
+| Homepage carousel/banner support | New admin UI needed |
+| Same product can be in multiple collections | Over-engineering for small menu |
+| History preserved (can reuse "Summer 2025") |  |
+
+**Best for:** Marketing-heavy launches, collaborations, themed campaigns
+
+#### Recommendation
+Start with **Option 1** (zero effort). If seasonal items become a regular thing (>2 per quarter), migrate to **Option 2**. Reserve **Option 3** for when there's dedicated marketing budget for seasonal campaigns.
+
 ### Future Architecture: Delivery Support
 
 > **Note:** This architecture is designed for future projects (e.g., sushi restaurant) that require delivery. Yibei Tea is pickup-only.
