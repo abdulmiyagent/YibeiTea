@@ -197,7 +197,7 @@ export function MenuPageContent() {
                           )}
                         </div>
                         <h3 className="font-semibold text-sm mt-0.5 line-clamp-1">
-                          {translation?.name || product.slug}
+                          {translation?.name || formatSlug(product.slug)}
                         </h3>
                         <span className="text-sm font-bold text-tea-600 mt-0.5 block">
                           €{Number(product.price).toFixed(2)}

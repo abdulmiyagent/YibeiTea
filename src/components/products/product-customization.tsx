@@ -217,158 +217,168 @@ export function ProductCustomization({
   const productDescription = product.translations[0]?.description;
   const categoryName = product.category?.translations[0]?.name || (product.category?.slug && formatSlug(product.category.slug));
 
-  // Modal variant: ultra-compact floating card
-  // Minimal, clean, non-intrusive
+  // Modal variant: modern, clean card with product image
   if (variant === "modal") {
     return (
-      <div className="flex flex-col p-3">
-        {/* Compact Header */}
-        <div className="flex gap-2.5 pr-5">
-          {/* Tiny product image */}
-          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-tea-50 to-taro-50">
-            {product.imageUrl ? (
-              <img
-                src={product.imageUrl}
-                alt={productName}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <span className="text-base">🧋</span>
-              </div>
-            )}
-          </div>
+      <div className="flex flex-col">
+        {/* Product Image Header */}
+        <div className="relative h-32 w-full overflow-hidden bg-gradient-to-br from-tea-100 via-taro-50 to-cream-100">
+          {product.imageUrl ? (
+            <img
+              src={product.imageUrl}
+              alt={productName}
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <span className="text-5xl">🧋</span>
+            </div>
+          )}
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+        </div>
 
+        {/* Content */}
+        <div className="px-4 pb-4 -mt-6 relative">
           {/* Product Info */}
-          <div className="flex flex-1 flex-col justify-center min-w-0">
-            <h2 className="text-sm font-semibold leading-tight truncate">{productName}</h2>
-            <span className="text-xs font-semibold text-tea-600">
+          <div className="flex items-start justify-between gap-2 mb-3">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-bold leading-tight text-gray-900">{productName}</h2>
+              {categoryName && (
+                <p className="text-xs text-tea-600 font-medium mt-0.5">{categoryName}</p>
+              )}
+            </div>
+            <span className="text-lg font-bold text-tea-600 shrink-0">
               €{Number(product.price).toFixed(2)}
             </span>
           </div>
-        </div>
 
-        {/* Customization Options - ultra compact */}
-        {filteredCustomizationGroups.length > 0 && (
-          <div className="mt-2.5 space-y-2">
-            {filteredCustomizationGroups.map((group) => (
-              <div key={group.id}>
-                <label className="mb-1 block text-[10px] font-medium text-gray-400 uppercase tracking-wider">
-                  {getGroupLabel(group.type)}
-                </label>
-                <div className="flex flex-wrap gap-1">
-                  {group.values.map((option) => {
-                    const label = option.translations[0]?.label || option.value;
-                    const isSelected = selectedOptions[group.type] === option.value;
+          {/* Customization Options */}
+          {filteredCustomizationGroups.length > 0 && (
+            <div className="space-y-3">
+              {filteredCustomizationGroups.map((group) => (
+                <div key={group.id}>
+                  <label className="mb-1.5 block text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                    {getGroupLabel(group.type)}
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.values.map((option) => {
+                      const label = option.translations[0]?.label || option.value;
+                      const isSelected = selectedOptions[group.type] === option.value;
 
-                    return (
-                      <button
-                        key={option.id}
-                        onClick={() =>
-                          setSelectedOptions({
-                            ...selectedOptions,
-                            [group.type]: option.value,
-                          })
-                        }
-                        className={cn(
-                          "rounded-full px-2 py-0.5 text-[11px] font-medium transition-all",
-                          isSelected
-                            ? "bg-tea-500 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        )}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={option.id}
+                          onClick={() =>
+                            setSelectedOptions({
+                              ...selectedOptions,
+                              [group.type]: option.value,
+                            })
+                          }
+                          className={cn(
+                            "rounded-full px-3 py-1 text-xs font-medium transition-all border",
+                            isSelected
+                              ? "bg-tea-500 text-white border-tea-500 shadow-sm"
+                              : "bg-white text-gray-600 border-gray-200 hover:border-tea-300 hover:bg-tea-50"
+                          )}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Toppings - ultra compact */}
-        {filteredToppings.length > 0 && (
-          <div className="mt-2">
-            <label className="mb-1 block text-[10px] font-medium text-gray-400 uppercase tracking-wider">
-              {t("customize.toppings")}
-            </label>
-            <div className="flex flex-wrap gap-1">
-              {filteredToppings.map((topping) => {
-                const isSelected = selectedToppings.includes(topping.id);
-                return (
-                  <button
-                    key={topping.id}
-                    onClick={() =>
-                      setSelectedToppings((prev) =>
-                        prev.includes(topping.id)
-                          ? prev.filter((id) => id !== topping.id)
-                          : [...prev, topping.id]
-                      )
-                    }
-                    className={cn(
-                      "rounded-full px-2 py-0.5 text-[11px] font-medium transition-all flex items-center gap-0.5",
-                      isSelected
-                        ? "bg-tea-500 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    )}
-                  >
-                    {isSelected && <Check className="h-2 w-2" />}
-                    {topping.translations[0]?.name || formatSlug(topping.slug)}
-                    <span className="opacity-60 text-[10px]">+€{Number(topping.price).toFixed(2)}</span>
-                  </button>
-                );
-              })}
+              ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Footer: Quantity + Add Button */}
-        <div className="mt-2.5 flex items-center gap-2">
-          {/* Quantity controls */}
-          <div className="flex items-center rounded-full bg-gray-100">
+          {/* Toppings */}
+          {filteredToppings.length > 0 && (
+            <div className="mt-3">
+              <label className="mb-1.5 block text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                {t("customize.toppings")}
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {filteredToppings.map((topping) => {
+                  const isSelected = selectedToppings.includes(topping.id);
+                  return (
+                    <button
+                      key={topping.id}
+                      onClick={() =>
+                        setSelectedToppings((prev) =>
+                          prev.includes(topping.id)
+                            ? prev.filter((id) => id !== topping.id)
+                            : [...prev, topping.id]
+                        )
+                      }
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-medium transition-all border flex items-center gap-1",
+                        isSelected
+                          ? "bg-tea-500 text-white border-tea-500 shadow-sm"
+                          : "bg-white text-gray-600 border-gray-200 hover:border-tea-300 hover:bg-tea-50"
+                      )}
+                    >
+                      {isSelected && <Check className="h-3 w-3" />}
+                      {topping.translations[0]?.name || formatSlug(topping.slug)}
+                      <span className={cn("text-[10px]", isSelected ? "text-white/80" : "text-gray-400")}>
+                        +€{Number(topping.price).toFixed(2)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Footer: Quantity + Add Button */}
+          <div className="mt-4 flex items-center gap-3 pt-3 border-t border-gray-100">
+            {/* Quantity controls */}
+            <div className="flex items-center rounded-full bg-gray-100 border border-gray-200">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                disabled={quantity <= 1}
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-full transition-all",
+                  quantity <= 1 ? "text-gray-300" : "text-gray-600 hover:bg-white"
+                )}
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <span className="w-6 text-center text-sm font-bold">{quantity}</span>
+              <button
+                onClick={() => setQuantity(quantity + 1)}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-all hover:bg-white"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Add to Cart Button */}
             <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              disabled={quantity <= 1}
+              onClick={handleAddToCart}
+              disabled={isAddedToCart}
               className={cn(
-                "flex h-6 w-6 items-center justify-center rounded-full transition-all",
-                quantity <= 1 ? "text-gray-300" : "text-gray-600 hover:bg-white"
+                "flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-sm font-bold transition-all shadow-sm",
+                isAddedToCart
+                  ? "bg-green-500 text-white shadow-green-200"
+                  : "bg-tea-500 text-white hover:bg-tea-600 shadow-tea-200 hover:shadow-md"
               )}
             >
-              <Minus className="h-3 w-3" />
-            </button>
-            <span className="w-4 text-center text-xs font-semibold">{quantity}</span>
-            <button
-              onClick={() => setQuantity(quantity + 1)}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-gray-600 transition-all hover:bg-white"
-            >
-              <Plus className="h-3 w-3" />
+              {isAddedToCart ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  <span>{locale === "nl" ? "Toegevoegd!" : "Added!"}</span>
+                </>
+              ) : (
+                <>
+                  <span>{locale === "nl" ? "Toevoegen" : "Add"}</span>
+                  <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                    €{totalPrice.toFixed(2)}
+                  </span>
+                </>
+              )}
             </button>
           </div>
-
-          {/* Add to Cart Button */}
-          <button
-            onClick={handleAddToCart}
-            disabled={isAddedToCart}
-            className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-full py-1.5 text-xs font-semibold transition-all",
-              isAddedToCart
-                ? "bg-green-500 text-white"
-                : "bg-tea-500 text-white hover:bg-tea-600"
-            )}
-          >
-            {isAddedToCart ? (
-              <>
-                <Check className="h-3 w-3" />
-                <span>{locale === "nl" ? "Toegevoegd!" : "Added!"}</span>
-              </>
-            ) : (
-              <>
-                <span>{locale === "nl" ? "Toevoegen" : "Add"}</span>
-                <span>€{totalPrice.toFixed(2)}</span>
-              </>
-            )}
-          </button>
         </div>
       </div>
     );
