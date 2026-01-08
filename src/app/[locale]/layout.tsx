@@ -28,7 +28,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://yibeitea.be"),
   title: {
-    default: "Yibei Tea - Premium Bubble Tea in Gent",
+    default: "Yibei Tea - The Best Bubble Tea in Ghent",
     template: "%s | Yibei Tea",
   },
   description:
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     alternateLocale: "en_GB",
     url: "https://yibeitea.be",
     siteName: "Yibei Tea",
-    title: "Yibei Tea - Premium Bubble Tea in Gent",
+    title: "Yibei Tea - The Best Bubble Tea in Ghent",
     description:
       "Bestel verse, handgemaakte bubble tea online. Pas je drankje aan en haal af in Gent.",
     images: [
@@ -63,13 +63,13 @@ export const metadata: Metadata = {
         url: "/images/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Yibei Tea - Bubble Tea in Gent",
+        alt: "Yibei Tea - The Best Bubble Tea in Ghent",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yibei Tea - Premium Bubble Tea in Gent",
+    title: "Yibei Tea - The Best Bubble Tea in Ghent",
     description:
       "Bestel verse, handgemaakte bubble tea online. Afhalen in Gent.",
     images: ["/images/og-image.png"],
