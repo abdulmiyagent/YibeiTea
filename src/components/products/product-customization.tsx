@@ -371,10 +371,10 @@ export function ProductCustomization({
                 </>
               ) : (
                 <>
+                  <ShoppingCart className="h-4 w-4" />
                   <span>{locale === "nl" ? "Toevoegen" : "Add"}</span>
-                  <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
-                    €{totalPrice.toFixed(2)}
-                  </span>
+                  <span className="mx-1 h-4 w-px bg-white/40" />
+                  <span className="tabular-nums">€{totalPrice.toFixed(2)}</span>
                 </>
               )}
             </button>
