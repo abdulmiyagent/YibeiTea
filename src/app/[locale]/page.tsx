@@ -402,218 +402,44 @@ export default function HomePage() {
               </motion.div>
             </motion.div>
 
-            {/* Right - Yibei Tea Bubble Tea Visual */}
+            {/* Right - Product Image */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
               className="relative"
             >
-              <div className="relative mx-auto aspect-square max-w-[280px] sm:max-w-[320px] lg:max-w-lg">
-                {/* Outer glow rings - Logo Colors */}
+              <div className="relative mx-auto max-w-[320px] sm:max-w-[400px] lg:max-w-lg">
+                {/* Subtle glow behind image */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-tea-200/30 via-transparent to-taro-200/30 blur-2xl" />
+
+                {/* Product Image */}
                 <motion.div
-                  animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 rounded-full blur-2xl"
-                  style={{ background: "radial-gradient(circle, rgba(139, 38, 53, 0.25) 0%, transparent 50%, rgba(255, 153, 0, 0.2) 100%)" }}
-                />
-
-                {/* Stylized Bubble Tea Cup - Logo Colors with Gradients */}
-                <div className="absolute inset-4 lg:inset-8 flex items-center justify-center scale-[0.6] sm:scale-75 lg:scale-100">
-                  <div className="relative">
-                    {/* Cup body */}
-                    <motion.div
-                      animate={{ y: [-3, 3, -3] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                      className="relative"
-                    >
-                      {/* Lid/dome with gradient */}
-                      <div
-                        className="absolute -top-6 left-1/2 h-12 w-52 -translate-x-1/2 rounded-t-full shadow-md"
-                        style={{ background: "linear-gradient(180deg, #F5E6D3 0%, #E8D5C4 50%, #DBC4B0 100%)" }}
-                      />
-                      <div
-                        className="absolute -top-2 left-1/2 h-4 w-56 -translate-x-1/2 rounded-full shadow-sm"
-                        style={{ background: "linear-gradient(90deg, #8B2635 0%, #A03040 50%, #8B2635 100%)" }}
-                      />
-
-                      {/* Straw - Orange gradient */}
-                      <motion.div
-                        animate={{ rotate: [-2, 2, -2] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute -top-20 left-1/2 z-20 h-28 w-4 -translate-x-1/2 rounded-full shadow-md"
-                        style={{ background: "linear-gradient(180deg, #FFB340 0%, #FF9900 30%, #E68A00 70%, #CC7A00 100%)", transformOrigin: "bottom center" }}
-                      />
-
-                      {/* Main cup with beautiful gradient */}
-                      <div
-                        className="relative h-64 w-48 overflow-hidden rounded-b-[3rem] shadow-2xl"
-                        style={{
-                          clipPath: "polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%)",
-                          background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,230,211,0.9) 50%, rgba(232,213,196,0.85) 100%)"
-                        }}
-                      >
-                        {/* Tea liquid gradient - Bordeaux to Orange blend */}
-                        <div
-                          className="absolute inset-x-2 bottom-0 top-8 rounded-b-[2.5rem]"
-                          style={{
-                            background: "linear-gradient(180deg, rgba(160, 48, 64, 0.6) 0%, rgba(139, 38, 53, 0.75) 30%, rgba(139, 38, 53, 0.85) 60%, rgba(107, 29, 42, 0.95) 100%)"
-                          }}
-                        />
-
-                        {/* Animated Boba Pearls inside - Orange gradient */}
-                        <motion.div
-                          animate={{ y: [0, -8, 0] }}
-                          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                          className="absolute bottom-8 left-6 h-6 w-6 rounded-full shadow-lg"
-                          style={{ background: "radial-gradient(circle at 30% 30%, #FFD080 0%, #FF9900 40%, #CC7A00 100%)" }}
-                        />
-                        <motion.div
-                          animate={{ y: [0, -6, 0] }}
-                          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-                          className="absolute bottom-6 left-14 h-5 w-5 rounded-full shadow-lg"
-                          style={{ background: "radial-gradient(circle at 30% 30%, #FFE0A0 0%, #FFB340 40%, #FF9900 100%)" }}
-                        />
-                        <motion.div
-                          animate={{ y: [0, -10, 0] }}
-                          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-                          className="absolute bottom-10 right-8 h-6 w-6 rounded-full shadow-lg"
-                          style={{ background: "radial-gradient(circle at 30% 30%, #FFD080 0%, #FF9900 40%, #CC7A00 100%)" }}
-                        />
-                        <motion.div
-                          animate={{ y: [0, -5, 0] }}
-                          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}
-                          className="absolute bottom-4 right-14 h-5 w-5 rounded-full shadow-lg"
-                          style={{ background: "radial-gradient(circle at 30% 30%, #FFE0A0 0%, #FFB340 40%, #FF9900 100%)" }}
-                        />
-                        <motion.div
-                          animate={{ y: [0, -7, 0] }}
-                          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-                          className="absolute bottom-12 left-10 h-4 w-4 rounded-full shadow-lg"
-                          style={{ background: "radial-gradient(circle at 30% 30%, #FFD080 0%, #FF9900 40%, #CC7A00 100%)" }}
-                        />
-
-                        {/* Multiple shine effects for glass look */}
-                        <div className="absolute left-2 top-10 h-32 w-6 rounded-full bg-white/40 blur-sm" />
-                        <div className="absolute left-4 top-16 h-20 w-3 rounded-full bg-white/25 blur-xs" />
-                        <div className="absolute right-4 top-12 h-16 w-2 rounded-full bg-white/20 blur-sm" />
-                      </div>
-
-                      {/* Cup bottom rim gradient */}
-                      <div
-                        className="absolute -bottom-1 left-1/2 h-3 w-32 -translate-x-1/2 rounded-full"
-                        style={{ background: "linear-gradient(90deg, transparent 0%, rgba(139, 38, 53, 0.3) 50%, transparent 100%)" }}
-                      />
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Mobile floating elements - smaller, fewer, at edges */}
-                <motion.div
-                  animate={{ y: [-8, 8, -8], opacity: [0.7, 1, 0.7] }}
+                  animate={{ y: [-5, 5, -5] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -right-1 top-4 h-5 w-5 rounded-full shadow-md lg:hidden"
-                  style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
-                />
-                <motion.div
-                  animate={{ y: [6, -6, 6], opacity: [0.8, 1, 0.8] }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                  className="absolute -left-1 bottom-12 h-4 w-4 rounded-full shadow-md lg:hidden"
-                  style={{ background: "linear-gradient(135deg, #FF9900 0%, #E68A00 100%)" }}
-                />
-                <motion.div
-                  animate={{ y: [-5, 5, -5], scale: [0.9, 1, 0.9] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                  className="absolute right-2 bottom-20 lg:hidden"
+                  className="relative"
                 >
-                  <span className="text-lg drop-shadow-md">✨</span>
+                  <img
+                    src="/images/hero-drinks.jpg"
+                    alt="Yibei Tea bubble tea collection"
+                    className="relative z-10 w-full rounded-2xl shadow-2xl"
+                  />
                 </motion.div>
 
-                {/* Desktop floating Boba Pearls around - Logo Colors */}
+                {/* Floating decorative elements */}
                 <motion.div
-                  animate={{ y: [-15, 15, -15], x: [-5, 5, -5], rotate: [0, 360] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -right-2 top-20 hidden h-10 w-10 rounded-full shadow-lg lg:block"
-                  style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
-                />
-                <motion.div
-                  animate={{ y: [10, -15, 10], x: [5, -5, 5] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                  className="absolute -left-4 top-32 hidden h-8 w-8 rounded-full shadow-lg lg:block"
-                  style={{ background: "linear-gradient(135deg, #FF9900 0%, #E68A00 100%)" }}
-                />
-                <motion.div
-                  animate={{ y: [-10, 20, -10], rotate: [0, -360] }}
-                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                  className="absolute bottom-24 right-4 hidden h-7 w-7 rounded-full shadow-lg lg:block"
-                  style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
-                />
-                <motion.div
-                  animate={{ y: [15, -10, 15], x: [-3, 3, -3] }}
-                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-                  className="absolute bottom-32 -left-6 hidden h-6 w-6 rounded-full shadow-lg lg:block"
-                  style={{ background: "linear-gradient(135deg, #FF9900 0%, #CC7A00 100%)" }}
-                />
-
-                {/* Floating icons - slow irregular crossing movement (hidden on mobile) */}
-                <motion.div
-                  animate={{
-                    y: [-60, 80, -30, 100, -80, 40, -60],
-                    x: [30, -90, 70, -40, 80, -70, 30],
-                    rotate: [0, 45, -30, 90, -60, 120, 0],
-                    scale: [1, 1.15, 0.95, 1.1, 1, 1.2, 1]
-                  }}
-                  transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute left-1/4 top-1/4 hidden lg:block"
+                  animate={{ y: [-10, 10, -10], rotate: [0, 10, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -right-4 -top-4 hidden lg:block"
                 >
                   <span className="text-4xl drop-shadow-lg">🧋</span>
                 </motion.div>
                 <motion.div
-                  animate={{
-                    y: [70, -50, 30, -90, 60, -40, 70],
-                    x: [-60, 80, -30, 100, -80, 50, -60],
-                    rotate: [0, -60, 45, -90, 30, -120, 0],
-                    scale: [1.1, 0.9, 1.2, 1, 1.15, 0.95, 1.1]
-                  }}
-                  transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                  className="absolute right-1/4 top-1/3 hidden lg:block"
-                >
-                  <span className="text-3xl drop-shadow-lg">🍃</span>
-                </motion.div>
-                <motion.div
-                  animate={{
-                    y: [-50, 70, -80, 50, -30, 90, -50],
-                    x: [80, -60, 40, -90, 70, -50, 80],
-                    rotate: [0, 75, -45, 100, -80, 60, 0],
-                    scale: [1, 1.25, 0.9, 1.1, 1, 1.15, 1]
-                  }}
-                  transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-                  className="absolute left-1/3 bottom-1/4 hidden lg:block"
+                  animate={{ y: [10, -10, 10], rotate: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  className="absolute -bottom-2 -left-4 hidden lg:block"
                 >
                   <span className="text-3xl drop-shadow-lg">✨</span>
-                </motion.div>
-                <motion.div
-                  animate={{
-                    y: [50, -80, 60, -40, 90, -70, 50],
-                    x: [-80, 50, -100, 70, -50, 90, -80],
-                    rotate: [0, -50, 80, -100, 45, -75, 0],
-                    scale: [1.1, 1, 1.2, 0.9, 1.15, 1, 1.1]
-                  }}
-                  transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 6 }}
-                  className="absolute right-1/3 bottom-1/3 hidden lg:block"
-                >
-                  {/* Custom Coffee Bean SVG */}
-                  <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-lg">
-                    <ellipse cx="16" cy="16" rx="10" ry="14" fill="url(#coffeeBeanGradient)" />
-                    <path d="M16 4 Q12 16 16 28" stroke="#3D1F0D" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                    <defs>
-                      <linearGradient id="coffeeBeanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#8B5A2B" />
-                        <stop offset="50%" stopColor="#5D3A1A" />
-                        <stop offset="100%" stopColor="#3D1F0D" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
                 </motion.div>
               </div>
             </motion.div>
