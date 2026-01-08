@@ -38,6 +38,26 @@ export const productsRouter = router({
       return products;
     }),
 
+  getById: publicProcedure
+    .input(z.object({
+      id: z.string(),
+      locale: z.enum(["nl", "en"]).default("nl"),
+    }))
+    .query(async ({ ctx, input }) => {
+      const product = await ctx.db.product.findUnique({
+        where: { id: input.id },
+        include: {
+          translations: { where: { locale: input.locale } },
+          category: {
+            include: {
+              translations: { where: { locale: input.locale } },
+            },
+          },
+        },
+      });
+      return product;
+    }),
+
   getBySlug: publicProcedure
     .input(z.object({
       slug: z.string(),

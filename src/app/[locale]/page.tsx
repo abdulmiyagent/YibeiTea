@@ -508,7 +508,28 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Floating Boba Pearls around - Logo Colors (hidden on mobile) */}
+                {/* Mobile floating elements - smaller, fewer, at edges */}
+                <motion.div
+                  animate={{ y: [-8, 8, -8], opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -right-1 top-4 h-5 w-5 rounded-full shadow-md lg:hidden"
+                  style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
+                />
+                <motion.div
+                  animate={{ y: [6, -6, 6], opacity: [0.8, 1, 0.8] }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                  className="absolute -left-1 bottom-12 h-4 w-4 rounded-full shadow-md lg:hidden"
+                  style={{ background: "linear-gradient(135deg, #FF9900 0%, #E68A00 100%)" }}
+                />
+                <motion.div
+                  animate={{ y: [-5, 5, -5], scale: [0.9, 1, 0.9] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  className="absolute right-2 bottom-20 lg:hidden"
+                >
+                  <span className="text-lg drop-shadow-md">✨</span>
+                </motion.div>
+
+                {/* Desktop floating Boba Pearls around - Logo Colors */}
                 <motion.div
                   animate={{ y: [-15, 15, -15], x: [-5, 5, -5], rotate: [0, 360] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}

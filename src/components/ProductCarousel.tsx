@@ -41,6 +41,12 @@ interface Product {
   slug: string;
   price: number | string | { toString(): string };
   imageUrl: string | null;
+  vegan: boolean;
+  caffeine: boolean;
+  calories: number | null;
+  allowSugarCustomization: boolean;
+  allowIceCustomization: boolean;
+  allowToppings: boolean;
   translations: Array<{ name: string; description?: string | null }>;
   category?: {
     slug: string;

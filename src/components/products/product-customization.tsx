@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useCartStore } from "@/stores/cart-store";
+import { useCartStore, CartItemCustomization } from "@/stores/cart-store";
 import { cn } from "@/lib/utils";
 import {
   Minus,
@@ -18,6 +18,203 @@ import {
   Heart,
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
+
+// =============================================================================
+// HAPTIC FEEDBACK UTILITY
+// =============================================================================
+
+function triggerHaptic(type: "light" | "medium" | "heavy" = "medium") {
+  if (typeof window === "undefined" || !navigator.vibrate) return;
+
+  const patterns = {
+    light: [10],
+    medium: [20],
+    heavy: [30, 10, 30],
+  };
+
+  try {
+    navigator.vibrate(patterns[type]);
+  } catch {
+    // Silently fail - haptics not supported
+  }
+}
+
+// =============================================================================
+// VISUAL SLIDER COMPONENTS
+// =============================================================================
+
+interface SugarSliderProps {
+  value: number;
+  onChange: (value: number) => void;
+  options: Array<{ value: string; label: string }>;
+}
+
+function SugarSlider({ value, onChange, options }: SugarSliderProps) {
+  const locale = useLocale() as "nl" | "en";
+
+  // Map numeric values to slider positions
+  const numericOptions = options.map(o => parseInt(o.value)).sort((a, b) => a - b);
+  const currentIndex = numericOptions.indexOf(value);
+  const percentage = numericOptions.length > 1
+    ? (currentIndex / (numericOptions.length - 1)) * 100
+    : 50;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-2xl font-bold text-amber-600">{value}%</span>
+        <span className="text-sm text-gray-500">
+          {value === 0 ? (locale === "nl" ? "Geen suiker" : "No sugar") :
+           value <= 30 ? (locale === "nl" ? "Licht zoet" : "Lightly sweet") :
+           value <= 70 ? (locale === "nl" ? "Normaal" : "Normal") :
+           (locale === "nl" ? "Extra zoet" : "Extra sweet")}
+        </span>
+      </div>
+
+      {/* Visual sugar level indicator */}
+      <div className="relative h-8 rounded-full bg-gradient-to-r from-amber-50 via-amber-100 to-amber-200 overflow-hidden border border-amber-200">
+        <div
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 transition-all duration-200 ease-out"
+          style={{ width: `${percentage}%` }}
+        />
+        {/* Sugar crystals visual */}
+        <div className="absolute inset-0 flex items-center justify-center gap-1 pointer-events-none">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "w-1.5 h-1.5 rounded-full transition-all duration-200",
+                i < Math.ceil((percentage / 100) * 5)
+                  ? "bg-white/80"
+                  : "bg-amber-200/50"
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Tap targets */}
+      <div className="flex gap-1.5">
+        {options.map((option) => {
+          const optionValue = parseInt(option.value);
+          const isSelected = value === optionValue;
+          return (
+            <button
+              key={option.value}
+              onClick={() => {
+                triggerHaptic("light");
+                onChange(optionValue);
+              }}
+              className={cn(
+                "flex-1 py-2.5 rounded-xl text-sm font-medium transition-all min-h-[44px]",
+                isSelected
+                  ? "bg-amber-500 text-white shadow-md shadow-amber-500/25"
+                  : "bg-amber-50 text-amber-700 hover:bg-amber-100 active:bg-amber-200"
+              )}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface IceSliderProps {
+  value: string;
+  onChange: (value: string) => void;
+  options: Array<{ value: string; label: string }>;
+}
+
+function IceSlider({ value, onChange, options }: IceSliderProps) {
+  const locale = useLocale() as "nl" | "en";
+
+  // Map ice levels to visual representation
+  const iceMap: Record<string, number> = {
+    "NO_ICE": 0,
+    "LESS_ICE": 33,
+    "NORMAL_ICE": 66,
+    "EXTRA_ICE": 100,
+  };
+
+  const iceLevel = iceMap[value] ?? 66;
+  const cubeCount = Math.ceil((iceLevel / 100) * 4);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {/* Ice cubes visualization */}
+          <div className="flex gap-0.5">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "w-3 h-3 rounded-sm transition-all duration-200",
+                  i < cubeCount
+                    ? "bg-sky-400 shadow-sm"
+                    : "bg-sky-100 border border-sky-200"
+                )}
+              />
+            ))}
+          </div>
+        </div>
+        <span className="text-sm text-gray-500">
+          {options.find(o => o.value === value)?.label || value}
+        </span>
+      </div>
+
+      {/* Visual ice level indicator */}
+      <div className="relative h-8 rounded-full bg-gradient-to-r from-sky-50 via-sky-100 to-sky-200 overflow-hidden border border-sky-200">
+        <div
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-sky-300 via-sky-400 to-sky-500 transition-all duration-200 ease-out"
+          style={{ width: `${iceLevel}%` }}
+        />
+        {/* Ice crystal effect */}
+        <div className="absolute inset-0 flex items-center px-3 pointer-events-none">
+          <div className="flex-1 flex justify-around">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "w-2 h-4 rounded-sm transition-all duration-200 rotate-12",
+                  i < cubeCount
+                    ? "bg-white/60"
+                    : "bg-sky-200/30"
+                )}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Tap targets */}
+      <div className="flex gap-1.5">
+        {options.map((option) => {
+          const isSelected = value === option.value;
+          return (
+            <button
+              key={option.value}
+              onClick={() => {
+                triggerHaptic("light");
+                onChange(option.value);
+              }}
+              className={cn(
+                "flex-1 py-2.5 rounded-xl text-sm font-medium transition-all min-h-[44px]",
+                isSelected
+                  ? "bg-sky-500 text-white shadow-md shadow-sky-500/25"
+                  : "bg-sky-50 text-sky-700 hover:bg-sky-100 active:bg-sky-200"
+              )}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 // Format slug to display name (taro-milk-tea → Taro Milk Tea)
 function formatSlug(slug: string): string {
@@ -83,6 +280,11 @@ interface ProductCustomizationProps {
   toppings: ToppingData[];
   variant: "modal" | "page";
   onClose?: () => void;
+  // For editing existing cart items
+  initialCustomizations?: CartItemCustomization;
+  initialQuantity?: number;
+  editMode?: boolean;
+  cartItemId?: string;
 }
 
 // =============================================================================
@@ -95,15 +297,20 @@ export function ProductCustomization({
   toppings,
   variant,
   onClose,
+  initialCustomizations,
+  initialQuantity,
+  editMode = false,
+  cartItemId,
 }: ProductCustomizationProps) {
   const t = useTranslations("product");
   const tMenu = useTranslations("menu");
   const locale = useLocale() as "nl" | "en";
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
+  const removeItem = useCartStore((state) => state.removeItem);
 
-  // Local state
-  const [quantity, setQuantity] = useState(1);
+  // Local state - initialize from props if editing
+  const [quantity, setQuantity] = useState(initialQuantity ?? 1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
@@ -122,19 +329,54 @@ export function ProductCustomization({
     return product.allowToppings ? toppings : [];
   }, [toppings, product.allowToppings]);
 
-  // Initialize defaults from customization groups
+  // Initialize defaults from customization groups or initial customizations (edit mode)
   useEffect(() => {
     const defaults: Record<string, string> = {};
+
+    // If editing, use initial customizations
+    if (initialCustomizations) {
+      if (initialCustomizations.sugarLevel !== undefined) {
+        defaults["SUGAR_LEVEL"] = String(initialCustomizations.sugarLevel);
+      }
+      if (initialCustomizations.iceLevel) {
+        defaults["ICE_LEVEL"] = initialCustomizations.iceLevel;
+      }
+      if (initialCustomizations.size) {
+        defaults["SIZE"] = initialCustomizations.size;
+      }
+      if (initialCustomizations.milkType) {
+        defaults["MILK_TYPE"] = initialCustomizations.milkType;
+      }
+    }
+
+    // Fill in remaining defaults from customization groups
     filteredCustomizationGroups.forEach((group) => {
-      const defaultValue = group.values.find((v) => v.isDefault);
-      if (defaultValue) {
-        defaults[group.type] = defaultValue.value;
-      } else if (group.values.length > 0) {
-        defaults[group.type] = group.values[0].value;
+      if (!defaults[group.type]) {
+        const defaultValue = group.values.find((v) => v.isDefault);
+        if (defaultValue) {
+          defaults[group.type] = defaultValue.value;
+        } else if (group.values.length > 0) {
+          defaults[group.type] = group.values[0].value;
+        }
       }
     });
+
     setSelectedOptions(defaults);
-  }, [filteredCustomizationGroups]);
+
+    // Initialize toppings from initial customizations
+    if (initialCustomizations?.toppings && initialCustomizations.toppings.length > 0) {
+      // Map topping names back to IDs
+      const toppingIds = initialCustomizations.toppings
+        .map((name) => {
+          const topping = toppings.find(
+            (t) => t.translations[0]?.name === name || t.slug === name
+          );
+          return topping?.id;
+        })
+        .filter(Boolean) as string[];
+      setSelectedToppings(toppingIds);
+    }
+  }, [filteredCustomizationGroups, initialCustomizations, toppings]);
 
   // Calculate total price
   const totalPrice = useMemo(() => {
@@ -158,11 +400,19 @@ export function ProductCustomization({
     return price * quantity;
   }, [product.price, filteredCustomizationGroups, selectedOptions, filteredToppings, selectedToppings, quantity]);
 
-  // Handle add to cart
+  // Handle add to cart (or update in edit mode)
   const handleAddToCart = () => {
+    // Haptic feedback on add/update
+    triggerHaptic("medium");
+
     const toppingNames = selectedToppings
       .map((id) => filteredToppings.find((t) => t.id === id)?.translations[0]?.name || "")
       .filter(Boolean);
+
+    // In edit mode, remove the old item first
+    if (editMode && cartItemId) {
+      removeItem(cartItemId);
+    }
 
     addItem({
       productId: product.id,
@@ -190,7 +440,7 @@ export function ProductCustomization({
       } else if (variant === "page") {
         router.back();
       }
-    }, 1000);
+    }, 800); // Slightly faster for better UX
   };
 
   // Handle back navigation
@@ -253,48 +503,96 @@ export function ProductCustomization({
             </span>
           </div>
 
-          {/* Customization Options - Larger touch targets */}
+          {/* Customization Options - Visual sliders for sugar/ice */}
           {filteredCustomizationGroups.length > 0 && (
-            <div className="space-y-4">
-              {filteredCustomizationGroups.map((group) => (
-                <div key={group.id}>
-                  <label className="mb-2 block text-sm font-semibold text-gray-700">
-                    {getGroupLabel(group.type)}
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {group.values.map((option) => {
-                      const label = option.translations[0]?.label || option.value;
-                      const isSelected = selectedOptions[group.type] === option.value;
-                      const hasModifier = Number(option.priceModifier) > 0;
+            <div className="space-y-5">
+              {filteredCustomizationGroups.map((group) => {
+                // Use visual slider for sugar level
+                if (group.type === "SUGAR_LEVEL") {
+                  const options = group.values.map((v) => ({
+                    value: v.value,
+                    label: v.translations[0]?.label || v.value,
+                  }));
+                  return (
+                    <div key={group.id}>
+                      <label className="mb-3 block text-sm font-semibold text-gray-700">
+                        {getGroupLabel(group.type)}
+                      </label>
+                      <SugarSlider
+                        value={parseInt(selectedOptions["SUGAR_LEVEL"] || "100")}
+                        onChange={(val) =>
+                          setSelectedOptions({ ...selectedOptions, SUGAR_LEVEL: String(val) })
+                        }
+                        options={options}
+                      />
+                    </div>
+                  );
+                }
 
-                      return (
-                        <button
-                          key={option.id}
-                          onClick={() =>
-                            setSelectedOptions({
-                              ...selectedOptions,
-                              [group.type]: option.value,
-                            })
-                          }
-                          className={cn(
-                            "rounded-full px-4 py-2 text-sm font-medium transition-all border min-h-[40px]",
-                            isSelected
-                              ? "bg-tea-600 text-white border-tea-600 shadow-sm"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-tea-300 hover:bg-tea-50 active:bg-tea-100"
-                          )}
-                        >
-                          {label}
-                          {hasModifier && (
-                            <span className={cn("ml-1", isSelected ? "text-white/70" : "text-gray-400")}>
-                              +€{Number(option.priceModifier).toFixed(2)}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                // Use visual slider for ice level
+                if (group.type === "ICE_LEVEL") {
+                  const options = group.values.map((v) => ({
+                    value: v.value,
+                    label: v.translations[0]?.label || v.value,
+                  }));
+                  return (
+                    <div key={group.id}>
+                      <label className="mb-3 block text-sm font-semibold text-gray-700">
+                        {getGroupLabel(group.type)}
+                      </label>
+                      <IceSlider
+                        value={selectedOptions["ICE_LEVEL"] || "NORMAL_ICE"}
+                        onChange={(val) =>
+                          setSelectedOptions({ ...selectedOptions, ICE_LEVEL: val })
+                        }
+                        options={options}
+                      />
+                    </div>
+                  );
+                }
+
+                // Default button style for other customization types
+                return (
+                  <div key={group.id}>
+                    <label className="mb-2 block text-sm font-semibold text-gray-700">
+                      {getGroupLabel(group.type)}
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {group.values.map((option) => {
+                        const label = option.translations[0]?.label || option.value;
+                        const isSelected = selectedOptions[group.type] === option.value;
+                        const hasModifier = Number(option.priceModifier) > 0;
+
+                        return (
+                          <button
+                            key={option.id}
+                            onClick={() => {
+                              triggerHaptic("light");
+                              setSelectedOptions({
+                                ...selectedOptions,
+                                [group.type]: option.value,
+                              });
+                            }}
+                            className={cn(
+                              "rounded-full px-4 py-2 text-sm font-medium transition-all border min-h-[40px]",
+                              isSelected
+                                ? "bg-tea-600 text-white border-tea-600 shadow-sm"
+                                : "bg-white text-gray-700 border-gray-200 hover:border-tea-300 hover:bg-tea-50 active:bg-tea-100"
+                            )}
+                          >
+                            {label}
+                            {hasModifier && (
+                              <span className={cn("ml-1", isSelected ? "text-white/70" : "text-gray-400")}>
+                                +€{Number(option.priceModifier).toFixed(2)}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -362,7 +660,7 @@ export function ProductCustomization({
               </button>
             </div>
 
-            {/* Add to Cart Button - More prominent */}
+            {/* Add to Cart / Update Button - More prominent */}
             <button
               onClick={handleAddToCart}
               disabled={isAddedToCart}
@@ -376,11 +674,19 @@ export function ProductCustomization({
               {isAddedToCart ? (
                 <>
                   <Check className="h-5 w-5" />
-                  <span>{locale === "nl" ? "Toegevoegd!" : "Added!"}</span>
+                  <span>
+                    {editMode
+                      ? (locale === "nl" ? "Bijgewerkt!" : "Updated!")
+                      : (locale === "nl" ? "Toegevoegd!" : "Added!")}
+                  </span>
                 </>
               ) : (
                 <>
-                  <span>{locale === "nl" ? "Toevoegen" : "Add to cart"}</span>
+                  <span>
+                    {editMode
+                      ? (locale === "nl" ? "Bijwerken" : "Update")
+                      : (locale === "nl" ? "Toevoegen" : "Add to cart")}
+                  </span>
                   <span className="mx-1.5 h-5 w-px bg-white/30" />
                   <span className="tabular-nums font-bold">€{totalPrice.toFixed(2)}</span>
                 </>

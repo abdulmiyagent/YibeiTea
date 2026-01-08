@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { useCartStore } from "@/stores/cart-store";
+import { useCartStore, CartItem } from "@/stores/cart-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,8 +13,11 @@ import {
   Trash2,
   ShoppingBag,
   ArrowRight,
+  Pencil,
 } from "lucide-react";
 import { formatPrice, cn } from "@/lib/utils";
+import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
+import { api } from "@/lib/trpc";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -25,6 +28,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const t = useTranslations("cart");
   const locale = useLocale() as "nl" | "en";
   const [mounted, setMounted] = useState(false);
+  const [editingItem, setEditingItem] = useState<CartItem | null>(null);
 
   const items = useCartStore((state) => state.items);
   const removeItem = useCartStore((state) => state.removeItem);
@@ -34,6 +38,12 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   );
   const itemCount = useCartStore((state) =>
     state.items.reduce((total, item) => total + item.quantity, 0)
+  );
+
+  // Fetch product data when editing (only when editingItem is set)
+  const { data: editingProduct } = api.products.getById.useQuery(
+    { id: editingItem?.productId ?? "", locale },
+    { enabled: !!editingItem }
   );
 
   // Hydration fix: wait for client-side mount before showing cart items
@@ -149,13 +159,22 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                             <h3 className="font-medium text-gray-900 leading-tight line-clamp-2">
                               {item.name}
                             </h3>
-                            <button
-                              onClick={() => removeItem(item.id)}
-                              className="flex-shrink-0 p-1 text-gray-400 transition-colors hover:text-red-500"
-                              aria-label={locale === "nl" ? "Verwijderen" : "Remove"}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              <button
+                                onClick={() => setEditingItem(item)}
+                                className="p-1.5 text-gray-400 transition-colors hover:text-tea-600 hover:bg-tea-50 rounded-full"
+                                aria-label={locale === "nl" ? "Bewerken" : "Edit"}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                onClick={() => removeItem(item.id)}
+                                className="p-1.5 text-gray-400 transition-colors hover:text-red-500 hover:bg-red-50 rounded-full"
+                                aria-label={locale === "nl" ? "Verwijderen" : "Remove"}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
                           </div>
 
                           {/* Customizations - More readable */}
@@ -246,6 +265,34 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           )}
         </div>
       </div>
+
+      {/* Edit Item Dialog */}
+      {editingItem && editingProduct && (
+        <ProductCustomizeDialog
+          product={{
+            id: editingProduct.id,
+            slug: editingProduct.slug,
+            price: Number(editingProduct.price),
+            imageUrl: editingProduct.imageUrl,
+            vegan: editingProduct.vegan,
+            caffeine: editingProduct.caffeine,
+            calories: editingProduct.calories,
+            allowSugarCustomization: editingProduct.allowSugarCustomization,
+            allowIceCustomization: editingProduct.allowIceCustomization,
+            allowToppings: editingProduct.allowToppings,
+            translations: editingProduct.translations,
+            category: editingProduct.category,
+          }}
+          open={!!editingItem}
+          onOpenChange={(open) => {
+            if (!open) setEditingItem(null);
+          }}
+          initialCustomizations={editingItem.customizations}
+          initialQuantity={editingItem.quantity}
+          editMode={true}
+          cartItemId={editingItem.id}
+        />
+      )}
     </>
   );
 }

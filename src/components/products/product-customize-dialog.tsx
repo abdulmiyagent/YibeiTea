@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { ProductCustomization, ProductData, CustomizationGroup, ToppingData } from "./product-customization";
 import { api } from "@/lib/trpc";
+import { CartItemCustomization } from "@/stores/cart-store";
 
 interface ProductCustomizeDialogProps {
   product: {
@@ -32,12 +33,21 @@ interface ProductCustomizeDialogProps {
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  // Edit mode props
+  initialCustomizations?: CartItemCustomization;
+  initialQuantity?: number;
+  editMode?: boolean;
+  cartItemId?: string;
 }
 
 export function ProductCustomizeDialog({
   product,
   open,
   onOpenChange,
+  initialCustomizations,
+  initialQuantity,
+  editMode = false,
+  cartItemId,
 }: ProductCustomizeDialogProps) {
   const locale = useLocale() as "nl" | "en";
 
@@ -130,6 +140,10 @@ export function ProductCustomizeDialog({
             toppings={convertedToppings}
             variant="modal"
             onClose={() => onOpenChange(false)}
+            initialCustomizations={initialCustomizations}
+            initialQuantity={initialQuantity}
+            editMode={editMode}
+            cartItemId={cartItemId}
           />
         ) : null}
       </DialogContent>
