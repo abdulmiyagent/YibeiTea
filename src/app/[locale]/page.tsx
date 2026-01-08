@@ -5,7 +5,7 @@ import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, memo } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "@/lib/trpc";
 import {
@@ -32,6 +32,7 @@ import { useState } from "react";
 import { useCartStore } from "@/stores/cart-store";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 // Gradient mappings for categories
 const categoryGradients: Record<string, string> = {
@@ -104,14 +105,14 @@ const scaleIn = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const } },
 };
 
-// Categories Carousel Component with pagination
+// Categories Carousel Component with pagination (memoized for performance)
 interface Category {
   id: string;
   slug: string;
   translations: Array<{ name: string; description?: string | null }>;
 }
 
-function CategoriesCarousel({
+const CategoriesCarousel = memo(function CategoriesCarousel({
   categories,
   categoryIcons,
 }: {
@@ -221,7 +222,7 @@ function CategoriesCarousel({
       )}
     </motion.div>
   );
-}
+});
 
 export default function HomePage() {
   const t = useTranslations("home");
@@ -263,7 +264,7 @@ export default function HomePage() {
   const addItem = useCartStore((state) => state.addItem);
   const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
 
-  const handleQuickAdd = (e: React.MouseEvent, product: NonNullable<typeof featuredProducts>[number]) => {
+  const handleQuickAdd = useCallback((e: React.MouseEvent, product: NonNullable<typeof featuredProducts>[number]) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -289,7 +290,7 @@ export default function HomePage() {
         return next;
       });
     }, 2000);
-  };
+  }, [addItem]);
 
   return (
     <>
@@ -324,24 +325,24 @@ export default function HomePage() {
               {/* Badge */}
               <motion.div variants={fadeInUp}>
                 <span className="inline-flex items-center gap-3 rounded-full border border-tea-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-tea-700 shadow-soft backdrop-blur-sm">
-                  {/* Animated Boba Pearls - Logo colors */}
+                  {/* Animated Boba Pearls - Logo colors (optimized with will-change) */}
                   <span className="relative flex h-5 w-8 items-center justify-center">
                     <motion.span
-                      animate={{ y: [-2, 2, -2], scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute left-0 h-2.5 w-2.5 rounded-full shadow-sm"
+                      animate={{ y: [-2, 2, -2] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute left-0 h-2.5 w-2.5 rounded-full shadow-sm will-change-transform"
                       style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
                     />
                     <motion.span
-                      animate={{ y: [2, -2, 2], scale: [1.1, 1, 1.1] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-                      className="absolute left-2.5 top-0 h-2 w-2 rounded-full shadow-sm"
+                      animate={{ y: [2, -2, 2] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                      className="absolute left-2.5 top-0 h-2 w-2 rounded-full shadow-sm will-change-transform"
                       style={{ background: "linear-gradient(135deg, #FF9900 0%, #E68A00 100%)" }}
                     />
                     <motion.span
-                      animate={{ y: [-1, 3, -1], scale: [1, 1.15, 1] }}
-                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-                      className="absolute right-0 h-2.5 w-2.5 rounded-full shadow-sm"
+                      animate={{ y: [-1, 3, -1] }}
+                      transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                      className="absolute right-0 h-2.5 w-2.5 rounded-full shadow-sm will-change-transform"
                       style={{ background: "linear-gradient(135deg, #8B2635 0%, #6B1D2A 100%)" }}
                     />
                   </span>
@@ -417,12 +418,15 @@ export default function HomePage() {
                 <motion.div
                   animate={{ y: [-5, 5, -5] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative"
+                  className="relative will-change-transform"
                 >
-                  <img
+                  <Image
                     src="/images/hero-drinks.jpg"
                     alt="Yibei Tea bubble tea collection"
+                    width={600}
+                    height={400}
                     className="relative z-10 w-full rounded-2xl shadow-2xl"
+                    priority
                   />
                 </motion.div>
 
@@ -582,185 +586,6 @@ export default function HomePage() {
           </div>
         </section>
       )}
-
-      {/* Our Story Section */}
-      <section className="section-padding relative overflow-hidden bg-gradient-to-b from-cream-50 to-white">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-50 pattern-dots" />
-
-        <div className="container-custom relative">
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-            {/* Image side */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-            >
-              <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-gradient-to-br from-tea-100 via-cream-100 to-matcha-100 shadow-soft-lg">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.div
-                    animate={{ scale: [1, 1.02, 1] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="text-[180px]"
-                  >
-                    🍃
-                  </motion.div>
-                </div>
-              </div>
-
-              {/* Floating stats card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5 }}
-                className="absolute -bottom-6 -right-6 rounded-2xl bg-white p-6 shadow-soft-lg lg:p-8"
-              >
-                <div className="grid grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="font-serif text-2xl font-medium text-tea-600 lg:text-3xl">
-                      {t("story.highlight1.value")}
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground lg:text-sm">
-                      {t("story.highlight1.label")}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-serif text-2xl font-medium text-matcha-600 lg:text-3xl">
-                      {t("story.highlight2.value")}
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground lg:text-sm">
-                      {t("story.highlight2.label")}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-serif text-2xl font-medium text-taro-600 lg:text-3xl">
-                      {t("story.highlight3.value")}
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground lg:text-sm">
-                      {t("story.highlight3.label")}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Content side */}
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={staggerContainer}
-            >
-              <motion.span variants={fadeInUp} className="text-sm font-medium uppercase tracking-widest text-tea-600">
-                {t("story.label")}
-              </motion.span>
-              <motion.h2 variants={fadeInUp} className="heading-1 mt-4 text-tea-900">
-                {t("story.title")}
-              </motion.h2>
-              <motion.p variants={fadeInUp} className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                {t("story.description")}
-              </motion.p>
-
-              <motion.div variants={fadeInUp} className="mt-10">
-                <Link href="/about">
-                  <Button
-                    size="lg"
-                    className="group rounded-full bg-tea-600 px-8 font-medium shadow-glow transition-all hover:bg-tea-700"
-                  >
-                    {t("story.readMore")}
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="text-center"
-          >
-            <motion.h2 variants={fadeInUp} className="heading-2 text-tea-900">
-              {t("categories.title")}
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="mt-4 text-lg text-muted-foreground">
-              {t("categories.subtitle")}
-            </motion.p>
-          </motion.div>
-
-          {categoriesLoading ? (
-            <div className="mt-16 flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
-            </div>
-          ) : (
-            <CategoriesCarousel categories={categories ?? []} categoryIcons={categoryIcons} />
-          )}
-        </div>
-      </section>
-
-      {/* Why Us Section */}
-      <section className="section-padding bg-gradient-to-b from-cream-50 to-cream-100">
-        <div className="container-custom">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="text-center"
-          >
-            <motion.h2 variants={fadeInUp} className="heading-2 text-tea-900">
-              {t("whyUs.title")}
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="mt-4 text-lg text-muted-foreground">
-              {t("whyUs.subtitle")}
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            {[
-              { icon: Leaf, key: "quality", color: "matcha" },
-              { icon: Clock, key: "fresh", color: "tea" },
-              { icon: Sparkles, key: "customize", color: "taro" },
-              { icon: Gift, key: "loyalty", color: "tea" },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={item.key}
-                  variants={scaleIn}
-                  className="group rounded-3xl bg-white p-8 shadow-soft transition-all duration-300 hover:shadow-soft-lg"
-                >
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-${item.color}-100 transition-transform duration-300 group-hover:scale-110`}>
-                    <Icon className={`h-7 w-7 text-${item.color}-600`} />
-                  </div>
-                  <h3 className="mt-6 font-serif text-xl font-medium text-tea-900">
-                    {t(`whyUs.${item.key}.title`)}
-                  </h3>
-                  <p className="mt-3 text-muted-foreground">
-                    {t(`whyUs.${item.key}.description`)}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        </div>
-      </section>
 
       {/* Loyalty CTA Section - Different content for logged in vs logged out */}
       <section className="section-padding relative overflow-hidden bg-gradient-to-br from-tea-600 via-tea-700 to-tea-800">
