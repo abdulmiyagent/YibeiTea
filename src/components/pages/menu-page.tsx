@@ -3,10 +3,8 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/trpc";
 import {
@@ -17,6 +15,19 @@ import {
   Loader2,
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
+
+interface Product {
+  id: string;
+  slug: string;
+  price: number | string | { toString(): string };
+  imageUrl: string | null;
+  translations: Array<{ name: string; description?: string | null }>;
+  category?: {
+    slug: string;
+    translations: Array<{ name: string }>;
+  } | null;
+}
 
 export function MenuPageContent() {
   const t = useTranslations("menu");
@@ -25,6 +36,7 @@ export function MenuPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showVeganOnly, setShowVeganOnly] = useState(false);
   const [showCaffeineFree, setShowCaffeineFree] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } = api.categories.getAll.useQuery({
@@ -141,12 +153,12 @@ export function MenuPageContent() {
               const categoryTranslation = product.category?.translations[0];
 
               return (
-                <Link
+                <div
                   key={product.id}
-                  href={`/${locale}/menu/${product.slug}`}
-                  className="block"
+                  className="block cursor-pointer"
+                  onClick={() => setSelectedProduct(product)}
                 >
-                  <Card className="product-card group overflow-hidden cursor-pointer transition-all hover:shadow-md hover:bg-tea-50/50">
+                  <Card className="product-card group overflow-hidden transition-all hover:shadow-md hover:bg-tea-50/50">
                     <div className="flex items-center gap-3 p-3">
                       {/* Compact thumbnail */}
                       <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-tea-50 to-taro-50">
@@ -189,12 +201,16 @@ export function MenuPageContent() {
                         size="icon"
                         variant="tea"
                         className="h-9 w-9 flex-shrink-0 rounded-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedProduct(product);
+                        }}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
                   </Card>
-                </Link>
+                </div>
               );
             })}
           </div>
@@ -208,6 +224,15 @@ export function MenuPageContent() {
                 : "No drinks found. Try different filters."}
             </p>
           </div>
+        )}
+
+        {/* Product Customize Dialog */}
+        {selectedProduct && (
+          <ProductCustomizeDialog
+            product={selectedProduct}
+            open={!!selectedProduct}
+            onOpenChange={(open) => !open && setSelectedProduct(null)}
+          />
         )}
       </div>
     </div>

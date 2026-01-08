@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLocale } from "next-intl";
-import { X, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -93,18 +93,10 @@ export function ProductCustomizeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm p-0 gap-0 overflow-hidden rounded-2xl">
+      <DialogContent className="max-w-sm p-0 gap-0 overflow-hidden rounded-2xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bottom-auto inset-x-auto">
         <DialogTitle className="sr-only">
           {product.translations[0]?.name || product.slug}
         </DialogTitle>
-
-        {/* Close button */}
-        <button
-          onClick={() => onOpenChange(false)}
-          className="absolute right-2 top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
