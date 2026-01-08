@@ -76,6 +76,16 @@ export function ProductCarousel({
     { enabled: status === "authenticated" && showFavoriteButton }
   );
 
+  // Pre-fetch shared data for popup (customizations and toppings) - makes popup instant
+  api.customizations.getAll.useQuery(
+    { locale },
+    { staleTime: 10 * 60 * 1000 } // 10 minutes - rarely changes
+  );
+  api.toppings.getAll.useQuery(
+    { locale, onlyAvailable: true },
+    { staleTime: 10 * 60 * 1000 } // 10 minutes - rarely changes
+  );
+
   const addFavorite = api.users.addFavorite.useMutation({
     onMutate: ({ productId }) => {
       setLoadingFavorites((prev) => new Set(prev).add(productId));
