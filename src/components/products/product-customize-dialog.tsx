@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { ProductCustomization, ProductData, CustomizationGroup, ToppingData } from "./product-customization";
 import { api } from "@/lib/trpc";
@@ -97,6 +98,9 @@ export function ProductCustomizeDialog({
         <DialogTitle className="sr-only">
           {product.translations[0]?.name || product.slug}
         </DialogTitle>
+        <DialogDescription className="sr-only">
+          Pas je drankje aan met suiker, ijs en toppings
+        </DialogDescription>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
