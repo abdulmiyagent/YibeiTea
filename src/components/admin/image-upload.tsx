@@ -4,7 +4,6 @@ import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Upload, X, Image as ImageIcon, Loader2, Sparkles } from "lucide-react";
 import Image from "next/image";
@@ -31,7 +30,6 @@ export function ImageUpload({
   const [error, setError] = useState<string | null>(null);
   const [removeBackground, setRemoveBackground] = useState(true);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isProductUpload = folder === "products";
@@ -41,47 +39,19 @@ export function ImageUpload({
     async (file: File) => {
       setError(null);
       setIsUploading(true);
-      setProgress(0);
+      setUploadStatus(
+        canRemoveBackground && removeBackground
+          ? "Achtergrond verwijderen..."
+          : "Uploading..."
+      );
 
       try {
-        let fileToUpload = file;
-
-        // Process background removal client-side if enabled
-        if (canRemoveBackground && removeBackground) {
-          setUploadStatus("AI model laden...");
-          setProgress(10);
-
-          // Dynamic import to reduce initial bundle size
-          const { removeBackground: removeBg } = await import(
-            "@imgly/background-removal"
-          );
-
-          setUploadStatus("Achtergrond verwijderen...");
-
-          const processedBlob = await removeBg(file, {
-            model: "medium",
-            progress: (key, current, total) => {
-              if (total > 0) {
-                const pct = Math.round((current / total) * 70) + 20; // 20-90%
-                setProgress(Math.min(pct, 90));
-              }
-            },
-          });
-
-          // Convert blob to file
-          fileToUpload = new File(
-            [processedBlob],
-            file.name.replace(/\.[^.]+$/, ".png"),
-            { type: "image/png" }
-          );
-          setProgress(90);
-        }
-
-        setUploadStatus("Uploaden...");
-
         const formData = new FormData();
-        formData.append("file", fileToUpload);
+        formData.append("file", file);
         formData.append("folder", folder);
+        if (canRemoveBackground && removeBackground) {
+          formData.append("removeBackground", "true");
+        }
 
         const response = await fetch("/api/upload", {
           method: "POST",
@@ -94,15 +64,17 @@ export function ImageUpload({
           throw new Error(data.error || "Upload failed");
         }
 
-        setProgress(100);
         onChange(data.imageUrl);
+
+        // Show warning if background removal was requested but not performed
+        if (data.warning) {
+          setError(data.warning);
+        }
       } catch (err) {
-        console.error("Upload error:", err);
         setError(err instanceof Error ? err.message : "Upload failed");
       } finally {
         setIsUploading(false);
         setUploadStatus(null);
-        setProgress(0);
       }
     },
     [folder, onChange, removeBackground, canRemoveBackground]
@@ -159,7 +131,7 @@ export function ImageUpload({
                 Achtergrond verwijderen
               </Label>
               <p className="text-xs text-muted-foreground">
-                AI-powered, gratis
+                AI-powered via Cloudinary
               </p>
             </div>
             <Switch
@@ -215,15 +187,12 @@ export function ImageUpload({
           onClick={() => !disabled && !isUploading && inputRef.current?.click()}
         >
           {isUploading ? (
-            <div className="flex flex-col items-center gap-2 px-4">
+            <>
               <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
-              <p className="text-center text-xs text-muted-foreground">
+              <p className="mt-2 text-center text-xs text-muted-foreground">
                 {uploadStatus}
               </p>
-              {progress > 0 && (
-                <Progress value={progress} className="h-1.5 w-full" />
-              )}
-            </div>
+            </>
           ) : (
             <>
               <ImageIcon className="h-8 w-8 text-muted-foreground" />
