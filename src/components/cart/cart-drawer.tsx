@@ -79,8 +79,8 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           shadow-[-8px_0_32px_rgba(0,0,0,0.1)]
           animate-in slide-in-from-right duration-300"
       >
-        {/* Header */}
-        <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-100 px-4 py-3">
+        {/* Header - with safe area for notches/Dynamic Island */}
+        <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-100 px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
           <div className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5 text-tea-600" />
             <h2 className="font-serif text-lg font-medium text-tea-900">
@@ -105,7 +105,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         {/* Content */}
         <div className="flex flex-1 flex-col min-h-0">
           {items.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-center">
               <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-cream-100">
                 <ShoppingBag className="h-10 w-10 text-cream-400" />
               </div>
