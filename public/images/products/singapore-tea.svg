@@ -1,36 +1,90 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
   <defs>
-    <linearGradient id="singapore" x1="0%" y1="0%" x2="0%" y2="100%">
+    <linearGradient id="cupBodySing" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
+    </linearGradient>
+    <linearGradient id="singTeaBase" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" style="stop-color:#C9A66B"/>
-      <stop offset="100%" style="stop-color:#8B7355"/>
+      <stop offset="50%" style="stop-color:#A68B50"/>
+      <stop offset="100%" style="stop-color:#8B7040"/>
     </linearGradient>
-    <linearGradient id="milkLayer" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFFEF5"/>
-      <stop offset="100%" style="stop-color:#E8D4B8"/>
+    <linearGradient id="singMilkLayer" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFEF8"/>
+      <stop offset="100%" style="stop-color:#F5EBD8"/>
     </linearGradient>
+    <linearGradient id="singLid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A68B50"/>
+      <stop offset="100%" style="stop-color:#7A6535"/>
+    </linearGradient>
+    <linearGradient id="strawGradientSing" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a2a"/>
+      <stop offset="50%" style="stop-color:#404040"/>
+      <stop offset="100%" style="stop-color:#2a2a2a"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowSing" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowSing" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <!-- Cup -->
-  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
-  <!-- Drink base -->
-  <path d="M48 140 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 140 Z" fill="url(#singapore)"/>
-  <!-- Milk layer top -->
-  <path d="M48 80 L48 145 L152 145 L152 80 Z" fill="url(#milkLayer)"/>
-  <!-- Layer blend line -->
-  <ellipse cx="100" cy="142" rx="52" ry="8" fill="#D4B896" opacity="0.6"/>
-  <!-- Foam top -->
-  <ellipse cx="100" cy="75" rx="55" ry="15" fill="#FFFEF5"/>
-  <ellipse cx="100" cy="72" rx="50" ry="12" fill="#FFFFFF"/>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowSing)">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodySing)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Tea base layer (bottom) -->
+    <path d="M50 160 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L150 160 Z" fill="url(#singTeaBase)"/>
+
+    <!-- Milk layer (top) -->
+    <path d="M52 85 L50 165 Q100 180 150 165 L148 85 Z" fill="url(#singMilkLayer)"/>
+
+    <!-- Layer blend line - signature pulled tea gradient -->
+    <ellipse cx="100" cy="162" rx="50" ry="12" fill="#B89860" opacity="0.7"/>
+    <ellipse cx="100" cy="165" rx="48" ry="10" fill="#A08545" opacity="0.5"/>
+    <ellipse cx="100" cy="168" rx="46" ry="8" fill="#8B7040" opacity="0.3"/>
+  </g>
+
+  <!-- Cream foam top -->
+  <ellipse cx="100" cy="82" rx="50" ry="14" fill="#FFFEF5"/>
+  <ellipse cx="100" cy="79" rx="45" ry="11" fill="#FFFFFF"/>
+  <ellipse cx="85" cy="76" rx="18" ry="6" fill="#ffffff" opacity="0.95"/>
+  <ellipse cx="115" cy="78" rx="12" ry="4" fill="#ffffff" opacity="0.8"/>
+
   <!-- Tapioca pearls -->
-  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
-  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
-  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
-  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
-  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <g>
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowSing)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowSing)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowSing)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowSing)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowSing)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowSing)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowSing)"/>
+  </g>
+
   <!-- Lid -->
-  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#8B7355"/>
-  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#A08060"/>
+  <ellipse cx="100" cy="67" rx="54" ry="12" fill="url(#singLid)"/>
+  <ellipse cx="100" cy="64" rx="50" ry="10" fill="#8B7540"/>
+  <ellipse cx="90" cy="62" rx="20" ry="5" fill="#A08B50" opacity="0.6"/>
+
   <!-- Straw hole -->
-  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#5D4E37"/>
+  <ellipse cx="100" cy="64" rx="9" ry="4" fill="#5A4525"/>
+
   <!-- Straw -->
-  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+  <rect x="95" y="15" width="10" height="55" rx="3" fill="url(#strawGradientSing)"/>
+  <rect x="96" y="15" width="3" height="55" fill="#555" opacity="0.3"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="145" cy="125" rx="3" ry="4" fill="#fff" opacity="0.5"/>
+  <ellipse cx="148" cy="165" rx="2" ry="3" fill="#fff" opacity="0.4"/>
+  <ellipse cx="55" cy="145" rx="2.5" ry="3.5" fill="#fff" opacity="0.45"/>
 </svg>

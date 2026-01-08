@@ -1,36 +1,92 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
   <defs>
-    <linearGradient id="matcha" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#8FBC8F"/>
-      <stop offset="100%" style="stop-color:#556B2F"/>
+    <linearGradient id="cupBodyM" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
     </linearGradient>
-    <linearGradient id="matchaDrizzle" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#8B4513"/>
-      <stop offset="100%" style="stop-color:#5D3A1A"/>
+    <linearGradient id="matchaDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A8D5BA"/>
+      <stop offset="50%" style="stop-color:#7CB68A"/>
+      <stop offset="100%" style="stop-color:#5A9A68"/>
     </linearGradient>
+    <linearGradient id="matchaSwirl" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A7C59"/>
+      <stop offset="100%" style="stop-color:#2D5A3D"/>
+    </linearGradient>
+    <linearGradient id="matchaLid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#7CB68A"/>
+      <stop offset="100%" style="stop-color:#5A9A68"/>
+    </linearGradient>
+    <linearGradient id="strawGradientM" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a2a"/>
+      <stop offset="50%" style="stop-color:#404040"/>
+      <stop offset="100%" style="stop-color:#2a2a2a"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowM" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowM" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <!-- Cup -->
-  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
-  <!-- Drink -->
-  <path d="M48 80 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 80 Z" fill="url(#matcha)"/>
-  <!-- Brown sugar drizzle -->
-  <path d="M60 80 Q70 120 65 160 Q60 200 70 235" stroke="url(#matchaDrizzle)" stroke-width="8" fill="none" stroke-linecap="round"/>
-  <path d="M100 80 Q95 130 100 180 Q105 220 95 240" stroke="url(#matchaDrizzle)" stroke-width="6" fill="none" stroke-linecap="round"/>
-  <path d="M135 80 Q145 110 140 150 Q130 200 140 235" stroke="url(#matchaDrizzle)" stroke-width="7" fill="none" stroke-linecap="round"/>
-  <!-- Foam top -->
-  <ellipse cx="100" cy="75" rx="55" ry="15" fill="#FFF8DC"/>
-  <ellipse cx="100" cy="72" rx="50" ry="12" fill="#FFFEF5"/>
-  <!-- Tapioca pearls -->
-  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
-  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
-  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
-  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
-  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowM)">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodyM)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Drink -->
+    <path d="M52 85 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L148 85 Z" fill="url(#matchaDrink)"/>
+
+    <!-- Matcha swirls - elegant pattern -->
+    <path d="M65 90 Q60 130 70 170 Q80 210 65 240" stroke="url(#matchaSwirl)" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <path d="M100 85 Q110 120 95 160 Q80 200 100 240" stroke="url(#matchaSwirl)" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path d="M135 90 Q140 125 130 165 Q120 205 135 235" stroke="url(#matchaSwirl)" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.65"/>
+  </g>
+
+  <!-- Cream foam top - rich and fluffy -->
+  <ellipse cx="100" cy="82" rx="50" ry="14" fill="#FFF8DC"/>
+  <ellipse cx="100" cy="79" rx="45" ry="11" fill="#FFFEF5"/>
+  <ellipse cx="85" cy="76" rx="18" ry="6" fill="#ffffff" opacity="0.8"/>
+  <ellipse cx="115" cy="78" rx="12" ry="4" fill="#ffffff" opacity="0.6"/>
+
+  <!-- Tapioca pearls - glossy look -->
+  <g>
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowM)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowM)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowM)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowM)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowM)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowM)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowM)"/>
+  </g>
+
   <!-- Lid -->
-  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#556B2F"/>
-  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#6B8E23"/>
+  <ellipse cx="100" cy="67" rx="54" ry="12" fill="url(#matchaLid)"/>
+  <ellipse cx="100" cy="64" rx="50" ry="10" fill="#8BC99B"/>
+  <ellipse cx="90" cy="62" rx="20" ry="5" fill="#A8D8B8" opacity="0.6"/>
+
   <!-- Straw hole -->
-  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#3D4F1E"/>
+  <ellipse cx="100" cy="64" rx="9" ry="4" fill="#3D6B4A"/>
+
   <!-- Straw -->
-  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+  <rect x="95" y="15" width="10" height="55" rx="3" fill="url(#strawGradientM)"/>
+  <rect x="96" y="15" width="3" height="55" fill="#555" opacity="0.3"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="145" cy="125" rx="3" ry="4" fill="#fff" opacity="0.5"/>
+  <ellipse cx="148" cy="165" rx="2" ry="3" fill="#fff" opacity="0.4"/>
+  <ellipse cx="55" cy="145" rx="2.5" ry="3.5" fill="#fff" opacity="0.45"/>
+
+  <!-- Matcha powder dust effect on top -->
+  <circle cx="75" cy="73" r="1.5" fill="#5A9A68" opacity="0.4"/>
+  <circle cx="110" cy="75" r="1" fill="#5A9A68" opacity="0.3"/>
+  <circle cx="125" cy="72" r="1.2" fill="#5A9A68" opacity="0.35"/>
 </svg>

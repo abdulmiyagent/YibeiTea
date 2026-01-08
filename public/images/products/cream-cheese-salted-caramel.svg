@@ -1,43 +1,108 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
   <defs>
-    <linearGradient id="saltedCaramelBase" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#D2691E"/>
-      <stop offset="100%" style="stop-color:#8B4513"/>
+    <linearGradient id="cupBodyCCSalt" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
     </linearGradient>
-    <linearGradient id="creamCheeseLayer" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFFEF5"/>
-      <stop offset="50%" style="stop-color:#FFF8DC"/>
-      <stop offset="100%" style="stop-color:#F5E6D3"/>
+    <linearGradient id="saltedCaramelCCDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4A060"/>
+      <stop offset="50%" style="stop-color:#B88040"/>
+      <stop offset="100%" style="stop-color:#8B5A2B"/>
     </linearGradient>
+    <linearGradient id="creamCheeseSalt" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFEF8"/>
+      <stop offset="50%" style="stop-color:#FFF8E0"/>
+      <stop offset="100%" style="stop-color:#F5EBD8"/>
+    </linearGradient>
+    <linearGradient id="caramelDrizzleCC" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A06020"/>
+      <stop offset="100%" style="stop-color:#784010"/>
+    </linearGradient>
+    <linearGradient id="ccSaltLid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4A060"/>
+      <stop offset="100%" style="stop-color:#A06020"/>
+    </linearGradient>
+    <linearGradient id="strawGradientCCSalt" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a2a"/>
+      <stop offset="50%" style="stop-color:#404040"/>
+      <stop offset="100%" style="stop-color:#2a2a2a"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowCCSalt" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowCCSalt" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <!-- Cup -->
-  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
-  <!-- Drink -->
-  <path d="M48 120 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 120 Z" fill="url(#saltedCaramelBase)"/>
-  <!-- Cream cheese layer -->
-  <path d="M48 80 L48 125 Q100 135 152 125 L152 80 Z" fill="url(#creamCheeseLayer)"/>
-  <ellipse cx="100" cy="122" rx="52" ry="8" fill="#FFF8DC"/>
-  <!-- Caramel drizzle on cream -->
-  <path d="M70 90 Q75 100 70 110" stroke="#A0522D" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M100 85 Q95 95 100 105" stroke="#A0522D" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M130 88 Q125 98 130 108" stroke="#A0522D" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <!-- Foam top -->
-  <ellipse cx="100" cy="75" rx="55" ry="15" fill="#FFFEF5"/>
-  <ellipse cx="100" cy="72" rx="50" ry="12" fill="#FFFFFF"/>
-  <!-- Salt crystals -->
-  <circle cx="85" cy="70" r="1.5" fill="#FFFFFF"/>
-  <circle cx="110" cy="73" r="1" fill="#FFFFFF"/>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowCCSalt)">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodyCCSalt)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Salted caramel drink layer -->
+    <path d="M50 130 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L150 130 Z" fill="url(#saltedCaramelCCDrink)"/>
+
+    <!-- Cream cheese layer on top -->
+    <path d="M52 85 L50 135 Q100 150 150 135 L148 85 Z" fill="url(#creamCheeseSalt)"/>
+
+    <!-- Caramel drizzle in cream cheese -->
+    <path d="M65 95 Q72 110 65 125" stroke="url(#caramelDrizzleCC)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+    <path d="M100 90 Q93 108 100 125" stroke="url(#caramelDrizzleCC)" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.75"/>
+    <path d="M135 93 Q128 110 135 125" stroke="url(#caramelDrizzleCC)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Layer blend line -->
+    <ellipse cx="100" cy="132" rx="50" ry="10" fill="#C9A060" opacity="0.6"/>
+    <ellipse cx="100" cy="135" rx="48" ry="8" fill="#B88040" opacity="0.4"/>
+  </g>
+
+  <!-- Rich cream cheese foam top -->
+  <ellipse cx="100" cy="82" rx="50" ry="14" fill="#FFF8E0"/>
+  <ellipse cx="100" cy="79" rx="45" ry="11" fill="#FFFEF8"/>
+  <ellipse cx="85" cy="76" rx="18" ry="6" fill="#ffffff" opacity="0.95"/>
+
+  <!-- Caramel drizzle on foam -->
+  <path d="M65 79 Q78 72 92 82 Q106 92 120 77 Q134 62 140 78" stroke="#A06020" stroke-width="2.5" fill="none" opacity="0.85"/>
+
+  <!-- Salt crystals on foam -->
+  <circle cx="70" cy="76" r="1.2" fill="#FFFFFF" opacity="0.95"/>
+  <circle cx="82" cy="80" r="0.9" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="105" cy="75" r="1.1" fill="#FFFFFF" opacity="0.95"/>
+  <circle cx="120" cy="79" r="1" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="130" cy="76" r="0.9" fill="#FFFFFF" opacity="0.85"/>
+
   <!-- Tapioca pearls -->
-  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
-  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
-  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
-  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
-  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <g>
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowCCSalt)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowCCSalt)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowCCSalt)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowCCSalt)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowCCSalt)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowCCSalt)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowCCSalt)"/>
+  </g>
+
   <!-- Lid -->
-  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#8B5A2B"/>
-  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#A0693E"/>
+  <ellipse cx="100" cy="67" rx="54" ry="12" fill="url(#ccSaltLid)"/>
+  <ellipse cx="100" cy="64" rx="50" ry="10" fill="#B88035"/>
+  <ellipse cx="90" cy="62" rx="20" ry="5" fill="#D09845" opacity="0.6"/>
+
   <!-- Straw hole -->
-  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#5D3A1A"/>
+  <ellipse cx="100" cy="64" rx="9" ry="4" fill="#603010"/>
+
   <!-- Straw -->
-  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+  <rect x="95" y="15" width="10" height="55" rx="3" fill="url(#strawGradientCCSalt)"/>
+  <rect x="96" y="15" width="3" height="55" fill="#555" opacity="0.3"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="145" cy="125" rx="3" ry="4" fill="#fff" opacity="0.5"/>
+  <ellipse cx="148" cy="165" rx="2" ry="3" fill="#fff" opacity="0.4"/>
+  <ellipse cx="55" cy="145" rx="2.5" ry="3.5" fill="#fff" opacity="0.45"/>
 </svg>

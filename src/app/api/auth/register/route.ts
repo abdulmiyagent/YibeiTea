@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { checkRateLimit, getClientIp, rateLimiters } from "@/lib/rate-limit";
+import { sendVerificationEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -68,6 +69,10 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Generate verification token
+    const verificationToken = crypto.randomUUID();
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
     // Create user with Account for credentials
     const userId = crypto.randomUUID();
     const user = await db.user.create({
@@ -77,6 +82,7 @@ export async function POST(request: Request) {
         email,
         newsletterOptIn: newsletterOptIn ?? false,
         updatedAt: new Date(),
+        // emailVerified is null by default - user must verify
         accounts: {
           create: {
             id: crypto.randomUUID(),
@@ -89,8 +95,30 @@ export async function POST(request: Request) {
       },
     });
 
+    // Create verification token
+    await db.verificationToken.create({
+      data: {
+        identifier: email,
+        token: verificationToken,
+        expires: tokenExpiry,
+      },
+    });
+
+    // Send verification email
+    try {
+      await sendVerificationEmail({
+        email,
+        name,
+        token: verificationToken,
+      });
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      // Don't fail registration if email fails, but log it
+    }
+
     return NextResponse.json({
-      message: "Account succesvol aangemaakt",
+      message: "Account aangemaakt! Controleer je inbox om je e-mailadres te bevestigen.",
+      requiresVerification: true,
       user: { id: user.id, email: user.email, name: user.name },
     });
   } catch (error) {

@@ -1,33 +1,74 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
   <defs>
-    <linearGradient id="hotAmericano" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#4A3728"/>
+    <linearGradient id="cupBodyHotAmer" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
+    </linearGradient>
+    <linearGradient id="hotAmericanoDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A3020"/>
+      <stop offset="50%" style="stop-color:#2D1810"/>
       <stop offset="100%" style="stop-color:#1A0A05"/>
     </linearGradient>
+    <linearGradient id="hotAmericanoLid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5D4037"/>
+      <stop offset="100%" style="stop-color:#3E2723"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowHotAmer" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowHotAmer" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <!-- Steam -->
-  <path d="M70 25 Q65 15 70 5" stroke="#E8E8E8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
-  <path d="M100 20 Q95 10 100 0" stroke="#E8E8E8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
-  <path d="M130 25 Q125 15 130 5" stroke="#E8E8E8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
-  <!-- Cup -->
-  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
-  <!-- Drink -->
-  <path d="M48 70 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 70 Z" fill="url(#hotAmericano)"/>
+
+  <!-- Steam wisps -->
+  <path d="M70 30 Q62 18 70 5" stroke="#E8E8E8" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <path d="M100 25 Q92 12 100 -2" stroke="#E8E8E8" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.55"/>
+  <path d="M130 30 Q122 18 130 5" stroke="#E8E8E8" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <path d="M85 35 Q78 22 85 8" stroke="#E8E8E8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
+  <path d="M115 35 Q108 22 115 8" stroke="#E8E8E8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowHotAmer)">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodyHotAmer)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Drink -->
+    <path d="M52 85 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L148 85 Z" fill="url(#hotAmericanoDrink)"/>
+
+    <!-- Handle -->
+    <path d="M155 110 Q180 110 180 160 Q180 210 155 210" stroke="#e8e8e8" stroke-width="10" fill="none"/>
+    <path d="M155 110 Q175 110 175 160 Q175 210 155 210" stroke="url(#cupBodyHotAmer)" stroke-width="6" fill="none"/>
+  </g>
+
   <!-- Crema top -->
-  <ellipse cx="100" cy="68" rx="53" ry="12" fill="#C9A66B"/>
-  <ellipse cx="100" cy="65" rx="48" ry="10" fill="#D4B896"/>
-  <!-- Handle -->
-  <path d="M160 100 Q185 100 185 150 Q185 200 160 200" stroke="#E8DCC8" stroke-width="8" fill="none"/>
-  <path d="M160 100 Q180 100 180 150 Q180 200 160 200" stroke="#FFF5E6" stroke-width="4" fill="none"/>
+  <ellipse cx="100" cy="82" rx="50" ry="14" fill="#C9A66B"/>
+  <ellipse cx="100" cy="79" rx="45" ry="11" fill="#D4B896"/>
+  <ellipse cx="85" cy="76" rx="18" ry="6" fill="#E0C8A8" opacity="0.7"/>
+
   <!-- Tapioca pearls -->
-  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
-  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
-  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
-  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
-  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <g>
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowHotAmer)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowHotAmer)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowHotAmer)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowHotAmer)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowHotAmer)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowHotAmer)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowHotAmer)"/>
+  </g>
+
   <!-- Lid -->
-  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#3E2723"/>
-  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#4E342E"/>
+  <ellipse cx="100" cy="67" rx="54" ry="12" fill="url(#hotAmericanoLid)"/>
+  <ellipse cx="100" cy="64" rx="50" ry="10" fill="#4E342E"/>
+  <ellipse cx="90" cy="62" rx="20" ry="5" fill="#5D4037" opacity="0.6"/>
+
   <!-- Drink hole -->
-  <ellipse cx="100" cy="52" rx="12" ry="5" fill="#1A0A05"/>
+  <ellipse cx="100" cy="64" rx="12" ry="5" fill="#1A0A05"/>
 </svg>

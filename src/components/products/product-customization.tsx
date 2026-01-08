@@ -109,14 +109,9 @@ function SugarSlider({ value, onChange, options }: SugarSliderProps) {
   const handleTouchEnd = () => setIsDragging(false);
 
   return (
-    <div className="space-y-2">
-      {/* Compact header */}
-      <div className="flex items-center justify-between text-sm">
-        <span className="font-semibold text-amber-600">{value}%</span>
-        <span className="text-xs text-gray-400">
-          {options.find(o => parseInt(o.value) === value)?.label || ""}
-        </span>
-      </div>
+    <div className="space-y-1.5">
+      {/* Simple level indicator */}
+      <span className="text-sm font-semibold text-amber-600">{value}%</span>
 
       {/* Draggable slider track */}
       <div
@@ -125,7 +120,7 @@ function SugarSlider({ value, onChange, options }: SugarSliderProps) {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="relative h-6 rounded-full bg-amber-100 cursor-pointer touch-none select-none"
+        className="relative h-7 rounded-full bg-amber-100 cursor-pointer touch-none select-none"
       >
         {/* Filled track */}
         <div
@@ -138,42 +133,17 @@ function SugarSlider({ value, onChange, options }: SugarSliderProps) {
         {/* Thumb */}
         <div
           className={cn(
-            "absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-amber-500 shadow-md",
+            "absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white border-2 border-amber-500 shadow-md",
             isDragging ? "scale-110" : "transition-all duration-150"
           )}
-          style={{ left: `calc(${percentage}% - 10px)` }}
+          style={{ left: `calc(${percentage}% - 12px)` }}
         />
         {/* Tick marks */}
-        <div className="absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-between px-3 pointer-events-none">
           {numericOptions.map((_, i) => (
-            <div key={i} className="w-1 h-1 rounded-full bg-amber-300/50" />
+            <div key={i} className="w-1.5 h-1.5 rounded-full bg-amber-300/60" />
           ))}
         </div>
-      </div>
-
-      {/* Compact quick-select buttons */}
-      <div className="flex gap-1">
-        {options.map((option) => {
-          const optionValue = parseInt(option.value);
-          const isSelected = value === optionValue;
-          return (
-            <button
-              key={option.value}
-              onClick={() => {
-                triggerHaptic("light");
-                onChange(optionValue);
-              }}
-              className={cn(
-                "flex-1 py-1.5 rounded-lg text-xs font-medium transition-all",
-                isSelected
-                  ? "bg-amber-500 text-white"
-                  : "bg-amber-50 text-amber-600 hover:bg-amber-100"
-              )}
-            >
-              {option.label}
-            </button>
-          );
-        })}
       </div>
     </div>
   );
@@ -243,24 +213,25 @@ function IceSlider({ value, onChange, options }: IceSliderProps) {
 
   const handleTouchEnd = () => setIsDragging(false);
 
+  // Get current label for display
+  const currentLabel = options.find(o => o.value === value)?.label || value;
+
   return (
-    <div className="space-y-2">
-      {/* Compact header with ice cubes */}
-      <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center gap-1.5">
+    <div className="space-y-1.5">
+      {/* Simple level indicator with ice cubes */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
               className={cn(
-                "w-2 h-2 rounded-sm transition-all duration-150",
+                "w-2.5 h-2.5 rounded-sm transition-all duration-150",
                 i <= currentIndex ? "bg-sky-400" : "bg-sky-100"
               )}
             />
           ))}
         </div>
-        <span className="text-xs text-gray-400">
-          {options.find(o => o.value === value)?.label || value}
-        </span>
+        <span className="text-sm font-semibold text-sky-600">{currentLabel}</span>
       </div>
 
       {/* Draggable slider track */}
@@ -270,7 +241,7 @@ function IceSlider({ value, onChange, options }: IceSliderProps) {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="relative h-6 rounded-full bg-sky-100 cursor-pointer touch-none select-none"
+        className="relative h-7 rounded-full bg-sky-100 cursor-pointer touch-none select-none"
       >
         {/* Filled track */}
         <div
@@ -283,41 +254,17 @@ function IceSlider({ value, onChange, options }: IceSliderProps) {
         {/* Thumb */}
         <div
           className={cn(
-            "absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-sky-500 shadow-md",
+            "absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white border-2 border-sky-500 shadow-md",
             isDragging ? "scale-110" : "transition-all duration-150"
           )}
-          style={{ left: `calc(${iceLevel}% - 10px)` }}
+          style={{ left: `calc(${iceLevel}% - 12px)` }}
         />
         {/* Tick marks */}
-        <div className="absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-between px-3 pointer-events-none">
           {options.map((_, i) => (
-            <div key={i} className="w-1 h-1 rounded-full bg-sky-300/50" />
+            <div key={i} className="w-1.5 h-1.5 rounded-full bg-sky-300/60" />
           ))}
         </div>
-      </div>
-
-      {/* Compact quick-select buttons */}
-      <div className="flex gap-1">
-        {options.map((option) => {
-          const isSelected = value === option.value;
-          return (
-            <button
-              key={option.value}
-              onClick={() => {
-                triggerHaptic("light");
-                onChange(option.value);
-              }}
-              className={cn(
-                "flex-1 py-1.5 rounded-lg text-xs font-medium transition-all",
-                isSelected
-                  ? "bg-sky-500 text-white"
-                  : "bg-sky-50 text-sky-600 hover:bg-sky-100"
-              )}
-            >
-              {option.label}
-            </button>
-          );
-        })}
       </div>
     </div>
   );
@@ -613,7 +560,7 @@ export function ProductCustomization({
 
           {/* Customization Options - Visual sliders for sugar/ice */}
           {filteredCustomizationGroups.length > 0 && (
-            <div className="space-y-5">
+            <div className="space-y-4">
               {filteredCustomizationGroups.map((group) => {
                 // Use visual slider for sugar level
                 if (group.type === "SUGAR_LEVEL") {
@@ -623,7 +570,7 @@ export function ProductCustomization({
                   }));
                   return (
                     <div key={group.id}>
-                      <label className="mb-3 block text-sm font-semibold text-gray-700">
+                      <label className="mb-2 block text-sm font-semibold text-gray-700">
                         {getGroupLabel(group.type)}
                       </label>
                       <SugarSlider
@@ -647,7 +594,7 @@ export function ProductCustomization({
                   const defaultIce = group.values.find(v => v.isDefault)?.value || options[options.length - 1]?.value || "";
                   return (
                     <div key={group.id}>
-                      <label className="mb-3 block text-sm font-semibold text-gray-700">
+                      <label className="mb-2 block text-sm font-semibold text-gray-700">
                         {getGroupLabel(group.type)}
                       </label>
                       <IceSlider

@@ -22,13 +22,13 @@ import { cn } from "@/lib/utils";
 // Skeleton loader for product cards - compact layout
 function ProductCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-      <Skeleton className="aspect-[4/5] w-full" />
-      <div className="p-2 space-y-1.5">
-        <Skeleton className="h-4 w-full" />
+    <div className="overflow-hidden rounded-lg border border-gray-100 bg-white">
+      <Skeleton className="aspect-square w-full" />
+      <div className="p-1.5 space-y-1">
+        <Skeleton className="h-3 w-full" />
         <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-12" />
-          <Skeleton className="h-7 w-7 rounded-full" />
+          <Skeleton className="h-3 w-10" />
+          <Skeleton className="h-6 w-6 rounded-full" />
         </div>
       </div>
     </div>
@@ -365,8 +365,8 @@ export function MenuPageContent() {
 
         {/* Initial Loading State */}
         {isInitialLoading && (
-          <div className="mt-4 grid gap-2.5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {[...Array(10)].map((_, i) => (
+          <div className="mt-4 grid gap-2 grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            {[...Array(12)].map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
           </div>
@@ -375,7 +375,7 @@ export function MenuPageContent() {
         {/* Products Grid - Compact cards optimized for mobile */}
         {!isInitialLoading && (
           <div className={cn(
-            "mt-4 grid gap-2.5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 transition-opacity duration-200",
+            "mt-4 grid gap-2 grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 transition-opacity duration-200",
             isFetching && "opacity-70"
           )}>
             {filteredProducts.map((product) => {
@@ -387,61 +387,61 @@ export function MenuPageContent() {
                   className="group cursor-pointer"
                   onClick={() => setSelectedProduct(product)}
                 >
-                  {/* Compact card with 4:5 aspect ratio image */}
-                  <div className="overflow-hidden rounded-xl border border-gray-100 bg-white transition-all duration-200 hover:shadow-md hover:border-tea-200 hover:-translate-y-0.5">
-                    {/* Product Image - shorter aspect ratio for compact display */}
-                    <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-cream-50 via-white to-tea-50/30">
+                  {/* Compact card optimized for 3-column mobile grid */}
+                  <div className="overflow-hidden rounded-lg border border-gray-100 bg-white transition-all duration-200 hover:shadow-md hover:border-tea-200 active:scale-[0.98]">
+                    {/* Product Image - square aspect ratio for compact display */}
+                    <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-cream-50 via-white to-tea-50/30">
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
                           alt={translation?.name || product.slug}
-                          className="h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
+                          className="h-full w-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
                           loading="lazy"
                           decoding="async"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-tea-50 to-cream-100">
-                          <span className="text-4xl transition-transform duration-300 group-hover:scale-110">🧋</span>
+                          <span className="text-3xl transition-transform duration-300 group-hover:scale-110">🧋</span>
                         </div>
                       )}
 
                       {/* Floating badges - smaller */}
                       {product.vegan && (
-                        <div className="absolute top-1.5 left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-matcha-500 text-white shadow-sm">
-                          <Leaf className="h-3 w-3" />
+                        <div className="absolute top-1 left-1 flex h-4 w-4 items-center justify-center rounded-full bg-matcha-500 text-white shadow-sm">
+                          <Leaf className="h-2.5 w-2.5" />
                         </div>
                       )}
 
                       {/* Favorite button - smaller */}
-                      <div className="absolute top-1.5 right-1.5">
+                      <div className="absolute top-1 right-1">
                         <FavoriteButton
                           productId={product.id}
-                          className="h-7 w-7 bg-white/90 backdrop-blur-sm shadow-sm"
+                          className="h-6 w-6 bg-white/90 backdrop-blur-sm shadow-sm"
                         />
                       </div>
                     </div>
 
-                    {/* Product Info - more compact */}
-                    <div className="p-2">
+                    {/* Product Info - ultra compact */}
+                    <div className="p-1.5">
                       {/* Name - single line with truncate */}
-                      <h3 className="font-medium text-gray-900 text-sm leading-snug truncate">
+                      <h3 className="font-medium text-gray-900 text-xs leading-tight truncate">
                         {translation?.name || formatSlug(product.slug)}
                       </h3>
 
                       {/* Price + Add button row */}
-                      <div className="flex items-center justify-between mt-1.5">
-                        <span className="text-sm font-bold text-tea-600">
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-xs font-bold text-tea-600">
                           €{Number(product.price).toFixed(2)}
                         </span>
                         <button
-                          className="flex h-7 w-7 items-center justify-center rounded-full bg-tea-600 text-white shadow-sm transition-all hover:bg-tea-700 active:scale-95"
+                          className="flex h-6 w-6 items-center justify-center rounded-full bg-tea-600 text-white shadow-sm transition-all hover:bg-tea-700 active:scale-95"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedProduct(product);
                           }}
                           aria-label={locale === "nl" ? "Toevoegen" : "Add"}
                         >
-                          <Plus className="h-3.5 w-3.5" />
+                          <Plus className="h-3 w-3" />
                         </button>
                       </div>
                     </div>

@@ -1,40 +1,106 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
   <defs>
-    <linearGradient id="peachMojito" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFDAB9"/>
-      <stop offset="100%" style="stop-color:#FFCBA4"/>
+    <linearGradient id="cupBodyMojPeach" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
     </linearGradient>
+    <linearGradient id="mojitoPeachDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE0C0"/>
+      <stop offset="50%" style="stop-color:#FFCA98"/>
+      <stop offset="100%" style="stop-color:#FFB070"/>
+    </linearGradient>
+    <linearGradient id="mojitoPeachLid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFCA98"/>
+      <stop offset="100%" style="stop-color:#E09050"/>
+    </linearGradient>
+    <linearGradient id="mintLeafPeach" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#40A040"/>
+      <stop offset="100%" style="stop-color:#206020"/>
+    </linearGradient>
+    <linearGradient id="strawGradientMojPeach" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a2a"/>
+      <stop offset="50%" style="stop-color:#404040"/>
+      <stop offset="100%" style="stop-color:#2a2a2a"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowMojPeach" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowMojPeach" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <!-- Cup -->
-  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
-  <!-- Drink -->
-  <path d="M48 80 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 80 Z" fill="url(#peachMojito)"/>
-  <!-- Peach slices -->
-  <path d="M70 130 Q82 118 94 130 Q82 145 70 130" fill="#FFE4B5"/>
-  <path d="M100 155 Q115 142 128 155 Q115 170 100 155" fill="#FFE4B5"/>
-  <!-- Mint leaves -->
-  <ellipse cx="60" cy="115" rx="6" ry="10" fill="#228B22" transform="rotate(-15 60 115)"/>
-  <ellipse cx="135" cy="120" rx="5" ry="8" fill="#228B22" transform="rotate(20 135 120)"/>
-  <!-- Ice cubes -->
-  <rect x="65" y="175" width="22" height="18" fill="#FFFFFF" opacity="0.4" rx="3"/>
-  <rect x="115" y="180" width="20" height="16" fill="#FFFFFF" opacity="0.4" rx="3"/>
-  <!-- Bubbles -->
-  <circle cx="85" cy="200" r="3" fill="#FFFFFF" opacity="0.5"/>
-  <circle cx="120" cy="205" r="2" fill="#FFFFFF" opacity="0.5"/>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowMojPeach)">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodyMojPeach)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Drink -->
+    <path d="M52 85 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L148 85 Z" fill="url(#mojitoPeachDrink)"/>
+
+    <!-- Peach slices -->
+    <path d="M65 125 Q80 110 95 125 Q80 145 65 125" fill="#FFE4C0" opacity="0.9"/>
+    <path d="M71 127 Q80 120 89 127" stroke="#FFC080" stroke-width="1" fill="none" opacity="0.6"/>
+    <path d="M105 155 Q122 138 138 155 Q122 175 105 155" fill="#FFE4C0" opacity="0.85"/>
+    <path d="M112 157 Q122 148 132 157" stroke="#FFC080" stroke-width="1" fill="none" opacity="0.6"/>
+    <path d="M80 180 Q95 165 110 180 Q95 195 80 180" fill="#FFE4C0" opacity="0.9"/>
+    <path d="M87 182 Q95 173 103 182" stroke="#FFC080" stroke-width="1" fill="none" opacity="0.6"/>
+
+    <!-- Mint leaves -->
+    <ellipse cx="58" cy="105" rx="9" ry="15" fill="url(#mintLeafPeach)" transform="rotate(-20 58 105)"/>
+    <path d="M58 94 Q58 105 58 116" stroke="#50B050" stroke-width="1" fill="none"/>
+    <ellipse cx="142" cy="125" rx="7" ry="12" fill="url(#mintLeafPeach)" transform="rotate(22 142 125)"/>
+
+    <!-- Fizz bubbles -->
+    <circle cx="68" cy="200" r="3.5" fill="#FFFFFF" opacity="0.55"/>
+    <circle cx="130" cy="170" r="3" fill="#FFFFFF" opacity="0.5"/>
+    <circle cx="55" cy="160" r="2.5" fill="#FFFFFF" opacity="0.45"/>
+    <circle cx="95" cy="198" r="2" fill="#FFFFFF" opacity="0.5"/>
+
+    <!-- Ice cubes -->
+    <rect x="58" y="195" width="24" height="20" rx="4" fill="#FFFFFF" opacity="0.45"/>
+    <rect x="56" y="193" width="8" height="6" fill="#FFFFFF" opacity="0.3"/>
+    <rect x="120" y="188" width="22" height="18" rx="4" fill="#FFFFFF" opacity="0.4"/>
+    <rect x="118" y="186" width="7" height="5" fill="#FFFFFF" opacity="0.25"/>
+  </g>
+
   <!-- Foam top -->
-  <ellipse cx="100" cy="75" rx="55" ry="15" fill="#FFF8DC"/>
-  <ellipse cx="100" cy="72" rx="50" ry="12" fill="#FFFEF5"/>
+  <ellipse cx="100" cy="82" rx="50" ry="14" fill="#FFF5E0"/>
+  <ellipse cx="100" cy="79" rx="45" ry="11" fill="#FFFEF5"/>
+  <ellipse cx="85" cy="76" rx="18" ry="6" fill="#ffffff" opacity="0.9"/>
+
   <!-- Tapioca pearls -->
-  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
-  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
-  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
-  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
-  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <g>
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowMojPeach)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowMojPeach)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowMojPeach)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowMojPeach)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowMojPeach)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowMojPeach)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowMojPeach)"/>
+  </g>
+
   <!-- Lid -->
-  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#FFB07C"/>
-  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#FFCBA4"/>
+  <ellipse cx="100" cy="67" rx="54" ry="12" fill="url(#mojitoPeachLid)"/>
+  <ellipse cx="100" cy="64" rx="50" ry="10" fill="#F0A060"/>
+  <ellipse cx="90" cy="62" rx="20" ry="5" fill="#FFBB80" opacity="0.6"/>
+
   <!-- Straw hole -->
-  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#E59866"/>
+  <ellipse cx="100" cy="64" rx="9" ry="4" fill="#A06030"/>
+
   <!-- Straw -->
-  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+  <rect x="95" y="15" width="10" height="55" rx="3" fill="url(#strawGradientMojPeach)"/>
+  <rect x="96" y="15" width="3" height="55" fill="#555" opacity="0.3"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="145" cy="120" rx="3" ry="4" fill="#fff" opacity="0.55"/>
+  <ellipse cx="148" cy="160" rx="2" ry="3" fill="#fff" opacity="0.45"/>
+  <ellipse cx="55" cy="140" rx="2.5" ry="3.5" fill="#fff" opacity="0.5"/>
 </svg>

@@ -1,46 +1,110 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
   <defs>
-    <linearGradient id="strawberryFrap" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFB6C1"/>
-      <stop offset="50%" style="stop-color:#FF69B4"/>
-      <stop offset="100%" style="stop-color:#DC143C"/>
+    <linearGradient id="cupBodyFrapStraw" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
     </linearGradient>
+    <linearGradient id="frapStrawberryDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFB8C8"/>
+      <stop offset="50%" style="stop-color:#FF6090"/>
+      <stop offset="100%" style="stop-color:#DC2060"/>
+    </linearGradient>
+    <linearGradient id="frapStrawberryLid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6090"/>
+      <stop offset="100%" style="stop-color:#DC2060"/>
+    </linearGradient>
+    <linearGradient id="strawGradientFrapStraw" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF6090"/>
+      <stop offset="50%" style="stop-color:#FF80A8"/>
+      <stop offset="100%" style="stop-color:#FF6090"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowFrapStraw" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowFrapStraw" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <!-- Cup -->
-  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
-  <!-- Drink (blended/icy texture) -->
-  <path d="M48 95 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 95 Z" fill="url(#strawberryFrap)"/>
-  <!-- Ice crystal texture -->
-  <polygon points="70,120 75,130 65,130" fill="#FFFFFF" opacity="0.3"/>
-  <polygon points="110,145 115,155 105,155" fill="#FFFFFF" opacity="0.3"/>
-  <polygon points="90,170 95,180 85,180" fill="#FFFFFF" opacity="0.3"/>
-  <polygon points="125,135 130,145 120,145" fill="#FFFFFF" opacity="0.3"/>
-  <!-- Strawberry pieces -->
-  <path d="M75 130 L80 120 L85 130 Q80 138 75 130" fill="#FF4444"/>
-  <path d="M115 155 L120 145 L125 155 Q120 163 115 155" fill="#FF4444"/>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowFrapStraw)">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodyFrapStraw)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Drink (blended/icy texture) -->
+    <path d="M52 100 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L148 100 Z" fill="url(#frapStrawberryDrink)"/>
+
+    <!-- Ice crystal texture -->
+    <polygon points="68,125 74,138 62,138" fill="#FFFFFF" opacity="0.35"/>
+    <polygon points="112,150 118,163 106,163" fill="#FFFFFF" opacity="0.35"/>
+    <polygon points="88,180 94,193 82,193" fill="#FFFFFF" opacity="0.35"/>
+    <polygon points="128,140 134,153 122,153" fill="#FFFFFF" opacity="0.35"/>
+
+    <!-- Strawberry pieces floating -->
+    <g transform="translate(72, 135)">
+      <path d="M0 0 L8 -12 L16 0 Q8 10 0 0" fill="#FF4050"/>
+      <circle cx="4" cy="-3" r="1" fill="#FFF0E0" opacity="0.7"/>
+      <circle cx="12" cy="-3" r="1" fill="#FFF0E0" opacity="0.7"/>
+    </g>
+    <g transform="translate(115, 160)">
+      <path d="M0 0 L6 -10 L12 0 Q6 8 0 0" fill="#FF4050" opacity="0.9"/>
+      <circle cx="3" cy="-2" r="0.8" fill="#FFF0E0" opacity="0.7"/>
+      <circle cx="9" cy="-2" r="0.8" fill="#FFF0E0" opacity="0.7"/>
+    </g>
+  </g>
+
   <!-- Large whipped cream dome -->
-  <ellipse cx="100" cy="88" rx="55" ry="22" fill="#FFFEF5"/>
-  <ellipse cx="85" cy="78" rx="22" ry="14" fill="#FFFFFF"/>
-  <ellipse cx="115" cy="80" rx="20" ry="12" fill="#FFFFFF"/>
-  <ellipse cx="100" cy="70" rx="18" ry="10" fill="#FFFFFF"/>
-  <ellipse cx="100" cy="62" rx="12" ry="7" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="92" rx="50" ry="20" fill="#FFF8F0"/>
+  <ellipse cx="85" cy="82" rx="22" ry="14" fill="#FFFFFF"/>
+  <ellipse cx="115" cy="84" rx="20" ry="12" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="74" rx="18" ry="11" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="66" rx="12" ry="8" fill="#FFFFFF"/>
+
   <!-- Strawberry drizzle on cream -->
-  <path d="M70 78 Q80 88 90 78" stroke="#DC143C" stroke-width="3" fill="none"/>
-  <path d="M110 80 Q120 90 130 80" stroke="#DC143C" stroke-width="3" fill="none"/>
+  <path d="M68 82 Q80 92 95 82 Q110 72 125 84" stroke="#DC2060" stroke-width="3" fill="none" opacity="0.85"/>
+  <path d="M85 74 Q95 82 105 74" stroke="#DC2060" stroke-width="2.5" fill="none" opacity="0.8"/>
+
   <!-- Fresh strawberry on top -->
-  <path d="M95 55 L100 45 L105 55 Q100 62 95 55" fill="#DC143C"/>
-  <path d="M100 45 Q102 40 105 42" stroke="#228B22" stroke-width="2" fill="none"/>
+  <g transform="translate(100, 52)">
+    <path d="M-6 0 L0 -12 L6 0 Q0 8 -6 0" fill="#DC143C"/>
+    <circle cx="-2" cy="-4" r="1" fill="#FFE0E0" opacity="0.7"/>
+    <circle cx="2" cy="-4" r="1" fill="#FFE0E0" opacity="0.7"/>
+    <circle cx="0" cy="0" r="1" fill="#FFE0E0" opacity="0.7"/>
+    <path d="M0 -12 Q4 -16 8 -14" stroke="#228B22" stroke-width="2.5" fill="none"/>
+  </g>
+
   <!-- Tapioca pearls -->
-  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
-  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
-  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
-  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
-  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
-  <!-- Lid -->
-  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#DC143C"/>
-  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#FF69B4"/>
+  <g>
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowFrapStraw)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowFrapStraw)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowFrapStraw)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowFrapStraw)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowFrapStraw)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowFrapStraw)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowFrapStraw)"/>
+  </g>
+
+  <!-- Dome lid -->
+  <ellipse cx="100" cy="60" rx="54" ry="12" fill="url(#frapStrawberryLid)"/>
+  <ellipse cx="100" cy="57" rx="50" ry="10" fill="#FF5080"/>
+  <ellipse cx="90" cy="55" rx="20" ry="5" fill="#FF70A0" opacity="0.6"/>
+
   <!-- Straw hole -->
-  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#8B0000"/>
+  <ellipse cx="100" cy="57" rx="9" ry="4" fill="#A01040"/>
+
   <!-- Straw -->
-  <rect x="96" y="10" width="8" height="50" fill="#FF69B4" rx="2"/>
+  <rect x="95" y="8" width="10" height="55" rx="3" fill="url(#strawGradientFrapStraw)"/>
+  <rect x="96" y="8" width="3" height="55" fill="#FFA0C0" opacity="0.4"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="145" cy="125" rx="3" ry="4" fill="#fff" opacity="0.55"/>
+  <ellipse cx="148" cy="165" rx="2" ry="3" fill="#fff" opacity="0.45"/>
+  <ellipse cx="55" cy="145" rx="2.5" ry="3.5" fill="#fff" opacity="0.5"/>
 </svg>

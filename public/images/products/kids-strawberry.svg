@@ -1,41 +1,98 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
   <defs>
-    <linearGradient id="kidsStrawberry" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#FF69B4"/>
-      <stop offset="100%" style="stop-color:#FF1493"/>
+    <linearGradient id="cupBodyKidsStraw" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
     </linearGradient>
+    <linearGradient id="kidsStrawberryDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFB0C0"/>
+      <stop offset="50%" style="stop-color:#FF7090"/>
+      <stop offset="100%" style="stop-color:#FF4080"/>
+    </linearGradient>
+    <linearGradient id="kidsStrawberryLid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF7090"/>
+      <stop offset="100%" style="stop-color:#E04070"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowKidsStraw" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowKidsStraw" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <!-- Cup (smaller, kid-sized) -->
-  <path d="M55 80 L50 220 Q50 235 65 235 L135 235 Q150 235 150 220 L145 80 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
-  <!-- Drink -->
-  <path d="M58 95 L53 210 Q53 222 65 222 L135 222 Q147 222 147 210 L142 95 Z" fill="url(#kidsStrawberry)"/>
-  <!-- Strawberry -->
-  <path d="M95 130 L100 115 L105 130 Q100 140 95 130" fill="#FF4444"/>
-  <circle cx="98" cy="127" r="1" fill="#FFE4B5"/>
-  <circle cx="102" cy="127" r="1" fill="#FFE4B5"/>
-  <!-- Sparkles (kid-friendly) -->
-  <path d="M75 120 L77 115 L79 120 L84 122 L79 124 L77 129 L75 124 L70 122 Z" fill="#FFD700" opacity="0.8"/>
-  <path d="M125 140 L127 136 L129 140 L133 142 L129 144 L127 148 L125 144 L121 142 Z" fill="#FFD700" opacity="0.8"/>
-  <!-- Whipped cream -->
-  <ellipse cx="100" cy="92" rx="45" ry="12" fill="#FFFEF5"/>
-  <ellipse cx="90" cy="88" rx="15" ry="8" fill="#FFFFFF"/>
-  <ellipse cx="110" cy="90" rx="13" ry="7" fill="#FFFFFF"/>
+
+  <!-- Cup with shadow (smaller kid-size) -->
+  <g filter="url(#shadowKidsStraw)">
+    <!-- Cup body -->
+    <path d="M55 85 L50 220 Q50 240 70 240 L130 240 Q150 240 150 220 L145 85 Z" fill="url(#cupBodyKidsStraw)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Drink -->
+    <path d="M57 100 L53 215 Q53 233 70 233 L130 233 Q147 233 147 215 L143 100 Z" fill="url(#kidsStrawberryDrink)"/>
+
+    <!-- Strawberry slices floating -->
+    <g transform="translate(75, 130)">
+      <path d="M0 0 L8 -12 L16 0 Q8 12 0 0" fill="#FF5060"/>
+      <circle cx="4" cy="-2" r="1.2" fill="#FFF0E0" opacity="0.8"/>
+      <circle cx="12" cy="-2" r="1.2" fill="#FFF0E0" opacity="0.8"/>
+      <circle cx="8" cy="3" r="1.2" fill="#FFF0E0" opacity="0.8"/>
+    </g>
+    <g transform="translate(112, 155)">
+      <path d="M0 0 L6 -10 L12 0 Q6 10 0 0" fill="#FF5060" opacity="0.9"/>
+      <circle cx="3" cy="-1" r="1" fill="#FFF0E0" opacity="0.7"/>
+      <circle cx="9" cy="-1" r="1" fill="#FFF0E0" opacity="0.7"/>
+    </g>
+
+    <!-- Sparkles (kid-friendly) -->
+    <path d="M70 120 L72 115 L74 120 L79 122 L74 124 L72 129 L70 124 L65 122 Z" fill="#FFD700" opacity="0.85"/>
+    <path d="M128 145 L130 141 L132 145 L136 147 L132 149 L130 153 L128 149 L124 147 Z" fill="#FFD700" opacity="0.85"/>
+  </g>
+
+  <!-- Whipped cream top -->
+  <ellipse cx="100" cy="97" rx="47" ry="14" fill="#FFF8F0"/>
+  <ellipse cx="90" cy="92" rx="16" ry="9" fill="#FFFFFF"/>
+  <ellipse cx="110" cy="94" rx="14" ry="8" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="88" rx="12" ry="7" fill="#FFFFFF"/>
+
   <!-- Cherry on top -->
   <circle cx="100" cy="75" r="10" fill="#DC143C"/>
-  <path d="M100 65 Q105 55 110 60" stroke="#228B22" stroke-width="2" fill="none"/>
+  <circle cx="96" cy="71" r="3" fill="#FF4060" opacity="0.6"/>
+  <path d="M100 65 Q106 55 112 58" stroke="#228B22" stroke-width="2.5" fill="none"/>
+
   <!-- Colorful sprinkles -->
-  <rect x="85" y="85" width="4" height="2" fill="#FF6B6B" rx="1"/>
-  <rect x="95" y="88" width="4" height="2" fill="#4ECDC4" rx="1"/>
-  <rect x="108" y="86" width="4" height="2" fill="#FFE66D" rx="1"/>
-  <!-- Tapioca pearls -->
-  <circle cx="70" cy="205" r="6" fill="#1A1A1A"/>
-  <circle cx="85" cy="212" r="5" fill="#1A1A1A"/>
-  <circle cx="100" cy="208" r="6" fill="#1A1A1A"/>
-  <circle cx="115" cy="213" r="5" fill="#1A1A1A"/>
-  <circle cx="130" cy="206" r="6" fill="#1A1A1A"/>
+  <rect x="82" y="90" width="5" height="2.5" fill="#FF6B6B" rx="1" transform="rotate(-20 84 91)"/>
+  <rect x="93" y="93" width="5" height="2.5" fill="#4ECDC4" rx="1" transform="rotate(15 95 94)"/>
+  <rect x="106" y="91" width="5" height="2.5" fill="#FFE66D" rx="1" transform="rotate(-10 108 92)"/>
+  <rect x="115" y="94" width="5" height="2.5" fill="#9B59B6" rx="1" transform="rotate(25 117 95)"/>
+
+  <!-- Tapioca pearls (smaller for kids cup) -->
+  <g>
+    <circle cx="68" cy="210" r="7" fill="url(#bobaGlowKidsStraw)"/>
+    <circle cx="65" cy="207" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="85" cy="218" r="6" fill="url(#bobaGlowKidsStraw)"/>
+    <circle cx="82" cy="215" r="2" fill="#555" opacity="0.6"/>
+    <circle cx="100" cy="212" r="7" fill="url(#bobaGlowKidsStraw)"/>
+    <circle cx="97" cy="209" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="115" cy="219" r="6" fill="url(#bobaGlowKidsStraw)"/>
+    <circle cx="112" cy="216" r="2" fill="#555" opacity="0.6"/>
+    <circle cx="132" cy="211" r="7" fill="url(#bobaGlowKidsStraw)"/>
+    <circle cx="129" cy="208" r="2.5" fill="#555" opacity="0.6"/>
+  </g>
+
   <!-- Lid -->
-  <ellipse cx="100" cy="72" rx="50" ry="10" fill="#FF69B4"/>
-  <ellipse cx="100" cy="70" rx="45" ry="8" fill="#FF85C1"/>
-  <!-- Straw -->
-  <rect x="96" y="30" width="8" height="50" fill="#FF69B4" rx="2"/>
+  <ellipse cx="100" cy="82" rx="50" ry="11" fill="url(#kidsStrawberryLid)"/>
+  <ellipse cx="100" cy="79" rx="45" ry="9" fill="#FF85A8"/>
+  <ellipse cx="90" cy="77" rx="18" ry="5" fill="#FFA0C0" opacity="0.6"/>
+
+  <!-- Straw hole -->
+  <ellipse cx="100" cy="79" rx="8" ry="3.5" fill="#C03060"/>
+
+  <!-- Fun pink straw -->
+  <rect x="95" y="30" width="10" height="55" rx="3" fill="#FF69B4"/>
+  <rect x="96" y="30" width="3" height="55" fill="#FF90C8" opacity="0.5"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="142" cy="130" rx="2.5" ry="3.5" fill="#fff" opacity="0.5"/>
+  <ellipse cx="58" cy="150" rx="2" ry="3" fill="#fff" opacity="0.45"/>
 </svg>

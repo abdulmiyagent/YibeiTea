@@ -1,37 +1,93 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
   <defs>
-    <linearGradient id="lemon" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFFACD"/>
-      <stop offset="100%" style="stop-color:#FFD700"/>
+    <linearGradient id="cupBodyLemon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
     </linearGradient>
+    <linearGradient id="lemonDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8B0"/>
+      <stop offset="50%" style="stop-color:#FFE866"/>
+      <stop offset="100%" style="stop-color:#FFD420"/>
+    </linearGradient>
+    <linearGradient id="lemonLid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE866"/>
+      <stop offset="100%" style="stop-color:#FFD420"/>
+    </linearGradient>
+    <linearGradient id="strawGradientLemon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a2a"/>
+      <stop offset="50%" style="stop-color:#404040"/>
+      <stop offset="100%" style="stop-color:#2a2a2a"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowLemon" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowLemon" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <!-- Cup -->
-  <path d="M45 60 L40 240 Q40 260 60 260 L140 260 Q160 260 160 240 L155 60 Z" fill="#FFF5E6" stroke="#E8DCC8" stroke-width="2"/>
-  <!-- Drink -->
-  <path d="M48 80 L44 235 Q44 250 60 250 L140 250 Q156 250 156 235 L152 80 Z" fill="url(#lemon)"/>
-  <!-- Lemon slice -->
-  <circle cx="120" cy="130" r="18" fill="#FFF44F" stroke="#FFD700" stroke-width="2"/>
-  <line x1="120" y1="115" x2="120" y2="145" stroke="#FFFACD" stroke-width="2"/>
-  <line x1="105" y1="130" x2="135" y2="130" stroke="#FFFACD" stroke-width="2"/>
-  <line x1="108" y1="118" x2="132" y2="142" stroke="#FFFACD" stroke-width="2"/>
-  <line x1="132" y1="118" x2="108" y2="142" stroke="#FFFACD" stroke-width="2"/>
-  <!-- Ice cubes -->
-  <rect x="60" y="100" width="25" height="20" fill="#FFFFFF" opacity="0.4" rx="3"/>
-  <rect x="75" y="160" width="22" height="18" fill="#FFFFFF" opacity="0.4" rx="3"/>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowLemon)">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodyLemon)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Drink -->
+    <path d="M52 85 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L148 85 Z" fill="url(#lemonDrink)"/>
+
+    <!-- Lemon slice -->
+    <g transform="translate(118, 135)">
+      <circle cx="0" cy="0" r="20" fill="#FFF8A0" stroke="#FFD420" stroke-width="3"/>
+      <circle cx="0" cy="0" r="16" fill="none" stroke="#FFFCD0" stroke-width="1"/>
+      <line x1="0" y1="-14" x2="0" y2="14" stroke="#FFFEF0" stroke-width="2.5" opacity="0.8"/>
+      <line x1="-14" y1="0" x2="14" y2="0" stroke="#FFFEF0" stroke-width="2.5" opacity="0.8"/>
+      <line x1="-10" y1="-10" x2="10" y2="10" stroke="#FFFEF0" stroke-width="2.5" opacity="0.8"/>
+      <line x1="10" y1="-10" x2="-10" y2="10" stroke="#FFFEF0" stroke-width="2.5" opacity="0.8"/>
+    </g>
+
+    <!-- Ice cubes -->
+    <rect x="60" y="105" width="26" height="22" rx="4" fill="#FFFFFF" opacity="0.5"/>
+    <rect x="58" y="103" width="9" height="7" fill="#FFFFFF" opacity="0.35"/>
+    <rect x="72" y="170" width="24" height="20" rx="4" fill="#FFFFFF" opacity="0.45"/>
+    <rect x="70" y="168" width="8" height="6" fill="#FFFFFF" opacity="0.3"/>
+  </g>
+
   <!-- Foam top -->
-  <ellipse cx="100" cy="75" rx="55" ry="15" fill="#FFFEF5"/>
-  <ellipse cx="100" cy="72" rx="50" ry="12" fill="#FFFFFF"/>
+  <ellipse cx="100" cy="82" rx="50" ry="14" fill="#FFF8DC"/>
+  <ellipse cx="100" cy="79" rx="45" ry="11" fill="#FFFEF5"/>
+  <ellipse cx="85" cy="76" rx="18" ry="6" fill="#ffffff" opacity="0.85"/>
+
   <!-- Tapioca pearls -->
-  <circle cx="60" cy="230" r="8" fill="#1A1A1A"/>
-  <circle cx="80" cy="240" r="7" fill="#1A1A1A"/>
-  <circle cx="100" cy="235" r="8" fill="#1A1A1A"/>
-  <circle cx="120" cy="242" r="7" fill="#1A1A1A"/>
-  <circle cx="140" cy="232" r="8" fill="#1A1A1A"/>
+  <g>
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowLemon)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowLemon)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowLemon)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowLemon)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.6"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowLemon)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.6"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowLemon)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowLemon)"/>
+  </g>
+
   <!-- Lid -->
-  <ellipse cx="100" cy="55" rx="60" ry="12" fill="#FFD700"/>
-  <ellipse cx="100" cy="52" rx="55" ry="10" fill="#FFF44F"/>
+  <ellipse cx="100" cy="67" rx="54" ry="12" fill="url(#lemonLid)"/>
+  <ellipse cx="100" cy="64" rx="50" ry="10" fill="#FFE030"/>
+  <ellipse cx="90" cy="62" rx="20" ry="5" fill="#FFF060" opacity="0.6"/>
+
   <!-- Straw hole -->
-  <ellipse cx="100" cy="52" rx="8" ry="4" fill="#DAA520"/>
+  <ellipse cx="100" cy="64" rx="9" ry="4" fill="#C9A010"/>
+
   <!-- Straw -->
-  <rect x="96" y="10" width="8" height="50" fill="#2F2F2F" rx="2"/>
+  <rect x="95" y="15" width="10" height="55" rx="3" fill="url(#strawGradientLemon)"/>
+  <rect x="96" y="15" width="3" height="55" fill="#555" opacity="0.3"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="145" cy="120" rx="3" ry="4" fill="#fff" opacity="0.55"/>
+  <ellipse cx="148" cy="160" rx="2" ry="3" fill="#fff" opacity="0.45"/>
+  <ellipse cx="55" cy="140" rx="2.5" ry="3.5" fill="#fff" opacity="0.5"/>
 </svg>

@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, Eye, EyeOff, Newspaper, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Newspaper, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -21,6 +21,9 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -88,6 +91,13 @@ export default function LoginPage() {
         setIsLoading(false);
         return;
       }
+
+      // Registration successful - show verification message
+      if (data.requiresVerification) {
+        setShowVerificationMessage(true);
+        setIsLoading(false);
+        return;
+      }
     }
 
     // First, try to sign in to verify credentials
@@ -110,6 +120,13 @@ export default function LoginPage() {
       if (result.error === "2FA_SETUP_REQUIRED" || result.error === "Error: 2FA_SETUP_REQUIRED") {
         // SUPER_ADMIN needs to set up 2FA first
         setError("Je moet eerst twee-factor authenticatie instellen voordat je kunt inloggen.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.error === "EMAIL_NOT_VERIFIED" || result.error === "Error: EMAIL_NOT_VERIFIED") {
+        // User needs to verify email first
+        setShowVerificationMessage(true);
         setIsLoading(false);
         return;
       }
@@ -145,6 +162,109 @@ export default function LoginPage() {
   const handleGoogleSignIn = () => {
     signIn("google", { callbackUrl: "/account" });
   };
+
+  const handleResendVerification = async () => {
+    setIsResendingVerification(true);
+    setResendSuccess(false);
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setResendSuccess(true);
+      } else {
+        setError(data.error || "Kon geen verificatie-email verzenden");
+      }
+    } catch {
+      setError("Er is een fout opgetreden");
+    } finally {
+      setIsResendingVerification(false);
+    }
+  };
+
+  // Show verification required message
+  if (showVerificationMessage) {
+    return (
+      <div className="section-padding">
+        <div className="container-custom">
+          <div className="mx-auto max-w-md">
+            <Card>
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-tea-100">
+                  <Mail className="h-6 w-6 text-tea-600" />
+                </div>
+                <CardTitle className="text-2xl">Bevestig je e-mailadres</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="rounded-lg bg-tea-50 p-4 text-center">
+                  <p className="text-sm text-tea-800">
+                    We hebben een verificatie-email gestuurd naar:
+                  </p>
+                  <p className="mt-1 font-medium text-tea-900">{formData.email}</p>
+                </div>
+
+                <p className="text-center text-sm text-muted-foreground">
+                  Klik op de link in de email om je account te activeren.
+                  Controleer ook je spam folder als je de email niet ziet.
+                </p>
+
+                {resendSuccess && (
+                  <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+                    <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                    Nieuwe verificatie-email verzonden!
+                  </div>
+                )}
+
+                {error && (
+                  <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                    {error}
+                  </div>
+                )}
+
+                <div className="space-y-3 pt-2">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleResendVerification}
+                    disabled={isResendingVerification}
+                  >
+                    {isResendingVerification ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Verzenden...
+                      </>
+                    ) : (
+                      "Verificatie-email opnieuw verzenden"
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => {
+                      setShowVerificationMessage(false);
+                      setResendSuccess(false);
+                      setError("");
+                    }}
+                  >
+                    Terug naar inloggen
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="section-padding">

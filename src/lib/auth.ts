@@ -78,6 +78,11 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        // Check if email is verified (only for credentials provider)
+        if (!user.emailVerified) {
+          throw new Error("EMAIL_NOT_VERIFIED");
+        }
+
         // Check if 2FA is enabled
         if (user.twoFactorEnabled && user.twoFactorSecret) {
           // If 2FA code is provided, verify it
