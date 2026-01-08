@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Lora, Nunito } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -11,14 +11,14 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
 
-const cormorant = Cormorant_Garamond({
+const lora = Lora({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-serif",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const nunito = Nunito({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-sans",
@@ -116,7 +116,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
       </head>
       <body
-        className={`${cormorant.variable} ${dmSans.variable} font-sans antialiased`}
+        className={`${lora.variable} ${nunito.variable} font-sans antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
           <Providers>
