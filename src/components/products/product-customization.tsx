@@ -316,17 +316,18 @@ export function ProductCustomization({
   const [isAddedToCart, setIsAddedToCart] = useState(false);
 
   // Filter customization groups based on product settings
+  // Use === false to only filter out explicitly disabled options (not undefined)
   const filteredCustomizationGroups = useMemo(() => {
     return customizationGroups.filter((group) => {
-      if (group.type === "SUGAR_LEVEL" && !product.allowSugarCustomization) return false;
-      if (group.type === "ICE_LEVEL" && !product.allowIceCustomization) return false;
+      if (group.type === "SUGAR_LEVEL" && product.allowSugarCustomization === false) return false;
+      if (group.type === "ICE_LEVEL" && product.allowIceCustomization === false) return false;
       return true;
     });
   }, [customizationGroups, product.allowSugarCustomization, product.allowIceCustomization]);
 
-  // Only show toppings if allowed for this product
+  // Only show toppings if allowed for this product (default to showing if undefined)
   const filteredToppings = useMemo(() => {
-    return product.allowToppings ? toppings : [];
+    return product.allowToppings !== false ? toppings : [];
   }, [toppings, product.allowToppings]);
 
   // Initialize defaults from customization groups or initial customizations (edit mode)
