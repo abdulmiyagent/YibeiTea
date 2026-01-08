@@ -184,11 +184,11 @@ export function ProductCustomization({
     setIsAddedToCart(true);
     setTimeout(() => {
       setIsAddedToCart(false);
-      // Close modal via router back, or redirect for page
-      if (variant === "modal") {
-        router.back();
-      } else if (onClose) {
+      // Close modal or page
+      if (onClose) {
         onClose();
+      } else if (variant === "page") {
+        router.back();
       }
     }, 1000);
   };
