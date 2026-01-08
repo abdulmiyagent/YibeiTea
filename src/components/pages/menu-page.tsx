@@ -79,62 +79,66 @@ export function MenuPageContent() {
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="mt-8 space-y-4">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={locale === "nl" ? "Zoek drankjes..." : "Search drinks..."}
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+        {/* Sticky Filters */}
+        <div className="sticky top-16 z-40 -mx-4 px-4 py-3 bg-white/95 backdrop-blur-sm border-b border-transparent [&:not(:first-child)]:mt-6 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.05)]">
+          <div className="space-y-3">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder={locale === "nl" ? "Zoek drankjes..." : "Search drinks..."}
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
 
-          {/* Category Tabs */}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={selectedCategory === null ? "tea" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(null)}
-            >
-              {locale === "nl" ? "Alle Drankjes" : "All Drinks"}
-            </Button>
-            {categories?.map((category) => {
-              const translation = category.translations[0];
-              return (
-                <Button
-                  key={category.id}
-                  variant={selectedCategory === category.slug ? "tea" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category.slug)}
-                >
-                  {translation?.name || category.slug}
-                </Button>
-              );
-            })}
-          </div>
+            {/* Category Tabs - Horizontal scroll on mobile */}
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
+              <Button
+                variant={selectedCategory === null ? "tea" : "outline"}
+                size="sm"
+                className="flex-shrink-0"
+                onClick={() => setSelectedCategory(null)}
+              >
+                {locale === "nl" ? "Alle Drankjes" : "All Drinks"}
+              </Button>
+              {categories?.map((category) => {
+                const translation = category.translations[0];
+                return (
+                  <Button
+                    key={category.id}
+                    variant={selectedCategory === category.slug ? "tea" : "outline"}
+                    size="sm"
+                    className="flex-shrink-0"
+                    onClick={() => setSelectedCategory(category.slug)}
+                  >
+                    {translation?.name || category.slug}
+                  </Button>
+                );
+              })}
+            </div>
 
-          {/* Filter toggles */}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={showVeganOnly ? "matcha" : "outline"}
-              size="sm"
-              onClick={() => setShowVeganOnly(!showVeganOnly)}
-            >
-              <Leaf className="mr-1 h-4 w-4" />
-              {t("filter.vegan")}
-            </Button>
-            <Button
-              variant={showCaffeineFree ? "secondary" : "outline"}
-              size="sm"
-              onClick={() => setShowCaffeineFree(!showCaffeineFree)}
-            >
-              <Coffee className="mr-1 h-4 w-4" />
-              {t("filter.caffeineFree")}
-            </Button>
+            {/* Filter toggles */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={showVeganOnly ? "matcha" : "outline"}
+                size="sm"
+                onClick={() => setShowVeganOnly(!showVeganOnly)}
+              >
+                <Leaf className="mr-1 h-4 w-4" />
+                {t("filter.vegan")}
+              </Button>
+              <Button
+                variant={showCaffeineFree ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => setShowCaffeineFree(!showCaffeineFree)}
+              >
+                <Coffee className="mr-1 h-4 w-4" />
+                {t("filter.caffeineFree")}
+              </Button>
+            </div>
           </div>
         </div>
 
