@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,8 @@ interface SugarSliderProps {
 }
 
 function SugarSlider({ value, onChange, options }: SugarSliderProps) {
-  const locale = useLocale() as "nl" | "en";
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Map numeric values to slider positions
   const numericOptions = options.map(o => parseInt(o.value)).sort((a, b) => a - b);
@@ -59,42 +60,99 @@ function SugarSlider({ value, onChange, options }: SugarSliderProps) {
     ? (currentIndex / (numericOptions.length - 1)) * 100
     : 50;
 
+  // Handle slider interaction (drag or click)
+  const handleSliderInteraction = useCallback((clientX: number) => {
+    if (!sliderRef.current) return;
+    const rect = sliderRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    const percent = x / rect.width;
+
+    // Snap to nearest option
+    const nearestIndex = Math.round(percent * (numericOptions.length - 1));
+    const newValue = numericOptions[nearestIndex];
+    if (newValue !== value) {
+      triggerHaptic("light");
+      onChange(newValue);
+    }
+  }, [numericOptions, value, onChange]);
+
+  // Mouse events
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    handleSliderInteraction(e.clientX);
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => handleSliderInteraction(e.clientX);
+    const handleMouseUp = () => setIsDragging(false);
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, handleSliderInteraction]);
+
+  // Touch events
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    handleSliderInteraction(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging) handleSliderInteraction(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => setIsDragging(false);
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-2xl font-bold text-amber-600">{value}%</span>
-        <span className="text-sm text-gray-500">
-          {value === 0 ? (locale === "nl" ? "Geen suiker" : "No sugar") :
-           value <= 30 ? (locale === "nl" ? "Licht zoet" : "Lightly sweet") :
-           value <= 70 ? (locale === "nl" ? "Normaal" : "Normal") :
-           (locale === "nl" ? "Extra zoet" : "Extra sweet")}
+    <div className="space-y-2">
+      {/* Compact header */}
+      <div className="flex items-center justify-between text-sm">
+        <span className="font-semibold text-amber-600">{value}%</span>
+        <span className="text-xs text-gray-400">
+          {options.find(o => parseInt(o.value) === value)?.label || ""}
         </span>
       </div>
 
-      {/* Visual sugar level indicator */}
-      <div className="relative h-8 rounded-full bg-gradient-to-r from-amber-50 via-amber-100 to-amber-200 overflow-hidden border border-amber-200">
+      {/* Draggable slider track */}
+      <div
+        ref={sliderRef}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="relative h-6 rounded-full bg-amber-100 cursor-pointer touch-none select-none"
+      >
+        {/* Filled track */}
         <div
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 transition-all duration-200 ease-out"
+          className={cn(
+            "absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber-300 to-amber-500",
+            isDragging ? "" : "transition-all duration-150"
+          )}
           style={{ width: `${percentage}%` }}
         />
-        {/* Sugar crystals visual */}
-        <div className="absolute inset-0 flex items-center justify-center gap-1 pointer-events-none">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                "w-1.5 h-1.5 rounded-full transition-all duration-200",
-                i < Math.ceil((percentage / 100) * 5)
-                  ? "bg-white/80"
-                  : "bg-amber-200/50"
-              )}
-            />
+        {/* Thumb */}
+        <div
+          className={cn(
+            "absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-amber-500 shadow-md",
+            isDragging ? "scale-110" : "transition-all duration-150"
+          )}
+          style={{ left: `calc(${percentage}% - 10px)` }}
+        />
+        {/* Tick marks */}
+        <div className="absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
+          {numericOptions.map((_, i) => (
+            <div key={i} className="w-1 h-1 rounded-full bg-amber-300/50" />
           ))}
         </div>
       </div>
 
-      {/* Tap targets */}
-      <div className="flex gap-1.5">
+      {/* Compact quick-select buttons */}
+      <div className="flex gap-1">
         {options.map((option) => {
           const optionValue = parseInt(option.value);
           const isSelected = value === optionValue;
@@ -106,10 +164,10 @@ function SugarSlider({ value, onChange, options }: SugarSliderProps) {
                 onChange(optionValue);
               }}
               className={cn(
-                "flex-1 py-2.5 rounded-xl text-sm font-medium transition-all min-h-[44px]",
+                "flex-1 py-1.5 rounded-lg text-xs font-medium transition-all",
                 isSelected
-                  ? "bg-amber-500 text-white shadow-md shadow-amber-500/25"
-                  : "bg-amber-50 text-amber-700 hover:bg-amber-100 active:bg-amber-200"
+                  ? "bg-amber-500 text-white"
+                  : "bg-amber-50 text-amber-600 hover:bg-amber-100"
               )}
             >
               {option.label}
@@ -128,63 +186,118 @@ interface IceSliderProps {
 }
 
 function IceSlider({ value, onChange, options }: IceSliderProps) {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
   // Calculate ice level based on position in options array
   const currentIndex = options.findIndex(o => o.value === value);
   const iceLevel = options.length > 1
     ? ((currentIndex === -1 ? options.length - 1 : currentIndex) / (options.length - 1)) * 100
     : 66;
-  const cubeCount = Math.ceil((iceLevel / 100) * 4);
+
+  // Handle slider interaction (drag or click)
+  const handleSliderInteraction = useCallback((clientX: number) => {
+    if (!sliderRef.current) return;
+    const rect = sliderRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    const percent = x / rect.width;
+
+    // Snap to nearest option
+    const nearestIndex = Math.round(percent * (options.length - 1));
+    const newValue = options[nearestIndex]?.value;
+    if (newValue && newValue !== value) {
+      triggerHaptic("light");
+      onChange(newValue);
+    }
+  }, [options, value, onChange]);
+
+  // Mouse events
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    handleSliderInteraction(e.clientX);
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => handleSliderInteraction(e.clientX);
+    const handleMouseUp = () => setIsDragging(false);
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, handleSliderInteraction]);
+
+  // Touch events
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    handleSliderInteraction(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging) handleSliderInteraction(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => setIsDragging(false);
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {/* Ice cubes visualization */}
-          <div className="flex gap-0.5">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "w-3 h-3 rounded-sm transition-all duration-200",
-                  i < cubeCount
-                    ? "bg-sky-400 shadow-sm"
-                    : "bg-sky-100 border border-sky-200"
-                )}
-              />
-            ))}
-          </div>
+    <div className="space-y-2">
+      {/* Compact header with ice cubes */}
+      <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center gap-1.5">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "w-2 h-2 rounded-sm transition-all duration-150",
+                i <= currentIndex ? "bg-sky-400" : "bg-sky-100"
+              )}
+            />
+          ))}
         </div>
-        <span className="text-sm text-gray-500">
+        <span className="text-xs text-gray-400">
           {options.find(o => o.value === value)?.label || value}
         </span>
       </div>
 
-      {/* Visual ice level indicator */}
-      <div className="relative h-8 rounded-full bg-gradient-to-r from-sky-50 via-sky-100 to-sky-200 overflow-hidden border border-sky-200">
+      {/* Draggable slider track */}
+      <div
+        ref={sliderRef}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="relative h-6 rounded-full bg-sky-100 cursor-pointer touch-none select-none"
+      >
+        {/* Filled track */}
         <div
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-sky-300 via-sky-400 to-sky-500 transition-all duration-200 ease-out"
+          className={cn(
+            "absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-sky-300 to-sky-500",
+            isDragging ? "" : "transition-all duration-150"
+          )}
           style={{ width: `${iceLevel}%` }}
         />
-        {/* Ice crystal effect */}
-        <div className="absolute inset-0 flex items-center px-3 pointer-events-none">
-          <div className="flex-1 flex justify-around">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "w-2 h-4 rounded-sm transition-all duration-200 rotate-12",
-                  i < cubeCount
-                    ? "bg-white/60"
-                    : "bg-sky-200/30"
-                )}
-              />
-            ))}
-          </div>
+        {/* Thumb */}
+        <div
+          className={cn(
+            "absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-sky-500 shadow-md",
+            isDragging ? "scale-110" : "transition-all duration-150"
+          )}
+          style={{ left: `calc(${iceLevel}% - 10px)` }}
+        />
+        {/* Tick marks */}
+        <div className="absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
+          {options.map((_, i) => (
+            <div key={i} className="w-1 h-1 rounded-full bg-sky-300/50" />
+          ))}
         </div>
       </div>
 
-      {/* Tap targets */}
-      <div className="flex gap-1.5">
+      {/* Compact quick-select buttons */}
+      <div className="flex gap-1">
         {options.map((option) => {
           const isSelected = value === option.value;
           return (
@@ -195,10 +308,10 @@ function IceSlider({ value, onChange, options }: IceSliderProps) {
                 onChange(option.value);
               }}
               className={cn(
-                "flex-1 py-2.5 rounded-xl text-sm font-medium transition-all min-h-[44px]",
+                "flex-1 py-1.5 rounded-lg text-xs font-medium transition-all",
                 isSelected
-                  ? "bg-sky-500 text-white shadow-md shadow-sky-500/25"
-                  : "bg-sky-50 text-sky-700 hover:bg-sky-100 active:bg-sky-200"
+                  ? "bg-sky-500 text-white"
+                  : "bg-sky-50 text-sky-600 hover:bg-sky-100"
               )}
             >
               {option.label}
