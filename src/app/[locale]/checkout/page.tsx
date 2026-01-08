@@ -600,39 +600,15 @@ export default function CheckoutPage() {
                               variant={isSelected ? "tea" : "outline"}
                               size="sm"
                               className={cn(
-                                "rounded-full relative flex flex-col items-center gap-0.5 h-auto py-2",
-                                isDisabled && "opacity-50 cursor-not-allowed line-through",
+                                "rounded-full",
+                                isDisabled && "opacity-50 cursor-not-allowed",
                                 isLimited && !isSelected && "border-amber-300 bg-amber-50 hover:bg-amber-100",
-                                status?.isFull && "bg-gray-100 hover:bg-gray-100"
+                                status?.isFull && "bg-gray-100 hover:bg-gray-100 line-through"
                               )}
                               onClick={() => !isDisabled && updateFormData("pickupTime", time)}
                               disabled={isDisabled}
                             >
-                              <span>{time}</span>
-                              {status && !status.isDisabled && (
-                                <span className={cn(
-                                  "text-[10px] font-normal",
-                                  status.isFull
-                                    ? "text-red-500"
-                                    : status.isLimited
-                                    ? "text-amber-600"
-                                    : isSelected
-                                    ? "text-white/80"
-                                    : "text-muted-foreground"
-                                )}>
-                                  {status.isFull
-                                    ? (locale === "nl" ? "vol" : "full")
-                                    : status.isLimited
-                                    ? `${status.available} ${locale === "nl" ? "over" : "left"}`
-                                    : `${status.available}/${status.capacity}`
-                                  }
-                                </span>
-                              )}
-                              {status?.isDisabled && (
-                                <span className="text-[10px] text-gray-400">
-                                  {locale === "nl" ? "gesloten" : "closed"}
-                                </span>
-                              )}
+                              {time}
                             </Button>
                           );
                         })}
@@ -645,26 +621,19 @@ export default function CheckoutPage() {
                         </p>
                       )}
                       {timeSlots.length > 0 && (
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground">
-                            {locale === "nl"
-                              ? `Minimale bereidingstijd: ${storeSettings?.minPickupMinutes ?? 15} minuten`
-                              : `Minimum preparation time: ${storeSettings?.minPickupMinutes ?? 15} minutes`}
-                          </p>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <span className="h-2 w-2 rounded-full bg-matcha-500"></span>
-                              {locale === "nl" ? "Beschikbaar" : "Available"}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <span className="h-2 w-2 rounded-full bg-amber-400"></span>
-                              {locale === "nl" ? "Bijna vol" : "Almost full"}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <span className="h-2 w-2 rounded-full bg-gray-300"></span>
-                              {locale === "nl" ? "Vol" : "Full"}
-                            </span>
-                          </div>
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <span className="h-5 w-5 rounded-full border border-input bg-background"></span>
+                            {locale === "nl" ? "Beschikbaar" : "Available"}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <span className="h-5 w-5 rounded-full border border-amber-300 bg-amber-50"></span>
+                            {locale === "nl" ? "Bijna vol" : "Almost full"}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <span className="h-5 w-5 rounded-full bg-gray-100 flex items-center justify-center text-[8px] text-gray-400 line-through">00</span>
+                            {locale === "nl" ? "Vol" : "Full"}
+                          </span>
                         </div>
                       )}
                     </div>
