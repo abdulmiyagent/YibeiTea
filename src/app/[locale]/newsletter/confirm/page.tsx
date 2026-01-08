@@ -7,7 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Loader2, Mail } from "lucide-react";
-import { api } from "@/lib/trpc/client";
+import { api } from "@/lib/trpc";
 
 type ConfirmationStatus = "loading" | "success" | "already_confirmed" | "error";
 
