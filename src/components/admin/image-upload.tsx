@@ -2,8 +2,10 @@
 
 import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Loader2, Sparkles } from "lucide-react";
 import Image from "next/image";
 
 interface ImageUploadProps {
@@ -12,6 +14,7 @@ interface ImageUploadProps {
   folder?: string;
   className?: string;
   disabled?: boolean;
+  showBackgroundRemoval?: boolean;
 }
 
 export function ImageUpload({
@@ -20,21 +23,35 @@ export function ImageUpload({
   folder = "products",
   className,
   disabled = false,
+  showBackgroundRemoval = true,
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [removeBackground, setRemoveBackground] = useState(true);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isProductUpload = folder === "products";
+  const canRemoveBackground = showBackgroundRemoval && isProductUpload;
 
   const handleUpload = useCallback(
     async (file: File) => {
       setError(null);
       setIsUploading(true);
+      setUploadStatus(
+        canRemoveBackground && removeBackground
+          ? "Achtergrond verwijderen..."
+          : "Uploading..."
+      );
 
       try {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("folder", folder);
+        if (canRemoveBackground && removeBackground) {
+          formData.append("removeBackground", "true");
+        }
 
         const response = await fetch("/api/upload", {
           method: "POST",
@@ -48,13 +65,19 @@ export function ImageUpload({
         }
 
         onChange(data.imageUrl);
+
+        // Show warning if background removal was requested but not performed
+        if (data.warning) {
+          setError(data.warning);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Upload failed");
       } finally {
         setIsUploading(false);
+        setUploadStatus(null);
       }
     },
-    [folder, onChange]
+    [folder, onChange, removeBackground, canRemoveBackground]
   );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,15 +117,42 @@ export function ImageUpload({
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-3", className)}>
+      {/* Background removal toggle - only for products */}
+      {canRemoveBackground && !value && (
+        <div className="flex items-center gap-3 rounded-lg border border-tea-200 bg-tea-50/50 p-3">
+          <Sparkles className="h-4 w-4 text-tea-600" />
+          <div className="flex flex-1 items-center justify-between">
+            <Label
+              htmlFor="remove-bg"
+              className="cursor-pointer text-sm font-medium text-tea-800"
+            >
+              Achtergrond verwijderen
+            </Label>
+            <Switch
+              id="remove-bg"
+              checked={removeBackground}
+              onCheckedChange={setRemoveBackground}
+              disabled={disabled || isUploading}
+            />
+          </div>
+        </div>
+      )}
+
       {value ? (
         <div className="relative">
-          <div className="relative aspect-square w-full max-w-[200px] overflow-hidden rounded-xl border bg-muted">
+          <div
+            className={cn(
+              "relative aspect-square w-full max-w-[200px] overflow-hidden rounded-xl border",
+              // Checkerboard pattern to show transparency
+              "bg-[length:20px_20px] bg-[linear-gradient(45deg,#f0f0f0_25%,transparent_25%),linear-gradient(-45deg,#f0f0f0_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f0f0f0_75%),linear-gradient(-45deg,transparent_75%,#f0f0f0_75%)] bg-[position:0_0,0_10px,10px_-10px,-10px_0]"
+            )}
+          >
             <Image
               src={value}
               alt="Product image"
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="200px"
             />
           </div>
@@ -133,8 +183,10 @@ export function ImageUpload({
         >
           {isUploading ? (
             <>
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              <p className="mt-2 text-xs text-muted-foreground">Uploading...</p>
+              <Loader2 className="h-8 w-8 animate-spin text-tea-600" />
+              <p className="mt-2 text-center text-xs text-muted-foreground">
+                {uploadStatus}
+              </p>
             </>
           ) : (
             <>

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { uploadImage, isCloudinaryConfigured } from "@/lib/cloudinary";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,6 +22,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const rawFolder = (formData.get("folder") as string) || "products";
+    const removeBackground = formData.get("removeBackground") === "true";
 
     // Validate folder to prevent path traversal
     const allowedFolders = ["products", "categories", "banners", "avatars"];
@@ -53,25 +55,54 @@ export async function POST(request: NextRequest) {
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-").toLowerCase();
     const extension = path.extname(originalName) || ".png";
     const baseName = path.basename(originalName, extension);
-    const filename = `${baseName}-${timestamp}${extension}`;
+    const filename = `${baseName}-${timestamp}`;
 
-    // Ensure upload directory exists
+    // Get file buffer
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Try Cloudinary first if configured
+    if (isCloudinaryConfigured()) {
+      try {
+        const result = await uploadImage(buffer, filename, {
+          folder,
+          removeBackground: removeBackground && folder === "products",
+        });
+
+        return NextResponse.json({
+          success: true,
+          imageUrl: result.url,
+          publicId: result.publicId,
+          width: result.width,
+          height: result.height,
+          provider: "cloudinary",
+          backgroundRemoved: removeBackground && folder === "products",
+        });
+      } catch (cloudinaryError) {
+        console.error("Cloudinary upload failed, falling back to local:", cloudinaryError);
+        // Fall through to local storage
+      }
+    }
+
+    // Fallback: Local storage
+    const filenameWithExt = `${filename}${extension}`;
     const uploadDir = path.join(process.cwd(), "public", "images", folder);
     await mkdir(uploadDir, { recursive: true });
 
-    // Write file
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const filepath = path.join(uploadDir, filename);
+    const filepath = path.join(uploadDir, filenameWithExt);
     await writeFile(filepath, buffer);
 
-    // Return the public URL
-    const imageUrl = `/images/${folder}/${filename}`;
+    const imageUrl = `/images/${folder}/${filenameWithExt}`;
 
     return NextResponse.json({
       success: true,
       imageUrl,
-      filename,
+      filename: filenameWithExt,
+      provider: "local",
+      backgroundRemoved: false,
+      warning: removeBackground
+        ? "Background removal requires Cloudinary. Image saved without processing."
+        : undefined,
     });
   } catch (error) {
     console.error("Upload error:", error);
