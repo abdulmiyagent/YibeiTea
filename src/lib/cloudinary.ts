@@ -26,48 +26,64 @@ export async function uploadImage(
   buffer: Buffer,
   filename: string,
   options: UploadOptions
-): Promise<UploadResult> {
+): Promise<UploadResult & { backgroundRemoved?: boolean }> {
   const { folder, removeBackground = false } = options;
 
-  return new Promise((resolve, reject) => {
-    const uploadOptions: Record<string, unknown> = {
-      folder: `yibeitea/${folder}`,
-      public_id: filename.replace(/\.[^.]+$/, ""), // Remove extension
-      resource_type: "image",
-      format: "png", // PNG for transparency support
-    };
+  const doUpload = (withBackgroundRemoval: boolean): Promise<UploadResult & { backgroundRemoved?: boolean }> => {
+    return new Promise((resolve, reject) => {
+      const uploadOptions: Record<string, unknown> = {
+        folder: `yibeitea/${folder}`,
+        public_id: filename.replace(/\.[^.]+$/, ""), // Remove extension
+        resource_type: "image",
+        format: "png", // PNG for transparency support
+      };
 
-    // Add background removal transformation if requested
-    if (removeBackground) {
-      uploadOptions.background_removal = "cloudinary_ai";
-    }
-
-    // Upload using upload_stream for buffer data
-    const uploadStream = cloudinary.uploader.upload_stream(
-      uploadOptions,
-      (error, result) => {
-        if (error) {
-          console.error("Cloudinary upload error:", error);
-          reject(new Error(`Upload failed: ${error.message}`));
-          return;
-        }
-
-        if (!result) {
-          reject(new Error("Upload failed: No result returned"));
-          return;
-        }
-
-        resolve({
-          url: result.secure_url,
-          publicId: result.public_id,
-          width: result.width,
-          height: result.height,
-        });
+      // Add background removal transformation if requested
+      if (withBackgroundRemoval) {
+        uploadOptions.background_removal = "cloudinary_ai";
       }
-    );
 
-    uploadStream.end(buffer);
-  });
+      // Upload using upload_stream for buffer data
+      const uploadStream = cloudinary.uploader.upload_stream(
+        uploadOptions,
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            reject(new Error(`Upload failed: ${error.message}`));
+            return;
+          }
+
+          if (!result) {
+            reject(new Error("Upload failed: No result returned"));
+            return;
+          }
+
+          resolve({
+            url: result.secure_url,
+            publicId: result.public_id,
+            width: result.width,
+            height: result.height,
+            backgroundRemoved: withBackgroundRemoval,
+          });
+        }
+      );
+
+      uploadStream.end(buffer);
+    });
+  };
+
+  // Try with background removal first if requested
+  if (removeBackground) {
+    try {
+      return await doUpload(true);
+    } catch (error) {
+      console.warn("Background removal failed, retrying without:", error);
+      // Retry without background removal
+      return await doUpload(false);
+    }
+  }
+
+  return doUpload(false);
 }
 
 /**

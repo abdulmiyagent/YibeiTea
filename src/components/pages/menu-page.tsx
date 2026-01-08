@@ -18,6 +18,7 @@ import {
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 // Skeleton loader for product cards - compact layout
 function ProductCardSkeleton() {
@@ -208,7 +209,7 @@ export function MenuPageContent() {
       <div className="container-custom">
         {/* Header - Clean, minimal */}
         <div className="mb-8">
-          <h1 className="font-serif text-3xl font-medium text-tea-900 md:text-4xl">
+          <h1 className="font-serif text-3xl font-medium text-bordeaux-800 md:text-4xl">
             {t("title")}
           </h1>
         </div>
@@ -343,9 +344,9 @@ export function MenuPageContent() {
                     if (product) setSelectedProduct(product);
                   }}
                 >
-                  <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+                  <div className="relative h-12 w-12 rounded-xl bg-white flex items-center justify-center overflow-hidden">
                     {order.imageUrl ? (
-                      <img src={order.imageUrl} alt={order.name} className="h-full w-full object-cover" />
+                      <Image src={order.imageUrl} alt={order.name} fill className="object-cover" sizes="48px" />
                     ) : (
                       <span className="text-xl">🧋</span>
                     )}
@@ -392,12 +393,13 @@ export function MenuPageContent() {
                     {/* Product Image - square aspect ratio for compact display */}
                     <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-cream-50 via-white to-tea-50/30">
                       {product.imageUrl ? (
-                        <img
+                        <Image
                           src={product.imageUrl}
                           alt={translation?.name || product.slug}
-                          className="h-full w-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                          fill
+                          sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 16vw"
+                          className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
                           loading="lazy"
-                          decoding="async"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-tea-50 to-cream-100">

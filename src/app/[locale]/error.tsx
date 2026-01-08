@@ -59,7 +59,7 @@ export default function Error({
           {isNl ? "Er is iets misgegaan" : "Something went wrong"}
         </div>
 
-        <h1 className="text-2xl font-bold text-tea-900 mb-3">
+        <h1 className="text-2xl font-bold text-bordeaux-800 mb-3">
           {isNl ? "Oeps! We hebben een probleem" : "Oops! We hit a snag"}
         </h1>
 

@@ -103,6 +103,20 @@ const config: Config = {
           900: "#867353",
           950: "#473c2a",
         },
+        // Bordeaux from logo - deep red/maroon
+        bordeaux: {
+          50: "#fdf4f4",
+          100: "#fce8e8",
+          200: "#f9d4d4",
+          300: "#f4b1b1",
+          400: "#ec8282",
+          500: "#df5555",
+          600: "#c93939",
+          700: "#a82c2c",
+          800: "#8b2020",
+          900: "#751f1f",
+          950: "#400c0c",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -184,6 +198,7 @@ const config: Config = {
         "inner-soft": "inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)",
         "glow": "0 0 40px -10px rgba(217, 168, 108, 0.5)",
         "glow-matcha": "0 0 40px -10px rgba(102, 147, 88, 0.5)",
+        "glow-bordeaux": "0 0 40px -10px rgba(139, 32, 32, 0.5)",
       },
     },
   },

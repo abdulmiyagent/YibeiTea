@@ -57,7 +57,7 @@ export function AboutPageContent() {
             <span className="mb-4 inline-block rounded-full bg-tea-100 px-4 py-1.5 text-sm font-medium text-tea-700">
               {t("title")}
             </span>
-            <h1 className="mb-4 font-serif text-4xl font-bold tracking-tight text-tea-900 md:text-5xl">
+            <h1 className="mb-4 font-serif text-4xl font-bold tracking-tight text-bordeaux-800 md:text-5xl">
               {t("hero.title")}
             </h1>
             <p className="text-xl text-tea-600 font-medium">
@@ -96,7 +96,7 @@ export function AboutPageContent() {
             >
               <motion.h2
                 variants={fadeInUp}
-                className="mb-8 text-center font-serif text-3xl font-bold text-tea-900"
+                className="mb-8 text-center font-serif text-3xl font-bold text-bordeaux-800"
               >
                 {t("mission.title")}
               </motion.h2>
@@ -125,7 +125,7 @@ export function AboutPageContent() {
           >
             <motion.h2
               variants={fadeInUp}
-              className="mb-12 text-center font-serif text-3xl font-bold text-tea-900"
+              className="mb-12 text-center font-serif text-3xl font-bold text-bordeaux-800"
             >
               {t("values.title")}
             </motion.h2>
@@ -142,7 +142,7 @@ export function AboutPageContent() {
                     <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-${item.color}-100 transition-transform duration-300 group-hover:scale-110`}>
                       <Icon className={`h-8 w-8 text-${item.color}-600`} />
                     </div>
-                    <h3 className="mt-6 font-serif text-xl font-semibold text-tea-900">
+                    <h3 className="mt-6 font-serif text-xl font-semibold text-bordeaux-800">
                       {t(`values.${item.key}.title`)}
                     </h3>
                     <p className="mt-3 text-muted-foreground">
@@ -189,7 +189,7 @@ export function AboutPageContent() {
           >
             <motion.h2
               variants={fadeInUp}
-              className="mb-4 text-center font-serif text-3xl font-bold text-tea-900"
+              className="mb-4 text-center font-serif text-3xl font-bold text-bordeaux-800"
             >
               {t("menu.title")}
             </motion.h2>
@@ -249,7 +249,7 @@ export function AboutPageContent() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="mb-6 font-serif text-3xl font-bold text-tea-900">
+              <h2 className="mb-6 font-serif text-3xl font-bold text-bordeaux-800">
                 {t("visit.title")}
               </h2>
               <p className="mb-8 text-lg leading-relaxed text-muted-foreground">

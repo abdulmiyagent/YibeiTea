@@ -100,7 +100,7 @@ export default function AccountOrdersPage() {
               <Package className="h-6 w-6 text-tea-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-tea-900">
+              <h1 className="text-2xl font-bold text-bordeaux-800">
                 {locale === "nl" ? "Mijn Bestellingen" : "My Orders"}
               </h1>
               <p className="text-sm text-muted-foreground">

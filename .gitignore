@@ -49,3 +49,4 @@ prisma/migrations
 _ul
 nul
 .env.backup
+.env.production

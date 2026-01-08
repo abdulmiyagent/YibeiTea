@@ -82,7 +82,7 @@
 
   /* Selection styles */
   ::selection {
-    @apply bg-tea-200 text-tea-900;
+    @apply bg-tea-200 text-bordeaux-800;
   }
 }
 
@@ -261,6 +261,10 @@
 
 .text-gradient-matcha {
   @apply bg-gradient-to-r from-matcha-600 via-matcha-500 to-matcha-600 bg-clip-text text-transparent;
+}
+
+.text-gradient-bordeaux {
+  @apply bg-gradient-to-r from-bordeaux-800 via-bordeaux-700 to-bordeaux-800 bg-clip-text text-transparent;
 }
 
 /* Noise texture overlay */

@@ -271,10 +271,11 @@ export default function AdminSecurityPage() {
                       </p>
                     </div>
 
-                    {/* QR Code */}
+                    {/* QR Code - using img for data URL (Next/Image doesn't support data URLs) */}
                     <div className="flex justify-center">
                       <div className="rounded-2xl border-4 border-tea-100 bg-white p-4">
                         {qrCode && (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={qrCode}
                             alt="2FA QR Code"

@@ -6,6 +6,7 @@
     "sentry@claude-plugins-official": true,
     "vercel@claude-plugins-official": true,
     "stripe@claude-plugins-official": true,
-    "gitlab@claude-plugins-official": true
+    "gitlab@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true
   }
 }

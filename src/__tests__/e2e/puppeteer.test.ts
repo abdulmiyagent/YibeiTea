@@ -7,7 +7,7 @@ const BASE_URL = process.env.TEST_URL || "http://localhost:3000";
 const TEST_TIMEOUT = 120000; // 120 seconds for browser tests with extensions
 
 // Use a separate test profile directory to avoid conflicts with running Chrome
-const TEST_USER_DATA_DIR = path.join(os.tmpdir(), "puppeteer-test-profile");
+const TEST_USER_DATA_DIR = path.join(os.tmpdir(), `puppeteer-test-profile-${Date.now()}`);
 
 describe("E2E Browser Tests", () => {
   let browser: Browser;

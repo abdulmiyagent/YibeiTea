@@ -18,6 +18,7 @@ import {
 import { formatPrice, cn } from "@/lib/utils";
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
 import { api } from "@/lib/trpc";
+import Image from "next/image";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -139,17 +140,20 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     >
                       <div className="flex gap-3">
                         {/* Product Image */}
-                        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cream-50 to-tea-50 overflow-hidden">
+                        <div className="relative h-16 w-16 flex-shrink-0 rounded-xl bg-gradient-to-br from-cream-50 to-tea-50 overflow-hidden">
                           {item.imageUrl ? (
-                            <img
+                            <Image
                               src={item.imageUrl}
                               alt={item.name}
-                              className="h-full w-full object-cover"
+                              fill
+                              sizes="64px"
+                              className="object-cover"
                               loading="lazy"
-                              decoding="async"
                             />
                           ) : (
-                            <span className="text-2xl">🧋</span>
+                            <div className="flex h-full w-full items-center justify-center">
+                              <span className="text-2xl">🧋</span>
+                            </div>
                           )}
                         </div>
 

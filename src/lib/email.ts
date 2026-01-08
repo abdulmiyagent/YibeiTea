@@ -10,6 +10,48 @@ apiInstance.setApiKey(
 const FROM_EMAIL = process.env.BREVO_FROM_EMAIL || "noreply@yibeitea.be";
 const FROM_NAME = "Yibei Tea";
 
+// Mailtrap SMTP for testing (when configured)
+const USE_MAILTRAP = !!process.env.MAILTRAP_SMTP_USER && !!process.env.MAILTRAP_SMTP_PASS;
+
+// Mailtrap SMTP sender using fetch (no nodemailer dependency)
+async function sendViaMailtrap(to: string, toName: string | undefined, subject: string, htmlContent: string) {
+  const MAILTRAP_HOST = process.env.MAILTRAP_SMTP_HOST || "sandbox.smtp.mailtrap.io";
+  const MAILTRAP_PORT = process.env.MAILTRAP_SMTP_PORT || "2525";
+  const MAILTRAP_USER = process.env.MAILTRAP_SMTP_USER;
+  const MAILTRAP_PASS = process.env.MAILTRAP_SMTP_PASS;
+  const MAILTRAP_INBOX_ID = process.env.MAILTRAP_INBOX_ID;
+
+  if (!MAILTRAP_USER || !MAILTRAP_PASS) {
+    throw new Error("Mailtrap SMTP credentials not configured");
+  }
+
+  // Use Mailtrap's API instead of SMTP for simpler implementation
+  const apiUrl = `https://sandbox.api.mailtrap.io/api/send/${MAILTRAP_INBOX_ID}`;
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Api-Token": process.env.MAILTRAP_API_TOKEN || "",
+    },
+    body: JSON.stringify({
+      from: { email: FROM_EMAIL, name: FROM_NAME },
+      to: [{ email: to, name: toName || to }],
+      subject,
+      html: htmlContent,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error("Mailtrap API error:", error);
+    throw new Error(`Mailtrap send failed: ${response.status}`);
+  }
+
+  console.log(`[MAILTRAP] Email sent to ${to}: ${subject}`);
+  return response.json();
+}
+
 interface OrderItem {
   name: string;
   quantity: number;
@@ -200,18 +242,9 @@ interface VerificationEmailData {
 }
 
 export async function sendVerificationEmail(data: VerificationEmailData) {
-  if (!process.env.BREVO_API_KEY) {
-    console.warn("BREVO_API_KEY not set, skipping verification email");
-    return;
-  }
-
   const verifyUrl = `${process.env.NEXTAUTH_URL || "https://yibeitea.be"}/login/verify-email?token=${data.token}`;
-
-  const sendSmtpEmail = new brevo.SendSmtpEmail();
-  sendSmtpEmail.subject = "Bevestig je e-mailadres - Yibei Tea";
-  sendSmtpEmail.sender = { name: FROM_NAME, email: FROM_EMAIL };
-  sendSmtpEmail.to = [{ email: data.email, name: data.name || undefined }];
-  sendSmtpEmail.htmlContent = `
+  const subject = "Bevestig je e-mailadres - Yibei Tea";
+  const htmlContent = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -261,12 +294,35 @@ export async function sendVerificationEmail(data: VerificationEmailData) {
     </html>
   `;
 
+  // Use Mailtrap if configured (for testing), otherwise use Brevo
+  if (USE_MAILTRAP) {
+    try {
+      await sendViaMailtrap(data.email, data.name || undefined, subject, htmlContent);
+      console.log(`[MAILTRAP] Verification email sent to ${data.email}`);
+    } catch (error) {
+      console.error("Failed to send verification email via Mailtrap:", error);
+      throw error;
+    }
+    return;
+  }
+
+  if (!process.env.BREVO_API_KEY) {
+    console.warn("BREVO_API_KEY not set, skipping verification email");
+    return;
+  }
+
+  const sendSmtpEmail = new brevo.SendSmtpEmail();
+  sendSmtpEmail.subject = subject;
+  sendSmtpEmail.sender = { name: FROM_NAME, email: FROM_EMAIL };
+  sendSmtpEmail.to = [{ email: data.email, name: data.name || undefined }];
+  sendSmtpEmail.htmlContent = htmlContent;
+
   try {
     await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log(`Verification email sent to ${data.email}`);
   } catch (error) {
     console.error("Failed to send verification email:", error);
-    throw error; // Re-throw so registration can handle the error
+    throw error;
   }
 }
 

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { formatPrice } from "@/lib/utils";
+import Image from "next/image";
 
 export default function CartPage() {
   const t = useTranslations("cart");
@@ -64,7 +65,7 @@ export default function CartPage() {
             <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-cream-100 to-tea-50 shadow-soft">
               <ShoppingBag className="h-14 w-14 text-tea-400" />
             </div>
-            <h1 className="heading-2 text-tea-900">{t("title")}</h1>
+            <h1 className="heading-2 text-bordeaux-800">{t("title")}</h1>
             <p className="mt-4 text-muted-foreground">{t("empty")}</p>
             <Link href="/menu" className="mt-8 inline-block">
               <Button variant="tea" size="lg" className="rounded-full px-8 shadow-md transition-all hover:shadow-lg">
@@ -97,17 +98,20 @@ export default function CartPage() {
                     className="flex items-center gap-4 p-4 md:p-6"
                   >
                     {/* Product Image */}
-                    <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-tea-50 to-taro-50">
+                    <div className="relative h-20 w-20 flex-shrink-0 rounded-lg bg-gradient-to-br from-tea-50 to-taro-50 overflow-hidden">
                       {item.imageUrl ? (
-                        <img
+                        <Image
                           src={item.imageUrl}
                           alt={item.name}
-                          className="h-16 w-16 object-contain"
+                          fill
+                          sizes="80px"
+                          className="object-contain p-1"
                           loading="lazy"
-                          decoding="async"
                         />
                       ) : (
-                        <span className="text-4xl">🧋</span>
+                        <div className="flex h-full w-full items-center justify-center">
+                          <span className="text-4xl">🧋</span>
+                        </div>
                       )}
                     </div>
 

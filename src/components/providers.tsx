@@ -15,8 +15,11 @@ export function Providers({ children }: ProvidersProps) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000,
+            // Increased staleTime for better performance - data stays fresh longer
+            staleTime: 5 * 60 * 1000, // 5 minutes instead of 1 minute
+            cacheTime: 10 * 60 * 1000, // 10 minutes cache time (v4 syntax)
             refetchOnWindowFocus: false,
+            refetchOnMount: false, // Don't refetch on component mount if data exists
           },
         },
       })

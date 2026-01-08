@@ -17,6 +17,7 @@ import {
   Leaf,
 } from "lucide-react";
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
+import Image from "next/image";
 
 export default function FavoritesPage() {
   const t = useTranslations("account");
@@ -100,10 +101,12 @@ export default function FavoritesPage() {
                     {/* Thumbnail */}
                     <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-tea-50 to-taro-50">
                       {product.imageUrl ? (
-                        <img
+                        <Image
                           src={product.imageUrl}
                           alt={translation?.name || product.slug}
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="64px"
+                          className="object-cover"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">

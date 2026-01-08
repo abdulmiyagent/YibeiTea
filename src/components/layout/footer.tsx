@@ -18,6 +18,7 @@ import {
   Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 // Social icon component
 const SocialIcon = ({ platform }: { platform: string }) => {
@@ -121,9 +122,11 @@ export function Footer() {
           {/* Brand & About */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center">
-              <img
+              <Image
                 src="/images/logo.png"
                 alt="Yibei Tea"
+                width={48}
+                height={48}
                 className="h-12 w-auto"
               />
             </Link>

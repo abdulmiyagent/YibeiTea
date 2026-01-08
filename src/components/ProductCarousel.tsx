@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
@@ -8,7 +8,14 @@ import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight, Plus, Heart, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/trpc";
-import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+
+// Lazy load the customize dialog - only loaded when needed
+const ProductCustomizeDialog = dynamic(
+  () => import("@/components/products/product-customize-dialog").then(mod => mod.ProductCustomizeDialog),
+  { ssr: false }
+);
 
 // Background colors for cards (inspired by the screenshot)
 const cardColors = [
@@ -59,6 +66,126 @@ interface ProductCarouselProps {
   className?: string;
   showFavoriteButton?: boolean;
 }
+
+// Memoized Product Card for performance
+interface ProductCardProps {
+  product: Product;
+  index: number;
+  originalIndex: number;
+  cardsPerView: number;
+  showFavoriteButton: boolean;
+  isFavorite: boolean;
+  isLoadingFavorite: boolean;
+  onFavoriteClick: (e: React.MouseEvent, productId: string) => void;
+  onProductClick: (e: React.MouseEvent, product: Product) => void;
+}
+
+const ProductCard = memo(function ProductCard({
+  product,
+  index,
+  originalIndex,
+  cardsPerView,
+  showFavoriteButton,
+  isFavorite: productIsFavorite,
+  isLoadingFavorite,
+  onFavoriteClick,
+  onProductClick,
+}: ProductCardProps) {
+  const translation = product.translations[0];
+  const categorySlug = product.category?.slug || "";
+  const bgColor =
+    categoryColors[categorySlug] ||
+    cardColors[originalIndex % cardColors.length];
+
+  return (
+    <div
+      key={`${product.id}-${index}`}
+      className="flex-shrink-0 cursor-pointer"
+      style={{
+        width: `calc((100% - ${(Math.floor(cardsPerView) - 1) * 16}px) / ${cardsPerView})`,
+      }}
+      onClick={(e) => onProductClick(e, product)}
+    >
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.2 }}
+        className={cn(
+          "group relative flex h-[400px] flex-col overflow-hidden rounded-3xl p-6 text-white shadow-lg transition-shadow hover:shadow-xl",
+          bgColor
+        )}
+      >
+        {/* Favorite Button - Top Right */}
+        {showFavoriteButton && (
+          <button
+            onClick={(e) => onFavoriteClick(e, product.id)}
+            disabled={isLoadingFavorite}
+            className={cn(
+              "absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full transition-all",
+              productIsFavorite
+                ? "bg-white/30 text-red-400 hover:bg-white/40"
+                : "bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
+            )}
+            aria-label={productIsFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            {isLoadingFavorite ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Heart
+                className={cn(
+                  "h-5 w-5 transition-transform",
+                  productIsFavorite && "fill-current scale-110"
+                )}
+              />
+            )}
+          </button>
+        )}
+
+        {/* Product Name */}
+        <div className="flex items-start justify-between gap-2 pr-12">
+          <h3 className="font-serif text-xl font-bold uppercase leading-tight tracking-wide drop-shadow-md sm:text-2xl line-clamp-2">
+            {translation?.name || product.slug}
+          </h3>
+        </div>
+
+        {/* Product Image */}
+        <div className="relative mt-auto flex flex-1 items-end justify-center pb-2">
+          {product.imageUrl ? (
+            <div className="relative h-[220px] w-full">
+              <Image
+                src={product.imageUrl}
+                alt={translation?.name || product.slug}
+                fill
+                sizes="(max-width: 640px) 80vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 20vw"
+                className="object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+          ) : (
+            <span className="text-8xl drop-shadow-lg transition-transform duration-300 group-hover:scale-105">
+              🧋
+            </span>
+          )}
+        </div>
+
+        {/* Price Badge - Bottom Left */}
+        <div className="absolute bottom-4 left-4">
+          <span className="rounded-full bg-white/30 px-4 py-2 text-base font-bold backdrop-blur-sm shadow-sm">
+            €{Number(product.price).toFixed(2)}
+          </span>
+        </div>
+
+        {/* Floating Add to Cart Button - Opens customization modal */}
+        <button
+          onClick={(e) => onProductClick(e, product)}
+          className="absolute bottom-4 right-4 flex h-12 w-12 items-center justify-center rounded-full bg-white text-tea-700 shadow-lg transition-all hover:bg-tea-600 hover:text-white hover:scale-110 hover:shadow-xl"
+          aria-label="Customize and add to cart"
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+      </motion.div>
+    </div>
+  );
+});
 
 export function ProductCarousel({
   products,
@@ -124,24 +251,29 @@ export function ProductCarousel({
     },
   });
 
-  const isFavorite = (productId: string) =>
-    favorites?.some((fav) => fav.id === productId) ?? false;
+  const isFavorite = useCallback(
+    (productId: string) => favorites?.some((fav) => fav.id === productId) ?? false,
+    [favorites]
+  );
 
-  const handleFavoriteClick = (e: React.MouseEvent, productId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleFavoriteClick = useCallback(
+    (e: React.MouseEvent, productId: string) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    if (status !== "authenticated") {
-      router.push("/login");
-      return;
-    }
+      if (status !== "authenticated") {
+        router.push("/login");
+        return;
+      }
 
-    if (isFavorite(productId)) {
-      removeFavorite.mutate({ productId });
-    } else {
-      addFavorite.mutate({ productId });
-    }
-  };
+      if (favorites?.some((fav) => fav.id === productId)) {
+        removeFavorite.mutate({ productId });
+      } else {
+        addFavorite.mutate({ productId });
+      }
+    },
+    [status, router, favorites, removeFavorite, addFavorite]
+  );
 
   // Calculate cards per view based on screen width
   useEffect(() => {
@@ -243,11 +375,11 @@ export function ProductCarousel({
   };
 
   // Open customize dialog
-  const handleProductClick = (e: React.MouseEvent, product: Product) => {
+  const handleProductClick = useCallback((e: React.MouseEvent, product: Product) => {
     e.preventDefault();
     e.stopPropagation();
     setSelectedProduct(product);
-  };
+  }, []);
 
   // Calculate pagination dots
   const totalPages = Math.ceil(products.length / Math.floor(cardsPerView));
@@ -342,100 +474,20 @@ export function ProductCarousel({
         )}
         style={{ scrollBehavior: "auto" }}
       >
-        {extendedProducts.map((product, index) => {
-          const translation = product.translations[0];
-          const categorySlug = product.category?.slug || "";
-          const originalIndex = index % products.length;
-          const bgColor =
-            categoryColors[categorySlug] ||
-            cardColors[originalIndex % cardColors.length];
-          const productIsFavorite = isFavorite(product.id);
-          const isLoadingFavorite = loadingFavorites.has(product.id);
-
-          return (
-            <div
-              key={`${product.id}-${index}`}
-              className="flex-shrink-0 cursor-pointer"
-              style={{
-                width: `calc((100% - ${(Math.floor(cardsPerView) - 1) * 16}px) / ${cardsPerView})`,
-              }}
-              onClick={(e) => handleProductClick(e, product)}
-            >
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-                className={cn(
-                  "group relative flex h-[400px] flex-col overflow-hidden rounded-3xl p-6 text-white shadow-lg transition-shadow hover:shadow-xl",
-                  bgColor
-                )}
-              >
-                {/* Favorite Button - Top Right */}
-                {showFavoriteButton && (
-                  <button
-                    onClick={(e) => handleFavoriteClick(e, product.id)}
-                    disabled={isLoadingFavorite}
-                    className={cn(
-                      "absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full transition-all",
-                      productIsFavorite
-                        ? "bg-white/30 text-red-400 hover:bg-white/40"
-                        : "bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
-                    )}
-                    aria-label={productIsFavorite ? "Remove from favorites" : "Add to favorites"}
-                  >
-                    {isLoadingFavorite ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Heart
-                        className={cn(
-                          "h-5 w-5 transition-transform",
-                          productIsFavorite && "fill-current scale-110"
-                        )}
-                      />
-                    )}
-                  </button>
-                )}
-
-                {/* Product Name */}
-                <div className="flex items-start justify-between gap-2 pr-12">
-                  <h3 className="font-serif text-xl font-bold uppercase leading-tight tracking-wide drop-shadow-md sm:text-2xl line-clamp-2">
-                    {translation?.name || product.slug}
-                  </h3>
-                </div>
-
-                {/* Product Image */}
-                <div className="relative mt-auto flex flex-1 items-end justify-center pb-2">
-                  {product.imageUrl ? (
-                    <img
-                      src={product.imageUrl}
-                      alt={translation?.name || product.slug}
-                      className="h-auto max-h-[220px] w-auto max-w-full object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <span className="text-8xl drop-shadow-lg transition-transform duration-300 group-hover:scale-105">
-                      🧋
-                    </span>
-                  )}
-                </div>
-
-                {/* Price Badge - Bottom Left */}
-                <div className="absolute bottom-4 left-4">
-                  <span className="rounded-full bg-white/30 px-4 py-2 text-base font-bold backdrop-blur-sm shadow-sm">
-                    €{Number(product.price).toFixed(2)}
-                  </span>
-                </div>
-
-                {/* Floating Add to Cart Button - Opens customization modal */}
-                <button
-                  onClick={(e) => handleProductClick(e, product)}
-                  className="absolute bottom-4 right-4 flex h-12 w-12 items-center justify-center rounded-full bg-white text-tea-700 shadow-lg transition-all hover:bg-tea-600 hover:text-white hover:scale-110 hover:shadow-xl"
-                  aria-label="Customize and add to cart"
-                >
-                  <Plus className="h-6 w-6" />
-                </button>
-              </motion.div>
-            </div>
-          );
-        })}
+        {extendedProducts.map((product, index) => (
+          <ProductCard
+            key={`${product.id}-${index}`}
+            product={product}
+            index={index}
+            originalIndex={index % products.length}
+            cardsPerView={cardsPerView}
+            showFavoriteButton={showFavoriteButton}
+            isFavorite={isFavorite(product.id)}
+            isLoadingFavorite={loadingFavorites.has(product.id)}
+            onFavoriteClick={handleFavoriteClick}
+            onProductClick={handleProductClick}
+          />
+        ))}
       </div>
 
       {/* Pagination Dots */}

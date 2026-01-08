@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Lora, Nunito } from "next/font/google";
+import { Playfair_Display, Nunito } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -11,7 +11,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
 
-const lora = Lora({
+const playfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-serif",
@@ -116,7 +116,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
       </head>
       <body
-        className={`${lora.variable} ${nunito.variable} font-sans antialiased`}
+        className={`${playfair.variable} ${nunito.variable} font-sans antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
           <Providers>

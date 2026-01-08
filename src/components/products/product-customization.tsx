@@ -18,6 +18,7 @@ import {
   Heart,
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import Image from "next/image";
 
 // =============================================================================
 // HAPTIC FEEDBACK UTILITY
@@ -529,10 +530,12 @@ export function ProductCustomization({
         {/* Product Image Header - Larger, more appetizing */}
         <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-cream-100 via-tea-50 to-taro-50">
           {product.imageUrl ? (
-            <img
+            <Image
               src={product.imageUrl}
               alt={productName}
-              className="h-full w-full object-contain"
+              fill
+              sizes="(max-width: 640px) 100vw, 400px"
+              className="object-contain"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
@@ -761,10 +764,13 @@ export function ProductCustomization({
       {/* Product Image - large for page view */}
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-tea-50 to-taro-50">
         {product.imageUrl ? (
-          <img
+          <Image
             src={product.imageUrl}
             alt={productName}
-            className="h-full w-full object-cover"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+            priority
           />
         ) : (
           <div className="flex h-full min-h-[200px] items-center justify-center">

@@ -35,7 +35,7 @@ export default function NotFound() {
           </span>
         </div>
 
-        <h1 className="text-2xl font-bold text-tea-900 mb-3">
+        <h1 className="text-2xl font-bold text-bordeaux-800 mb-3">
           {isNl ? "Oeps! Pagina niet gevonden" : "Oops! Page not found"}
         </h1>
 

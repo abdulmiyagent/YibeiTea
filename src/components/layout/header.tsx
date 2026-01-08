@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -23,9 +23,10 @@ import { CartDrawer } from "@/components/cart/cart-drawer";
 import { StoreStatusBadge, MobileStoreStatusBadge, CompactStoreStatusBadge } from "./store-status-badge";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/trpc";
+import Image from "next/image";
 
-// Social icon component (matches footer icons)
-const SocialIcon = ({ platform }: { platform: string }) => {
+// Memoized social icon component for performance
+const SocialIcon = memo(function SocialIcon({ platform }: { platform: string }) {
   const iconClass = "h-4 w-4";
   switch (platform) {
     case "instagram":
@@ -84,7 +85,7 @@ const SocialIcon = ({ platform }: { platform: string }) => {
         </svg>
       );
   }
-};
+});
 
 export function Header() {
   const t = useTranslations("nav");
@@ -138,10 +139,13 @@ export function Header() {
           {/* Logo + Mobile Store Status */}
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center">
-              <img
+              <Image
                 src="/images/logo.png"
                 alt="Yibei Tea"
+                width={56}
+                height={56}
                 className="h-10 md:h-14 w-auto"
+                priority
               />
             </Link>
             <CompactStoreStatusBadge />
@@ -180,9 +184,11 @@ export function Header() {
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                   >
                     {session.user?.image ? (
-                      <img
+                      <Image
                         src={session.user.image}
                         alt={session.user.name || "User"}
+                        width={32}
+                        height={32}
                         className="h-6 w-6 md:h-8 md:w-8 rounded-full object-cover"
                       />
                     ) : (

@@ -1,7 +1,7 @@
 # Yibei Tea - Project Documentation
 
 > **Version:** 1.2.0
-> **Last Updated:** 2026-01-07
+> **Last Updated:** 2026-01-09
 > **Status:** In Development
 > **Repository:** github.com/abdulmiyagent/YibeiTea
 
@@ -114,7 +114,53 @@ Dashboard → View Orders → Update Status (Preparing → Ready) → Customer N
 
 ---
 
-## 4. UX/UI Decisions
+## 4. Brand Identity
+
+> **Full documentation:** See [BRAND_IDENTITY.md](BRAND_IDENTITY.md) for complete brand guidelines.
+
+### Brand Essence
+
+| Element | Value |
+|---------|-------|
+| **Tagline** | "Cup of Joy" (#cupofjoy) |
+| **Mission** | Authentieke, kwalitatieve bubble tea met een persoonlijke touch |
+| **Personality** | Warm, vriendelijk, kwaliteitsgericht, lokaal verankerd |
+
+### Visual Identity
+
+**Logo:** Gestileerde theekop met concentrische cirkels, vijf theebladeren, en Chinese karakters "一杯" (één kopje).
+
+**Kleurenpalet:**
+| Kleur | Hex | Gebruik |
+|-------|-----|---------|
+| Bordeaux | `#8B1E3F` | Logo "Yibei", headings |
+| Warm Oranje | `#E67E22` | Logo "Tea", CTAs |
+| Crème | `#FDF8F3` | Achtergronden |
+| Donkerbruin | `#2C1810` | Body tekst |
+
+**Typografie:**
+| Font | Gebruik | Reden |
+|------|---------|-------|
+| **Lora** | Headings | Warme, elegante serif die matcht met "Yibei" logo-deel |
+| **Nunito** | Body | Ronde, vriendelijke sans-serif die past bij "Tea" logo-deel |
+
+### Tone of Voice
+
+**Kenmerken:**
+- Warm & vriendelijk, niet te formeel
+- Uitnodigend: "See you soon 😇"
+- Lokaal verankerd: "In the heart of Ghent"
+- Emoji's spaarzaam (vooral 😇)
+
+**Gebaseerd op klantreviews:**
+- "Super friendly people"
+- "Nothing is impossible if you ask"
+- "Really clean and tidy"
+- "Still has that hint of tea bitterness" (kwaliteit boven zoet)
+
+---
+
+## 5. UX/UI Decisions
 
 ### Design System
 
@@ -174,7 +220,7 @@ Dashboard → View Orders → Update Status (Preparing → Ready) → Customer N
 
 ---
 
-## 5. Technical Architecture
+## 6. Technical Architecture
 
 ### Stack Overview
 
@@ -219,7 +265,7 @@ Dashboard → View Orders → Update Status (Preparing → Ready) → Customer N
 
 ---
 
-## 6. Data & Backend
+## 7. Data & Backend
 
 ### Database Schema (Core Models)
 
@@ -280,7 +326,7 @@ Topping
 
 ---
 
-## 7. Frontend Structure
+## 8. Frontend Structure
 
 ### Route Structure
 
@@ -325,7 +371,7 @@ src/app/[locale]/
 
 ---
 
-## 8. Key Decisions & Rationale
+## 9. Key Decisions & Rationale
 
 ### Architecture Decisions
 
@@ -355,7 +401,7 @@ src/app/[locale]/
 
 ---
 
-## 9. Risks & Dependencies
+## 10. Risks & Dependencies
 
 ### External Dependencies
 
@@ -399,7 +445,7 @@ src/app/[locale]/
 
 ---
 
-## 10. Open Questions & Future Ideas
+## 11. Open Questions & Future Ideas
 
 ### Open Questions
 - [ ] What are the exact loyalty point thresholds for tier upgrades?
@@ -570,7 +616,7 @@ export const fulfillmentConfig = {
 
 ---
 
-## 11. How to Work on This Project
+## 12. How to Work on This Project
 
 ### Development Setup
 
@@ -709,6 +755,7 @@ yibei-tea/
 - [ ] Production deployment
 
 ### Recently Completed
+- [x] Brand Identity Guide: complete brand guidelines based on logo, social media, and customer reviews analysis (Jan 2026)
 - [x] Email provider migration: Resend (US) → Brevo (France/EU) for native GDPR compliance, no SCCs needed (Jan 2026)
 - [x] Legal documents v4.0: TIA and Verwerkingsregister updated, 60% of processors now EU-based (Jan 2026)
 - [x] Newsletter campaign sending: Brevo integration with batch processing (Jan 2026)

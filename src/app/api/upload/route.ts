@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
           width: result.width,
           height: result.height,
           provider: "cloudinary",
-          backgroundRemoved: removeBackground && folder === "products",
+          backgroundRemoved: result.backgroundRemoved ?? false,
         });
       } catch (cloudinaryError) {
         console.error("Cloudinary upload failed, falling back to local:", cloudinaryError);
