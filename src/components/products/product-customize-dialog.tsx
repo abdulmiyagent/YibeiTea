@@ -94,7 +94,9 @@ export function ProductCustomizeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm p-0 gap-0 overflow-hidden rounded-2xl !fixed !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 !bottom-auto !right-auto">
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-sm p-0 gap-0 overflow-hidden rounded-2xl !fixed !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 !bottom-auto !right-auto">
         <DialogTitle className="sr-only">
           {product.translations[0]?.name || product.slug}
         </DialogTitle>

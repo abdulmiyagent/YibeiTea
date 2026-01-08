@@ -19,6 +19,14 @@ import {
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
 
+// Format slug to display name (taro-milk-tea → Taro Milk Tea)
+function formatSlug(slug: string): string {
+  return slug
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 // =============================================================================
 // TYPES - Shared across modal and page
 // =============================================================================
@@ -158,7 +166,7 @@ export function ProductCustomization({
 
     addItem({
       productId: product.id,
-      name: product.translations[0]?.name || product.slug,
+      name: product.translations[0]?.name || formatSlug(product.slug),
       price: totalPrice / quantity,
       quantity,
       imageUrl: product.imageUrl || undefined,
@@ -205,9 +213,9 @@ export function ProductCustomization({
     return t(`customize.${typeMap[type] || type.toLowerCase()}`);
   };
 
-  const productName = product.translations[0]?.name || product.slug;
+  const productName = product.translations[0]?.name || formatSlug(product.slug);
   const productDescription = product.translations[0]?.description;
-  const categoryName = product.category?.translations[0]?.name || product.category?.slug;
+  const categoryName = product.category?.translations[0]?.name || (product.category?.slug && formatSlug(product.category.slug));
 
   // Modal variant: ultra-compact floating card
   // Minimal, clean, non-intrusive
@@ -306,7 +314,7 @@ export function ProductCustomization({
                     )}
                   >
                     {isSelected && <Check className="h-2 w-2" />}
-                    {topping.translations[0]?.name || topping.slug}
+                    {topping.translations[0]?.name || formatSlug(topping.slug)}
                     <span className="opacity-60 text-[10px]">+€{Number(topping.price).toFixed(2)}</span>
                   </button>
                 );
@@ -520,7 +528,7 @@ export function ProductCustomization({
                     )}
                   >
                     {isSelected && <Check className="h-3 w-3" />}
-                    {topping.translations[0]?.name || topping.slug}
+                    {topping.translations[0]?.name || formatSlug(topping.slug)}
                     <span className={cn(
                       "text-xs",
                       isSelected ? "text-white/80" : "text-gray-400"
