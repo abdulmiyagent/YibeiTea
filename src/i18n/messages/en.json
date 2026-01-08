@@ -89,6 +89,10 @@
         "description": "At Yibei Tea, it's not just about the drink, but about the moment. Enjoying together, catching up and slowing down."
       }
     },
+    "review": {
+      "quote": "The best bubble tea in Ghent. Finally real tea, not too sweet, with that perfect hint of bitterness.",
+      "source": "Customer review"
+    },
     "menu": {
       "title": "What you can taste",
       "description": "At Yibei Tea you'll find an extensive menu including:",
@@ -97,7 +101,7 @@
         "icedCoffee": "Creative iced coffee varieties",
         "icedTea": "Refreshing fruity iced teas and mojito-style drinks",
         "warmCoffee": "Warm coffees and lattes",
-        "kids": "Special kids drinks"
+        "sweets": "Homemade cookies and pastries"
       },
       "closing": "Whether you choose a trusted classic or feel like discovering something new, there's something for everyone.",
       "viewMenu": "View Menu"

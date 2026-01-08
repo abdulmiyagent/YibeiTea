@@ -89,6 +89,10 @@
         "description": "Bij Yibei Tea draait het niet alleen om het drankje, maar om het moment. Samen genieten, bijpraten en even vertragen."
       }
     },
+    "review": {
+      "quote": "De beste bubble tea in Gent. Eindelijk echte thee, niet te zoet, met die perfecte hint van bitterheid.",
+      "source": "Klant review"
+    },
     "menu": {
       "title": "Wat je bij ons kunt proeven",
       "description": "Bij Yibei Tea vind je een uitgebreide menukaart met onder andere:",
@@ -97,7 +101,7 @@
         "icedCoffee": "Creatieve ijskoffievarianten",
         "icedTea": "Verfrissende fruitige ijstheeën en mojito-achtige drankjes",
         "warmCoffee": "Warme koffies en latte's",
-        "kids": "Speciale kids-drankjes"
+        "sweets": "Huisgemaakte koekjes en gebak"
       },
       "closing": "Of je nu kiest voor een vertrouwde klassieker of zin hebt om iets nieuws te ontdekken, er is voor ieder wat wils.",
       "viewMenu": "Bekijk Menu"

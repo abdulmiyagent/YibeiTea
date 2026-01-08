@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { MapPin, Clock, Phone, Mail, Leaf, Sparkles, Heart } from "lucide-react";
+import { MapPin, Clock, Phone, Mail, Leaf, Sparkles, Heart, Quote } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -34,7 +34,7 @@ export function AboutPageContent() {
     { key: "icedCoffee", icon: "☕" },
     { key: "icedTea", icon: "🍹" },
     { key: "warmCoffee", icon: "🫖" },
-    { key: "kids", icon: "🥤" },
+    { key: "sweets", icon: "🍪" },
   ];
 
   return (
@@ -151,6 +151,27 @@ export function AboutPageContent() {
                 );
               })}
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Review Quote Section */}
+      <section className="py-12 bg-tea-50/50">
+        <div className="container-custom">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mx-auto max-w-2xl text-center"
+          >
+            <Quote className="mx-auto h-10 w-10 text-tea-300 mb-4" />
+            <blockquote className="text-xl md:text-2xl font-serif text-tea-800 italic leading-relaxed">
+              {t("review.quote")}
+            </blockquote>
+            <p className="mt-4 text-sm text-muted-foreground">
+              — {t("review.source")}
+            </p>
           </motion.div>
         </div>
       </section>
@@ -319,7 +340,7 @@ export function AboutPageContent() {
           >
             <div className="aspect-video overflow-hidden rounded-3xl bg-muted shadow-soft">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2508.4!2d3.7238!3d51.0516!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTHCsDAzJzA2LjAiTiAzwrA0MycyNi4yIkU!5e0!3m2!1sen!2sbe!4v1234567890"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2508.5!2d3.7205!3d51.0538!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c371b12c3b8c9f%3A0x3f1c7c3e7a9c1234!2sSint-Niklaasstraat%2036%2C%209000%20Gent!5e0!3m2!1snl!2sbe!4v1704672000000!5m2!1snl!2sbe"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
