@@ -30,13 +30,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find the user
+    // Find the user with their OAuth accounts (if any)
     const user = await db.user.findUnique({
       where: { email },
       include: {
-        accounts: {
-          where: { provider: "credentials" },
-        },
+        accounts: true, // Get all accounts to check for OAuth providers
       },
     });
 
@@ -47,10 +45,13 @@ export async function POST(request: Request) {
       });
     }
 
-    // Only for credential users (Google users are auto-verified)
-    if (user.accounts.length === 0) {
+    // Skip OAuth users (Google users are auto-verified, they have OAuth account records)
+    // Credential users don't have Account records in NextAuth
+    const hasOAuthAccount = user.accounts.length > 0;
+    if (hasOAuthAccount) {
       return NextResponse.json({
-        message: "Als er een account bestaat met dit e-mailadres, ontvang je een verificatie-email.",
+        message: "Dit account gebruikt Google login. Je kunt direct inloggen.",
+        alreadyVerified: true,
       });
     }
 
