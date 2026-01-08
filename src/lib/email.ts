@@ -334,6 +334,90 @@ export async function sendNewsletterCampaign(data: NewsletterCampaignData): Prom
   return { success: failed === 0, sent, failed };
 }
 
+// Newsletter subscription confirmation email (double opt-in)
+interface NewsletterConfirmationData {
+  email: string;
+  name: string | null;
+  token: string;
+  locale: string;
+}
+
+export async function sendNewsletterConfirmationEmail(data: NewsletterConfirmationData) {
+  if (!process.env.BREVO_API_KEY) {
+    console.warn("BREVO_API_KEY not set, skipping newsletter confirmation email");
+    return;
+  }
+
+  const confirmUrl = `${process.env.NEXTAUTH_URL || "https://yibeitea.be"}/newsletter/confirm?token=${data.token}`;
+  const isNL = data.locale === "nl";
+
+  const sendSmtpEmail = new brevo.SendSmtpEmail();
+  sendSmtpEmail.subject = isNL
+    ? "Bevestig je nieuwsbrief inschrijving - Yibei Tea"
+    : "Confirm your newsletter subscription - Yibei Tea";
+  sendSmtpEmail.sender = { name: FROM_NAME, email: FROM_EMAIL };
+  sendSmtpEmail.to = [{ email: data.email, name: data.name || undefined }];
+  sendSmtpEmail.htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #9B7B5B; margin-bottom: 5px;">Yibei Tea</h1>
+        <p style="color: #666; margin: 0;">${isNL ? "Nieuwsbrief" : "Newsletter"}</p>
+      </div>
+
+      <div style="background: #f8f5f2; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <h2 style="color: #9B7B5B; margin-top: 0; margin-bottom: 16px;">
+          ${data.name ? (isNL ? `Hallo ${data.name}!` : `Hello ${data.name}!`) : (isNL ? "Hallo!" : "Hello!")}
+        </h2>
+        <p style="margin: 0;">
+          ${isNL
+            ? "Bedankt voor je interesse in onze nieuwsbrief! Klik op de onderstaande knop om je inschrijving te bevestigen."
+            : "Thank you for your interest in our newsletter! Click the button below to confirm your subscription."}
+        </p>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 24px;">
+        <a href="${confirmUrl}" style="display: inline-block; background: linear-gradient(135deg, #9B7B5B 0%, #7d634a 100%); color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+          ${isNL ? "Inschrijving bevestigen" : "Confirm subscription"}
+        </a>
+      </div>
+
+      <div style="background: #fff; border: 1px solid #e0d9d3; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <p style="margin: 0; color: #666; font-size: 14px; text-align: center;">
+          ${isNL ? "Of kopieer deze link naar je browser:" : "Or copy this link to your browser:"}<br>
+          <a href="${confirmUrl}" style="color: #9B7B5B; word-break: break-all;">${confirmUrl}</a>
+        </p>
+      </div>
+
+      <div style="text-align: center; color: #999; font-size: 12px;">
+        <p>${isNL
+          ? "Als je je niet hebt ingeschreven voor onze nieuwsbrief, kun je deze email negeren."
+          : "If you didn't subscribe to our newsletter, you can ignore this email."}</p>
+      </div>
+
+      <div style="text-align: center; color: #666; font-size: 14px; border-top: 1px solid #e0d9d3; padding-top: 24px; margin-top: 24px;">
+        <p>
+          <a href="https://yibeitea.be" style="color: #9B7B5B; text-decoration: none;">yibeitea.be</a>
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`Newsletter confirmation email sent to ${data.email}`);
+  } catch (error) {
+    console.error("Failed to send newsletter confirmation email:", error);
+    throw error;
+  }
+}
+
 function generateNewsletterHtml(content: string, recipient: NewsletterRecipient): string {
   const unsubscribeUrl = recipient.unsubscribeToken
     ? `https://yibeitea.be/unsubscribe?token=${recipient.unsubscribeToken}`

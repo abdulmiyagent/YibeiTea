@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, publicProcedure, adminProcedure, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { sendNewsletterConfirmationEmail } from "@/lib/email";
 
 export const newsletterRouter = router({
   // Public: Subscribe from footer (anonymous users)
@@ -27,14 +28,24 @@ export const newsletterRouter = router({
         }
         // Resubscribe if previously unsubscribed
         if (existing.status === "UNSUBSCRIBED") {
-          await ctx.db.newsletterSubscriber.update({
+          const updated = await ctx.db.newsletterSubscriber.update({
             where: { id: existing.id },
             data: {
               status: "PENDING",
               unsubscribedAt: null,
             },
           });
-          // TODO: Send confirmation email
+          // Send confirmation email
+          try {
+            await sendNewsletterConfirmationEmail({
+              email: updated.email,
+              name: updated.name,
+              token: updated.unsubscribeToken,
+              locale: updated.locale,
+            });
+          } catch (emailError) {
+            console.error("Failed to send newsletter confirmation:", emailError);
+          }
           return { success: true, message: "confirmation_sent" };
         }
         // Already pending
@@ -56,17 +67,26 @@ export const newsletterRouter = router({
       }
 
       // Create new subscriber (pending confirmation)
-      await ctx.db.newsletterSubscriber.create({
+      const subscriber = await ctx.db.newsletterSubscriber.create({
         data: {
           email: input.email.toLowerCase(),
           name: input.name,
           locale: input.locale,
           status: "PENDING",
-          // In production, would capture IP from request headers
         },
       });
 
-      // TODO: Send confirmation email with double opt-in link
+      // Send confirmation email with double opt-in link
+      try {
+        await sendNewsletterConfirmationEmail({
+          email: subscriber.email,
+          name: subscriber.name,
+          token: subscriber.unsubscribeToken,
+          locale: subscriber.locale,
+        });
+      } catch (emailError) {
+        console.error("Failed to send newsletter confirmation:", emailError);
+      }
       return { success: true, message: "confirmation_sent" };
     }),
 
