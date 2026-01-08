@@ -169,11 +169,16 @@ export function MenuPageContent() {
     return products.filter((product) => {
       const productName = product.translations[0]?.name || "";
       const productDescription = product.translations[0]?.description || "";
+      const categoryName = product.category?.translations[0]?.name || "";
+      const productSlug = product.slug || "";
 
-      // Search filter
+      // Search filter - search in name, description, category, and slug
       const matchesSearch =
+        !searchLower ||
         productName.toLowerCase().includes(searchLower) ||
-        productDescription.toLowerCase().includes(searchLower);
+        productDescription.toLowerCase().includes(searchLower) ||
+        categoryName.toLowerCase().includes(searchLower) ||
+        productSlug.toLowerCase().includes(searchLower);
 
       // Category filter: OR logic (if any category selected, product must be in one of them)
       const matchesCategory =
