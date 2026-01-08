@@ -128,17 +128,11 @@ interface IceSliderProps {
 }
 
 function IceSlider({ value, onChange, options }: IceSliderProps) {
-  const locale = useLocale() as "nl" | "en";
-
-  // Map ice levels to visual representation
-  const iceMap: Record<string, number> = {
-    "NO_ICE": 0,
-    "LESS_ICE": 33,
-    "NORMAL_ICE": 66,
-    "EXTRA_ICE": 100,
-  };
-
-  const iceLevel = iceMap[value] ?? 66;
+  // Calculate ice level based on position in options array
+  const currentIndex = options.findIndex(o => o.value === value);
+  const iceLevel = options.length > 1
+    ? ((currentIndex === -1 ? options.length - 1 : currentIndex) / (options.length - 1)) * 100
+    : 66;
   const cubeCount = Math.ceil((iceLevel / 100) * 4);
 
   return (
@@ -536,13 +530,15 @@ export function ProductCustomization({
                     value: v.value,
                     label: v.translations[0]?.label || v.value,
                   }));
+                  // Find default or use last option (usually "normal")
+                  const defaultIce = group.values.find(v => v.isDefault)?.value || options[options.length - 1]?.value || "";
                   return (
                     <div key={group.id}>
                       <label className="mb-3 block text-sm font-semibold text-gray-700">
                         {getGroupLabel(group.type)}
                       </label>
                       <IceSlider
-                        value={selectedOptions["ICE_LEVEL"] || "NORMAL_ICE"}
+                        value={selectedOptions["ICE_LEVEL"] || defaultIce}
                         onChange={(val) =>
                           setSelectedOptions({ ...selectedOptions, ICE_LEVEL: val })
                         }
