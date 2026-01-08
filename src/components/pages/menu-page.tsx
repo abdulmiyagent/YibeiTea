@@ -29,6 +29,14 @@ interface Product {
   } | null;
 }
 
+// Format slug to display name (brown-sugar → Brown Sugar)
+function formatSlug(slug: string): string {
+  return slug
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export function MenuPageContent() {
   const t = useTranslations("menu");
   const locale = useLocale() as "nl" | "en";
@@ -114,7 +122,7 @@ export function MenuPageContent() {
                     className="flex-shrink-0"
                     onClick={() => setSelectedCategory(category.slug)}
                   >
-                    {translation?.name || category.slug}
+                    {translation?.name || formatSlug(category.slug)}
                   </Button>
                 );
               })}
@@ -182,7 +190,7 @@ export function MenuPageContent() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <p className="text-xs text-tea-600 font-medium">
-                            {categoryTranslation?.name || product.category?.slug}
+                            {categoryTranslation?.name || (product.category?.slug && formatSlug(product.category.slug))}
                           </p>
                           {product.vegan && (
                             <Leaf className="h-3 w-3 text-matcha-500" />
