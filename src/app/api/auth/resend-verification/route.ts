@@ -45,9 +45,11 @@ export async function POST(request: Request) {
       });
     }
 
-    // Skip OAuth users (Google users are auto-verified, they have OAuth account records)
-    // Credential users don't have Account records in NextAuth
-    const hasOAuthAccount = user.accounts.length > 0;
+    // Skip OAuth users (Google users are auto-verified)
+    // Check if user has any OAuth account (not credentials)
+    const hasOAuthAccount = user.accounts.some(
+      (account) => account.provider !== "credentials"
+    );
     if (hasOAuthAccount) {
       return NextResponse.json({
         message: "Dit account gebruikt Google login. Je kunt direct inloggen.",
