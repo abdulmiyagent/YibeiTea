@@ -61,13 +61,13 @@ export default function CartPage() {
       <div className="section-padding">
         <div className="container-custom">
           <div className="mx-auto max-w-md text-center">
-            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
-              <ShoppingBag className="h-12 w-12 text-muted-foreground" />
+            <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-cream-100 to-tea-50 shadow-soft">
+              <ShoppingBag className="h-14 w-14 text-tea-400" />
             </div>
-            <h1 className="heading-2">{t("title")}</h1>
+            <h1 className="heading-2 text-tea-900">{t("title")}</h1>
             <p className="mt-4 text-muted-foreground">{t("empty")}</p>
             <Link href="/menu" className="mt-8 inline-block">
-              <Button variant="tea" size="lg">
+              <Button variant="tea" size="lg" className="rounded-full px-8 shadow-md transition-all hover:shadow-lg">
                 {t("continueShopping")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -89,8 +89,8 @@ export default function CartPage() {
         <div className="mt-8 grid gap-8 lg:grid-cols-3">
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardContent className="divide-y p-0">
+            <Card className="overflow-hidden rounded-2xl border-gray-100 shadow-soft">
+              <CardContent className="divide-y divide-gray-100 p-0">
                 {items.map((item) => (
                   <div
                     key={item.id}
@@ -139,30 +139,26 @@ export default function CartPage() {
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
+                    <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 p-1">
+                      <button
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-all hover:bg-white hover:text-tea-600 hover:shadow-sm"
                         onClick={() =>
                           updateQuantity(item.id, item.quantity - 1)
                         }
                       >
                         <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-8 text-center font-medium">
+                      </button>
+                      <span className="w-8 text-center font-semibold text-tea-900">
                         {item.quantity}
                       </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
+                      <button
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-all hover:bg-white hover:text-tea-600 hover:shadow-sm"
                         onClick={() =>
                           updateQuantity(item.id, item.quantity + 1)
                         }
                       >
                         <Plus className="h-4 w-4" />
-                      </Button>
+                      </button>
                     </div>
 
                     {/* Item Total */}
@@ -204,9 +200,9 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardHeader>
-                <CardTitle>Overzicht</CardTitle>
+            <Card className="sticky top-24 overflow-hidden rounded-2xl border-gray-100 shadow-soft">
+              <CardHeader className="bg-gradient-to-b from-cream-50 to-white pb-4">
+                <CardTitle className="text-tea-900">Overzicht</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Promo Code */}
@@ -281,9 +277,9 @@ export default function CartPage() {
                   </span>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="pt-0">
                 <Link href="/checkout" className="w-full">
-                  <Button variant="tea" size="lg" className="w-full">
+                  <Button variant="tea" size="lg" className="w-full rounded-full shadow-md transition-all hover:shadow-lg">
                     {t("checkout")}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>

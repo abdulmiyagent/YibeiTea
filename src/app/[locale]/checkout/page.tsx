@@ -469,7 +469,7 @@ export default function CheckoutPage() {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Form Section */}
           <div className="lg:col-span-2">
-            <Card>
+            <Card className="overflow-hidden rounded-2xl border-gray-100 shadow-soft">
               <CardContent className="p-6">
                 {/* Step 1: Contact Details */}
                 {currentStep === 0 && (
@@ -539,6 +539,7 @@ export default function CheckoutPage() {
                             key={time}
                             variant={formData.pickupTime === time ? "tea" : "outline"}
                             size="sm"
+                            className="rounded-full"
                             onClick={() => updateFormData("pickupTime", time)}
                           >
                             {time}
@@ -597,6 +598,7 @@ export default function CheckoutPage() {
                 <div className="mt-8 flex justify-between">
                   <Button
                     variant="ghost"
+                    className="rounded-full"
                     onClick={handleBack}
                     disabled={currentStep === 0}
                   >
@@ -607,13 +609,14 @@ export default function CheckoutPage() {
                   </Button>
 
                   {currentStep < steps.length - 1 ? (
-                    <Button variant="tea" onClick={handleNext}>
+                    <Button variant="tea" className="rounded-full shadow-md transition-all hover:shadow-lg" onClick={handleNext}>
                       {t(`steps.${steps[currentStep + 1].id}`)}
                       <ChevronRight className="ml-2 h-4 w-4" />
                     </Button>
                   ) : (
                     <Button
                       variant="tea"
+                      className="rounded-full shadow-md transition-all hover:shadow-lg"
                       onClick={handleSubmit}
                       disabled={isProcessing}
                     >
@@ -627,9 +630,9 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardHeader>
-                <CardTitle>Besteloverzicht</CardTitle>
+            <Card className="sticky top-24 overflow-hidden rounded-2xl border-gray-100 shadow-soft">
+              <CardHeader className="bg-gradient-to-b from-cream-50 to-white pb-4">
+                <CardTitle className="text-tea-900">Besteloverzicht</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Items */}

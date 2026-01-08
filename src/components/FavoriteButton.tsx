@@ -68,9 +68,9 @@ export function FavoriteButton({
       size={size}
       variant={variant}
       className={cn(
-        "rounded-full transition-colors",
-        isFavorite && "text-red-500 hover:text-red-600",
-        !isFavorite && "text-muted-foreground hover:text-red-500",
+        "rounded-full transition-all duration-200",
+        isFavorite && "text-red-500 hover:text-red-600 hover:scale-110",
+        !isFavorite && "text-muted-foreground hover:text-red-500 hover:scale-110",
         className
       )}
       onClick={handleClick}
@@ -80,7 +80,10 @@ export function FavoriteButton({
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
         <Heart
-          className={cn("h-4 w-4", isFavorite && "fill-current")}
+          className={cn(
+            "h-4 w-4 transition-transform duration-200",
+            isFavorite && "fill-current scale-110"
+          )}
         />
       )}
     </Button>
