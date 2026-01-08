@@ -19,17 +19,16 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
 import { cn } from "@/lib/utils";
 
-// Skeleton loader for product cards - vertical image-forward layout
+// Skeleton loader for product cards - compact layout
 function ProductCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
-      <Skeleton className="aspect-square w-full" />
-      <div className="p-4 space-y-2">
-        <Skeleton className="h-3 w-16" />
-        <Skeleton className="h-5 w-full" />
-        <div className="flex items-center justify-between pt-2">
-          <Skeleton className="h-5 w-14" />
-          <Skeleton className="h-9 w-9 rounded-full" />
+    <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
+      <Skeleton className="aspect-[4/5] w-full" />
+      <div className="p-2 space-y-1.5">
+        <Skeleton className="h-4 w-full" />
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-7 w-7 rounded-full" />
         </div>
       </div>
     </div>
@@ -366,22 +365,21 @@ export function MenuPageContent() {
 
         {/* Initial Loading State */}
         {isInitialLoading && (
-          <div className="mt-6 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-            {[...Array(8)].map((_, i) => (
+          <div className="mt-4 grid gap-2.5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {[...Array(10)].map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
           </div>
         )}
 
-        {/* Products Grid - Visual image-forward cards */}
+        {/* Products Grid - Compact cards optimized for mobile */}
         {!isInitialLoading && (
           <div className={cn(
-            "mt-6 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 transition-opacity duration-200",
+            "mt-4 grid gap-2.5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 transition-opacity duration-200",
             isFetching && "opacity-70"
           )}>
             {filteredProducts.map((product) => {
               const translation = product.translations[0];
-              const categoryTranslation = product.category?.translations[0];
 
               return (
                 <div
@@ -389,66 +387,61 @@ export function MenuPageContent() {
                   className="group cursor-pointer"
                   onClick={() => setSelectedProduct(product)}
                 >
-                  {/* Vertical image-forward card */}
-                  <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-200 hover:shadow-lg hover:border-tea-200 hover:-translate-y-0.5">
-                    {/* Product Image - Hero element */}
-                    <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-cream-50 to-tea-50">
+                  {/* Compact card with 4:5 aspect ratio image */}
+                  <div className="overflow-hidden rounded-xl border border-gray-100 bg-white transition-all duration-200 hover:shadow-md hover:border-tea-200 hover:-translate-y-0.5">
+                    {/* Product Image - shorter aspect ratio for compact display */}
+                    <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-cream-50 via-white to-tea-50/30">
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
                           alt={translation?.name || product.slug}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
                           loading="lazy"
                           decoding="async"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <span className="text-5xl transition-transform duration-300 group-hover:scale-110">🧋</span>
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-tea-50 to-cream-100">
+                          <span className="text-4xl transition-transform duration-300 group-hover:scale-110">🧋</span>
                         </div>
                       )}
 
-                      {/* Floating badges */}
+                      {/* Floating badges - smaller */}
                       {product.vegan && (
-                        <div className="absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full bg-matcha-500 text-white shadow-sm">
-                          <Leaf className="h-3.5 w-3.5" />
+                        <div className="absolute top-1.5 left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-matcha-500 text-white shadow-sm">
+                          <Leaf className="h-3 w-3" />
                         </div>
                       )}
 
-                      {/* Favorite button - top right - always visible */}
-                      <div className="absolute top-2 right-2">
+                      {/* Favorite button - smaller */}
+                      <div className="absolute top-1.5 right-1.5">
                         <FavoriteButton
                           productId={product.id}
-                          className="h-8 w-8 bg-white/90 backdrop-blur-sm shadow-sm"
+                          className="h-7 w-7 bg-white/90 backdrop-blur-sm shadow-sm"
                         />
                       </div>
                     </div>
 
-                    {/* Product Info */}
-                    <div className="p-3">
-                      {/* Category */}
-                      <p className="text-xs text-gray-500 mb-0.5">
-                        {categoryTranslation?.name || (product.category?.slug && formatSlug(product.category.slug))}
-                      </p>
-
-                      {/* Name */}
-                      <h3 className="font-medium text-gray-900 text-sm leading-tight line-clamp-2 min-h-[2.5rem]">
+                    {/* Product Info - more compact */}
+                    <div className="p-2">
+                      {/* Name - single line with truncate */}
+                      <h3 className="font-medium text-gray-900 text-sm leading-snug truncate">
                         {translation?.name || formatSlug(product.slug)}
                       </h3>
 
                       {/* Price + Add button row */}
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-base font-bold text-tea-600">
+                      <div className="flex items-center justify-between mt-1.5">
+                        <span className="text-sm font-bold text-tea-600">
                           €{Number(product.price).toFixed(2)}
                         </span>
                         <button
-                          className="flex h-9 w-9 items-center justify-center rounded-full bg-tea-600 text-white shadow-sm transition-all hover:bg-tea-700 hover:shadow-md active:scale-95"
+                          className="flex h-7 w-7 items-center justify-center rounded-full bg-tea-600 text-white shadow-sm transition-all hover:bg-tea-700 active:scale-95"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedProduct(product);
                           }}
                           aria-label={locale === "nl" ? "Toevoegen" : "Add"}
                         >
-                          <Plus className="h-4 w-4" />
+                          <Plus className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
