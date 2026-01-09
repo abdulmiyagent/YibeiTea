@@ -29,6 +29,7 @@ import {
   Mail,
 } from "lucide-react";
 import Link from "next/link";
+import { AdminLanguageSwitcher } from "@/components/admin/admin-language-switcher";
 
 const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -117,7 +118,8 @@ export default function AdminDashboardPage() {
               Welkom terug! Hier is een overzicht van vandaag.
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
+            <AdminLanguageSwitcher />
             <Link href="/admin/orders">
               <Button variant="tea">
                 <Package className="mr-2 h-4 w-4" />

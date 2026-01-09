@@ -1,0 +1,699 @@
+{
+  "common": {
+    "brandName": "Yibei Tea",
+    "tagline": "Yibei Tea",
+    "loading": "लोड हुँदैछ...",
+    "error": "त्रुटि भयो",
+    "retry": "पुन: प्रयास गर्नुहोस्",
+    "save": "सेभ गर्नुहोस्",
+    "cancel": "रद्द गर्नुहोस्",
+    "delete": "मेटाउनुहोस्",
+    "edit": "सम्पादन गर्नुहोस्",
+    "close": "बन्द गर्नुहोस्",
+    "back": "पछाडि",
+    "next": "अर्को",
+    "previous": "अघिल्लो",
+    "search": "खोज्नुहोस्",
+    "all": "सबै",
+    "yes": "हो",
+    "no": "होइन"
+  },
+  "nav": {
+    "home": "गृहपृष्ठ",
+    "menu": "मेनु",
+    "about": "हाम्रो बारेमा",
+    "contact": "सम्पर्क",
+    "cart": "कार्ट",
+    "account": "मेरो खाता",
+    "login": "लगइन",
+    "logout": "लगआउट",
+    "register": "दर्ता गर्नुहोस्",
+    "admin": "एड्मिन",
+    "orders": "अर्डरहरू",
+    "favorites": "मनपर्ने"
+  },
+  "storeStatus": {
+    "open": "खुला",
+    "closed": "बन्द",
+    "openUntil": "{time} सम्म खुला",
+    "opensAt": "{time} मा खुल्छ",
+    "opensTomorrow": "भोलि {time} मा खुल्छ",
+    "closedToday": "आज बन्द"
+  },
+  "contact": {
+    "title": "सम्पर्क",
+    "subtitle": "तपाईंको कुनै प्रश्न वा सुझाव छ? हामीलाई सम्पर्क गर्नुहोस्!",
+    "visitUs": "हामीलाई भेट्नुहोस्",
+    "form": {
+      "name": "नाम",
+      "namePlaceholder": "तपाईंको नाम",
+      "email": "इमेल",
+      "emailPlaceholder": "तपाईंको इमेल",
+      "subject": "विषय",
+      "subjectPlaceholder": "तपाईंको सन्देश बारे",
+      "message": "सन्देश",
+      "messagePlaceholder": "तपाईंको सन्देश...",
+      "submit": "सन्देश पठाउनुहोस्",
+      "submitting": "पठाउँदै..."
+    },
+    "success": {
+      "title": "सन्देश पठाइयो!",
+      "message": "तपाईंको सन्देशको लागि धन्यवाद। हामी चाँडै सम्पर्क गर्नेछौं।",
+      "newMessage": "नयाँ सन्देश"
+    }
+  },
+  "about": {
+    "title": "हाम्रो बारेमा",
+    "hero": {
+      "title": "Yibei Tea मा स्वागत छ",
+      "subtitle": "Ghent मा तपाईंको बबल टी गन्तव्य!"
+    },
+    "intro": "Yibei Tea मा, हामी प्रामाणिक बबल, समृद्ध स्वाद र न्यानो, व्यक्तिगत वातावरण ल्याउँछौं। ग्राहकहरू ताजा पेयको लागि आउँछन्।",
+    "mission": {
+      "title": "हाम्रो लक्ष्य",
+      "description": "हाम्रो लक्ष्य सरल छ: बबल टी जस्तो हुनुपर्छ त्यस्तै बनाउने। वास्तविक दूध, बलियो चिया र नरम टापियोका मोतीहरूसँग।",
+      "growth": "बबल टीको माग बढ्दै गएको बेला, हामीले ग्राहकहरूले बस्न र आनन्द लिन सक्ने ठाउँ खोज्यौं।"
+    },
+    "values": {
+      "title": "हाम्रा मूल्यहरू",
+      "authenticity": {
+        "title": "प्रामाणिकता",
+        "description": "हामी परम्परागत एशियाली बबल टी संस्कृतिमा विश्वस्त रहन्छौं।"
+      },
+      "quality": {
+        "title": "गुणस्तर",
+        "description": "हामी ताजा सामग्री प्रयोग गर्छौं: बलियो चिया र क्रीमी दूध।"
+      },
+      "warmth": {
+        "title": "न्यानोपन",
+        "description": "Yibei Tea मा, यो पेय मात्र होइन, क्षण हो।"
+      }
+    },
+    "review": {
+      "quote": "Ghent को सबैभन्दा राम्रो बबल टी।",
+      "source": "ग्राहक समीक्षा"
+    },
+    "menu": {
+      "title": "के स्वाद लिन सक्नुहुन्छ",
+      "description": "Yibei Tea मा तपाईंले पाउनुहुनेछ:",
+      "items": {
+        "classic": "क्लासिक बबल टी दूध र टापियोकासँग",
+        "icedCoffee": "आइस्ड कफी विविधताहरू",
+        "icedTea": "ताजगी दिने फलफूल आइस्ड टी",
+        "warmCoffee": "तातो कफी र लाते",
+        "sweets": "मिठाइ र केक",
+        "noodles": "इन्स्ट्यान्ट नुडल्स"
+      },
+      "closing": "सबैका लागि केही छ।",
+      "viewMenu": "मेनु हेर्नुहोस्"
+    },
+    "visit": {
+      "title": "हामीलाई भेट्नुहोस्",
+      "description": "Sint-Niklaasstraat 36, 9000 Ghent मा Yibei Tea भेट्नुहोस्।",
+      "tagline": "Yibei Tea — प्रामाणिक बबल, न्यानो भेटघाट।"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "सबैभन्दा राम्रो बबल टी",
+      "titleAccent": "Ghent मा",
+      "subtitle": "प्रिमियम सामग्रीका साथ हातले बनाइएको पेय",
+      "cta": "हाम्रो मेनु हेर्नुहोस्",
+      "orderNow": "अहिले अर्डर गर्नुहोस्",
+      "scrollHint": "पत्ता लगाउन स्क्रोल गर्नुहोस्"
+    },
+    "featured": {
+      "title": "हाम्रा मनपर्नेहरू",
+      "subtitle": "सबैभन्दा मनपर्ने पेयहरू",
+      "viewAll": "पूर्ण मेनु हेर्नुहोस्",
+      "addToCart": "कार्टमा थप्नुहोस्",
+      "added": "थपियो!"
+    },
+    "myFavorites": {
+      "title": "मेरा मनपर्ने",
+      "subtitle": "तपाईंका मनपर्ने पेयहरू",
+      "empty": "अहिले सम्म मनपर्ने छैन",
+      "emptySubtitle": "यहाँ देख्न मनपर्नेमा पेय थप्नुहोस्",
+      "browseMenu": "मेनु हेर्नुहोस्",
+      "loginRequired": "मनपर्ने देख्न लगइन गर्नुहोस्"
+    },
+    "story": {
+      "label": "हाम्रो कथा",
+      "title": "सपनादेखि वास्तविकतासम्म",
+      "description": "Yibei Tea Naim द्वारा स्थापित गरिएको थियो।",
+      "readMore": "थप पढ्नुहोस्",
+      "highlight1": {
+        "value": "१००%",
+        "label": "ताजा सामग्री"
+      },
+      "highlight2": {
+        "value": "१५+",
+        "label": "अनौठा स्वाद"
+      },
+      "highlight3": {
+        "value": "५०००+",
+        "label": "खुसी ग्राहकहरू"
+      }
+    },
+    "categories": {
+      "title": "हाम्रो संग्रह",
+      "subtitle": "क्लासिक मिल्क टी देखि ताजा फलफूल इन्फ्युजन सम्म",
+      "bubbleTea": "बबल टी",
+      "bubbleTeaDesc": "ताजा टापियोकासँग क्लासिक पर्ल टी",
+      "milkTea": "मिल्क टी",
+      "milkTeaDesc": "प्रिमियम दूधसँग क्रीमी टी",
+      "icedTea": "आइस्ड टी",
+      "icedTeaDesc": "ताजगी दिने फलफूल इन्फ्युजन",
+      "icedCoffee": "आइस्ड कफी",
+      "icedCoffeeDesc": "चिसो कफी क्रिएशन",
+      "mojito": "मोजिटो",
+      "mojitoDesc": "अल्कोहल-मुक्त ककटेल",
+      "seasonal": "सिजनल स्पेसल"
+    },
+    "whyUs": {
+      "title": "किन Yibei Tea?",
+      "subtitle": "हामीलाई अरूभन्दा फरक बनाउने",
+      "quality": {
+        "title": "प्रिमियम गुणस्तर",
+        "description": "सबैभन्दा राम्रो चिया पात र ताजा सामग्री"
+      },
+      "fresh": {
+        "title": "दैनिक ताजा",
+        "description": "हरेक पेय अर्डरमा बनाइन्छ"
+      },
+      "customize": {
+        "title": "तपाईंको छनोट",
+        "description": "चिनी, बरफ र टपिङहरू अनुकूलन गर्नुहोस्"
+      },
+      "loyalty": {
+        "title": "पुरस्कार कमाउनुहोस्",
+        "description": "हरेक अर्डरसँग पोइन्ट जम्मा गर्नुहोस्"
+      }
+    },
+    "reviews": {
+      "title": "हाम्रा ग्राहकहरू के भन्छन्",
+      "subtitle": "हाम्रा सन्तुष्ट भ्रमणकर्ताहरूको अनुभव पढ्नुहोस्"
+    },
+    "loyalty": {
+      "title": "हाम्रो टी परिवारमा सामेल हुनुहोस्",
+      "subtitle": "हाम्रो लोयल्टी कार्यक्रममा साइन अप गर्नुहोस्",
+      "benefit1": "प्रति यूरो १० पोइन्ट कमाउनुहोस्",
+      "benefit2": "जन्मदिनमा नि:शुल्क पेय",
+      "benefit3": "विशेष सिजनल अफरहरू",
+      "cta": "नि:शुल्क खाता बनाउनुहोस्",
+      "welcomeTitle": "Yibei परिवारमा स्वागत छ!",
+      "welcomeSubtitle": "हाम्रो टी परिवारको हिस्सा हुनुभएकोमा धन्यवाद",
+      "welcomeBenefit1": "तपाईं पोइन्ट कमाइरहनु भएको छ",
+      "welcomeBenefit2": "आफ्नो पुरस्कार जाँच गर्नुहोस्",
+      "welcomeBenefit3": "आफ्नो फाइदा हेर्नुहोस्",
+      "welcomeCta": "मेरो खाता"
+    },
+    "location": {
+      "title": "हामीलाई भेट्नुहोस्",
+      "subtitle": "प्रामाणिक बबल टी अनुभवको लागि आउनुहोस्",
+      "address": "Sint-Niklaasstraat 36, 9000 Ghent",
+      "hours": "खुला समय",
+      "monday": "सोमबार",
+      "tuesday": "मंगलबार",
+      "wednesday": "बुधबार",
+      "thursday": "बिहीबार",
+      "friday": "शुक्रबार",
+      "saturday": "शनिबार",
+      "sunday": "आइतबार",
+      "closed": "बन्द",
+      "directions": "दिशा पाउनुहोस्"
+    },
+    "cta": {
+      "title": "तपाईंको अर्को मनपर्ने पेयको लागि तयार?",
+      "subtitle": "अनलाइन अर्डर गर्नुहोस् र सुविधाजनक समयमा लिनुहोस्।",
+      "button": "आफ्नो अर्डर सुरु गर्नुहोस्"
+    }
+  },
+  "menu": {
+    "title": "हाम्रो मेनु",
+    "filter": {
+      "all": "सबै पेय",
+      "vegan": "भेगन",
+      "caffeineFree": "क्याफिन मुक्त"
+    },
+    "sort": {
+      "default": "पूर्वनिर्धारित",
+      "priceAsc": "मूल्य: कम देखि उच्च",
+      "priceDesc": "मूल्य: उच्च देखि कम",
+      "nameAsc": "नाम: A-Z"
+    },
+    "addToCart": "कार्टमा थप्नुहोस्",
+    "customize": "अनुकूलन",
+    "outOfStock": "स्टकमा छैन",
+    "calories": "क्यालोरी"
+  },
+  "product": {
+    "customize": {
+      "title": "तपाईंको पेय अनुकूलन गर्नुहोस्",
+      "sugarLevel": "चिनी स्तर",
+      "iceLevel": "बरफ स्तर",
+      "toppings": "टपिङहरू",
+      "milkType": "दूधको प्रकार",
+      "size": "आकार"
+    },
+    "sugarLevels": {
+      "0": "चिनी छैन",
+      "25": "२५% चिनी",
+      "50": "५०% चिनी",
+      "75": "७५% चिनी",
+      "100": "१००% चिनी"
+    },
+    "iceLevels": {
+      "none": "बरफ छैन",
+      "less": "कम बरफ",
+      "normal": "सामान्य",
+      "extra": "थप बरफ"
+    },
+    "allergens": "एलर्जेन",
+    "nutritionalInfo": "पोषण जानकारी"
+  },
+  "cart": {
+    "title": "किनमेल कार्ट",
+    "empty": "तपाईंको कार्ट खाली छ",
+    "continueShopping": "किनमेल जारी राख्नुहोस्",
+    "item": "वस्तु",
+    "items": "वस्तुहरू",
+    "subtotal": "उपकुल",
+    "discount": "छुट",
+    "total": "कुल",
+    "checkout": "चेकआउट",
+    "viewCart": "कार्ट हेर्नुहोस्",
+    "remove": "हटाउनुहोस्",
+    "updateQuantity": "मात्रा अपडेट गर्नुहोस्",
+    "promoCode": {
+      "label": "प्रोमो कोड",
+      "placeholder": "कोड प्रविष्ट गर्नुहोस्",
+      "apply": "लागू गर्नुहोस्",
+      "applied": "कोड लागू भयो!",
+      "invalid": "अमान्य कोड"
+    }
+  },
+  "checkout": {
+    "title": "चेकआउट",
+    "preorder": {
+      "title": "प्रि-अर्डर",
+      "badge": "प्रि-अर्डर",
+      "description": "पसल अहिले बन्द छ। तपाईं पछिको लागि अर्डर गर्न सक्नुहुन्छ।",
+      "pickupInfo": "हामी फेरि खोल्दा तपाईंको अर्डर तयार हुनेछ।"
+    },
+    "steps": {
+      "details": "विवरण",
+      "pickup": "पिकअप",
+      "payment": "भुक्तानी"
+    },
+    "contact": {
+      "title": "सम्पर्क विवरण",
+      "name": "नाम",
+      "email": "इमेल",
+      "phone": "फोन नम्बर"
+    },
+    "pickup": {
+      "title": "पिकअप समय",
+      "selectDate": "मिति छान्नुहोस्",
+      "selectTime": "समय छान्नुहोस्",
+      "asap": "सकेसम्म चाँडो",
+      "schedule": "अगाडि योजना गर्नुहोस्"
+    },
+    "payment": {
+      "title": "भुक्तानी विधि",
+      "methods": {
+        "bancontact": "Bancontact",
+        "ideal": "iDEAL",
+        "creditcard": "क्रेडिट कार्ड",
+        "paypal": "PayPal"
+      }
+    },
+    "loyalty": {
+      "title": "लोयल्टी पोइन्ट",
+      "available": "उपलब्ध पोइन्ट",
+      "use": "पोइन्ट प्रयोग गर्नुहोस्",
+      "earn": "यो अर्डरसँग {points} पोइन्ट कमाउनुहुनेछ"
+    },
+    "notes": {
+      "label": "टिप्पणी",
+      "placeholder": "विशेष अनुरोध वा एलर्जी..."
+    },
+    "validation": {
+      "nameRequired": "नाम आवश्यक छ",
+      "emailRequired": "इमेल आवश्यक छ",
+      "emailInvalid": "अमान्य इमेल ठेगाना",
+      "pickupTimeInvalid": "कृपया भविष्यको पिकअप समय छान्नुहोस्",
+      "fixErrors": "अर्डर गर्नु अघि त्रुटिहरू ठीक गर्नुहोस्"
+    },
+    "placeOrder": "अर्डर गर्नुहोस्",
+    "processing": "प्रक्रियामा..."
+  },
+  "order": {
+    "confirmation": {
+      "title": "तपाईंको अर्डरको लागि धन्यवाद!",
+      "orderNumber": "अर्डर नम्बर",
+      "pickupTime": "पिकअप समय",
+      "emailSent": "{email} मा पुष्टि पठाइएको छ",
+      "placeAnother": "अर्को अर्डर गर्नुहोस्",
+      "viewOrders": "मेरा अर्डरहरू हेर्नुहोस्"
+    },
+    "status": {
+      "pending": "पर्खिरहेको",
+      "paid": "भुक्तानी भयो",
+      "preparing": "तयारी हुँदैछ",
+      "ready": "पिकअपको लागि तयार",
+      "completed": "पूरा भयो",
+      "cancelled": "रद्द भयो"
+    },
+    "track": "अर्डर ट्र्याक गर्नुहोस्"
+  },
+  "account": {
+    "title": "मेरो खाता",
+    "welcome": "स्वागत छ, {name}!",
+    "orders": {
+      "title": "मेरा अर्डरहरू",
+      "empty": "तपाईंले अहिलेसम्म अर्डर गर्नुभएको छैन",
+      "viewDetails": "विवरण हेर्नुहोस्"
+    },
+    "loyalty": {
+      "title": "लोयल्टी कार्यक्रम",
+      "points": "पोइन्ट",
+      "tier": "तह",
+      "nextTier": "{tier} सम्म {points} पोइन्ट बाँकी",
+      "rewards": "उपलब्ध पुरस्कार",
+      "history": "पोइन्ट इतिहास"
+    },
+    "favorites": {
+      "title": "मनपर्नेहरू",
+      "empty": "अहिलेसम्म मनपर्ने छैन"
+    },
+    "settings": {
+      "title": "सेटिङहरू",
+      "profile": "प्रोफाइल",
+      "language": "भाषा",
+      "notifications": "सूचनाहरू"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "लगइन",
+      "email": "इमेल ठेगाना",
+      "password": "पासवर्ड",
+      "rememberMe": "मलाई सम्झनुहोस्",
+      "forgotPassword": "पासवर्ड बिर्सनुभयो?",
+      "submit": "लगइन",
+      "noAccount": "खाता छैन?",
+      "register": "यहाँ दर्ता गर्नुहोस्",
+      "orContinueWith": "वा जारी राख्नुहोस्"
+    },
+    "register": {
+      "title": "खाता बनाउनुहोस्",
+      "name": "नाम",
+      "email": "इमेल ठेगाना",
+      "password": "पासवर्ड",
+      "confirmPassword": "पासवर्ड पुष्टि गर्नुहोस्",
+      "terms": "म नियम र सर्तहरूमा सहमत छु",
+      "submit": "दर्ता गर्नुहोस्",
+      "hasAccount": "पहिले नै खाता छ?",
+      "login": "यहाँ लगइन गर्नुहोस्"
+    },
+    "errors": {
+      "invalidCredentials": "अमान्य प्रमाणहरू",
+      "emailExists": "यो इमेल पहिले नै दर्ता भएको छ",
+      "weakPassword": "पासवर्ड धेरै कमजोर छ",
+      "passwordMismatch": "पासवर्ड मेल खाँदैन"
+    },
+    "verification": {
+      "title": "तपाईंको इमेल प्रमाणित गर्नुहोस्",
+      "sentTo": "हामीले प्रमाणीकरण इमेल पठाएका छौं:",
+      "clickLink": "तपाईंको खाता सक्रिय गर्न इमेलमा लिंक क्लिक गर्नुहोस्।",
+      "resendButton": "प्रमाणीकरण इमेल पुन: पठाउनुहोस्",
+      "resending": "पठाउँदै...",
+      "resendSuccess": "नयाँ प्रमाणीकरण इमेल पठाइयो!",
+      "resendError": "प्रमाणीकरण इमेल पठाउन सकेन।",
+      "backToLogin": "लगइनमा फर्कनुहोस्",
+      "verifying": "इमेल प्रमाणित गर्दै...",
+      "verifyingWait": "इमेल प्रमाणित गर्दा पर्खनुहोस्...",
+      "success": "इमेल प्रमाणित भयो!",
+      "successMessage": "तपाईंको इमेल ठेगाना सफलतापूर्वक प्रमाणित भएको छ।",
+      "goToLogin": "लगइनमा जानुहोस्",
+      "alreadyVerified": "पहिले नै प्रमाणित",
+      "alreadyVerifiedMessage": "तपाईंको इमेल ठेगाना पहिले नै प्रमाणित भएको थियो।",
+      "failed": "प्रमाणीकरण असफल भयो",
+      "failedMessage": "प्रमाणीकरण लिंक समाप्त भएको वा पहिले नै प्रयोग गरिसकेको हुन सक्छ।",
+      "noToken": "URL मा प्रमाणीकरण टोकन फेला परेन।"
+    }
+  },
+  "footer": {
+    "address": "ठेगाना",
+    "hours": "खुला समय",
+    "contact": "सम्पर्क",
+    "followUs": "हामीलाई फलो गर्नुहोस्",
+    "tagline": "Ghent को सबैभन्दा राम्रो बबल टी। सबैभन्दा राम्रो सामग्रीले ताजा तयार।",
+    "weekdayHours": "सोम - शनि: ११:०० - २०:००",
+    "sundayHours": "आइत: १०:०० - १९:००",
+    "phone": "फोन",
+    "email": "इमेल",
+    "newsletter": {
+      "title": "अपडेट रहनुहोस्",
+      "placeholder": "तपाईंको इमेल ठेगाना",
+      "subscribe": "सदस्यता लिनुहोस्",
+      "description": "विशेष अफरहरू र सिजनल स्पेसलहरूको समाचार प्राप्त गर्नुहोस्।",
+      "messages": {
+        "confirmation_sent": "सदस्यता पुष्टि गर्न इमेल जाँच गर्नुहोस्।",
+        "confirmation_pending": "तपाईंले पहिले नै पुष्टि इमेल पाउनुभएको छ।",
+        "subscribed_as_user": "तपाईं अब न्युजलेटरमा सदस्य हुनुभयो!",
+        "already_subscribed": "तपाईं पहिले नै हाम्रो न्युजलेटरमा सदस्य हुनुहुन्छ।",
+        "error": "त्रुटि भयो। पछि पुन: प्रयास गर्नुहोस्।"
+      }
+    },
+    "legal": {
+      "privacy": "गोपनीयता नीति",
+      "terms": "नियम र सर्तहरू"
+    },
+    "copyright": "© {year} Yibei Tea। सर्वाधिकार सुरक्षित।"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "ड्यासबोर्ड",
+      "todayOrders": "आजका अर्डरहरू",
+      "todayRevenue": "आजको आय",
+      "pendingOrders": "पर्खिरहेका अर्डरहरू",
+      "totalCustomers": "कुल ग्राहकहरू",
+      "welcome": "फेरि स्वागत छ! आजको अवलोकन।",
+      "recentOrders": "हालका अर्डरहरू",
+      "viewAll": "सबै हेर्नुहोस्",
+      "popularProducts": "लोकप्रिय उत्पादनहरू",
+      "noOrders": "आज कुनै अर्डर छैन",
+      "noData": "अहिलेसम्म डाटा उपलब्ध छैन",
+      "orders": "अर्डरहरू",
+      "pickup": "पिकअप",
+      "vsYesterday": "हिजोको तुलनामा",
+      "actionRequired": "कार्य आवश्यक",
+      "thisWeek": "यो हप्ता"
+    },
+    "orders": {
+      "title": "अर्डरहरू",
+      "new": "नयाँ",
+      "updateStatus": "स्थिति अपडेट गर्नुहोस्",
+      "orderNumber": "अर्डर नम्बर",
+      "customer": "ग्राहक",
+      "items": "वस्तुहरू",
+      "total": "कुल",
+      "status": "स्थिति",
+      "pickupTime": "पिकअप समय",
+      "actions": "कार्यहरू",
+      "noOrders": "कुनै अर्डर फेला परेन",
+      "filterByStatus": "स्थितिले फिल्टर गर्नुहोस्",
+      "allStatuses": "सबै स्थिति",
+      "pending": "पर्खिरहेको",
+      "paid": "भुक्तानी भयो",
+      "preparing": "तयारी हुँदैछ",
+      "ready": "तयार",
+      "completed": "पूरा भयो",
+      "cancelled": "रद्द भयो",
+      "markPreparing": "तयारी सुरु गर्नुहोस्",
+      "markReady": "तयार चिन्ह लगाउनुहोस्",
+      "markCompleted": "पूरा भयो भनी चिन्ह लगाउनुहोस्"
+    },
+    "products": {
+      "title": "उत्पादनहरू",
+      "add": "उत्पादन थप्नुहोस्",
+      "edit": "उत्पादन सम्पादन गर्नुहोस्",
+      "name": "नाम",
+      "price": "मूल्य",
+      "category": "श्रेणी",
+      "status": "स्थिति",
+      "actions": "कार्यहरू",
+      "active": "सक्रिय",
+      "inactive": "निष्क्रिय",
+      "description": "विवरण",
+      "image": "छवि",
+      "featured": "विशेष",
+      "vegan": "भेगन",
+      "caffeineFree": "क्याफिन मुक्त",
+      "calories": "क्यालोरी",
+      "allergens": "एलर्जेन",
+      "save": "उत्पादन सेभ गर्नुहोस्",
+      "delete": "उत्पादन मेटाउनुहोस्",
+      "confirmDelete": "के तपाईं यो उत्पादन मेटाउन निश्चित हुनुहुन्छ?"
+    },
+    "categories": {
+      "title": "श्रेणीहरू",
+      "add": "श्रेणी थप्नुहोस्",
+      "edit": "श्रेणी सम्पादन गर्नुहोस्",
+      "name": "नाम",
+      "description": "विवरण",
+      "productCount": "उत्पादन गणना",
+      "actions": "कार्यहरू"
+    },
+    "toppings": {
+      "title": "टपिङहरू",
+      "add": "टपिङ थप्नुहोस्",
+      "edit": "टपिङ सम्पादन गर्नुहोस्",
+      "name": "नाम",
+      "price": "मूल्य",
+      "available": "उपलब्ध",
+      "actions": "कार्यहरू"
+    },
+    "customers": {
+      "title": "ग्राहकहरू",
+      "name": "नाम",
+      "email": "इमेल",
+      "orders": "अर्डरहरू",
+      "points": "पोइन्ट",
+      "tier": "तह",
+      "joined": "सामेल भएको",
+      "actions": "कार्यहरू",
+      "addPoints": "पोइन्ट थप्नुहोस्",
+      "viewOrders": "अर्डरहरू हेर्नुहोस्"
+    },
+    "analytics": {
+      "title": "एनालिटिक्स",
+      "revenue": "आय",
+      "orders": "अर्डरहरू",
+      "popularProducts": "लोकप्रिय उत्पादनहरू",
+      "period": "अवधि",
+      "today": "आज",
+      "thisWeek": "यो हप्ता",
+      "thisMonth": "यो महिना",
+      "thisYear": "यो वर्ष",
+      "totalRevenue": "कुल आय",
+      "totalOrders": "कुल अर्डरहरू",
+      "averageOrder": "औसत अर्डर",
+      "newCustomers": "नयाँ ग्राहकहरू"
+    },
+    "settings": {
+      "title": "सेटिङहरू",
+      "store": "पसल सेटिङहरू",
+      "openingHours": "खुला समय",
+      "loyalty": "लोयल्टी सेटिङहरू",
+      "storeName": "पसलको नाम",
+      "storeEmail": "पसलको इमेल",
+      "storePhone": "पसलको फोन",
+      "storeAddress": "पसलको ठेगाना",
+      "pointsPerEuro": "प्रति यूरो पोइन्ट",
+      "welcomeBonus": "स्वागत बोनस",
+      "save": "सेटिङहरू सेभ गर्नुहोस्",
+      "saved": "सेटिङहरू सेभ भयो!"
+    },
+    "promoCodes": {
+      "title": "प्रोमो कोडहरू",
+      "add": "प्रोमो कोड थप्नुहोस्",
+      "edit": "प्रोमो कोड सम्पादन गर्नुहोस्",
+      "code": "कोड",
+      "discount": "छुट",
+      "type": "प्रकार",
+      "percentage": "प्रतिशत",
+      "fixed": "निश्चित रकम",
+      "minOrder": "न्यूनतम अर्डर",
+      "maxUses": "अधिकतम प्रयोग",
+      "usedCount": "प्रयोग गणना",
+      "validFrom": "बाट मान्य",
+      "validUntil": "सम्म मान्य",
+      "active": "सक्रिय",
+      "actions": "कार्यहरू"
+    },
+    "rewards": {
+      "title": "पुरस्कारहरू",
+      "add": "पुरस्कार थप्नुहोस्",
+      "edit": "पुरस्कार सम्पादन गर्नुहोस्",
+      "name": "नाम",
+      "description": "विवरण",
+      "pointsCost": "पोइन्ट लागत",
+      "type": "प्रकार",
+      "available": "उपलब्ध",
+      "actions": "कार्यहरू"
+    },
+    "newsletter": {
+      "title": "न्युजलेटर",
+      "subscribers": "सदस्यहरू",
+      "campaigns": "अभियानहरू",
+      "totalSubscribers": "कुल सदस्यहरू",
+      "activeSubscribers": "सक्रिय सदस्यहरू",
+      "createCampaign": "अभियान सिर्जना गर्नुहोस्",
+      "sendCampaign": "अभियान पठाउनुहोस्"
+    },
+    "timeSlots": {
+      "title": "समय स्लटहरू",
+      "date": "मिति",
+      "time": "समय",
+      "capacity": "क्षमता",
+      "booked": "बुक भएको",
+      "available": "उपलब्ध",
+      "disabled": "असक्षम",
+      "actions": "कार्यहरू",
+      "disableSlot": "स्लट असक्षम गर्नुहोस्",
+      "enableSlot": "स्लट सक्षम गर्नुहोस्"
+    },
+    "security": {
+      "title": "सुरक्षा",
+      "twoFactor": "दुई-कारक प्रमाणीकरण",
+      "enable2FA": "2FA सक्षम गर्नुहोस्",
+      "disable2FA": "2FA असक्षम गर्नुहोस्",
+      "sessions": "सक्रिय सत्रहरू",
+      "logoutAll": "सबैबाट लगआउट गर्नुहोस्"
+    },
+    "sidebar": {
+      "dashboard": "ड्यासबोर्ड",
+      "orders": "अर्डरहरू",
+      "products": "उत्पादनहरू",
+      "categories": "श्रेणीहरू",
+      "toppings": "टपिङहरू",
+      "customers": "ग्राहकहरू",
+      "analytics": "एनालिटिक्स",
+      "promoCodes": "प्रोमो कोडहरू",
+      "rewards": "पुरस्कारहरू",
+      "newsletter": "न्युजलेटर",
+      "timeSlots": "समय स्लटहरू",
+      "settings": "सेटिङहरू",
+      "security": "सुरक्षा"
+    },
+    "quickActions": {
+      "manageProducts": "उत्पादन व्यवस्थापन",
+      "addEditDelete": "थप्नुहोस्, सम्पादन गर्नुहोस् वा मेटाउनुहोस्",
+      "categories": "श्रेणीहरू",
+      "manageCategories": "उत्पादन श्रेणीहरू व्यवस्थापन गर्नुहोस्",
+      "toppings": "टपिङहरू",
+      "toppingsBoba": "टापियोका, बोबा र अरू",
+      "analytics": "एनालिटिक्स",
+      "viewStats": "तथ्याङ्क र रिपोर्टहरू हेर्नुहोस्",
+      "promoCodes": "प्रोमो कोडहरू",
+      "manageDiscounts": "छुट कोडहरू व्यवस्थापन गर्नुहोस्",
+      "rewards": "पुरस्कारहरू",
+      "loyaltyRewards": "लोयल्टी पुरस्कार व्यवस्थापन गर्नुहोस्",
+      "customers": "ग्राहकहरू",
+      "pointsManagement": "पोइन्ट र ग्राहक व्यवस्थापन",
+      "newsletter": "न्युजलेटर",
+      "subscribersCampaigns": "सदस्यहरू र अभियानहरू",
+      "settings": "सेटिङहरू",
+      "storeLoyalty": "पसल र लोयल्टी"
+    },
+    "language": {
+      "title": "भाषा",
+      "dutch": "डच",
+      "english": "अंग्रेजी",
+      "nepali": "नेपाली"
+    }
+  }
+}
