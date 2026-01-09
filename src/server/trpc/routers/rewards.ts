@@ -6,7 +6,7 @@ import { calculateLoyaltyTier } from "@/lib/utils";
 export const rewardsRouter = router({
   // Get all available rewards
   getAll: publicProcedure
-    .input(z.object({ locale: z.enum(["nl", "en"]).default("nl") }))
+    .input(z.object({ locale: z.enum(["nl", "en", "ne"]).default("nl") }))
     .query(async ({ ctx, input }) => {
       const rewards = await ctx.db.reward.findMany({
         where: { isAvailable: true },
@@ -158,7 +158,7 @@ export const rewardsRouter = router({
         isAvailable: z.boolean().default(true),
         translations: z.array(
           z.object({
-            locale: z.enum(["nl", "en"]),
+            locale: z.enum(["nl", "en", "ne"]),
             name: z.string(),
             description: z.string(),
           })
@@ -196,7 +196,7 @@ export const rewardsRouter = router({
         translations: z
           .array(
             z.object({
-              locale: z.enum(["nl", "en"]),
+              locale: z.enum(["nl", "en", "ne"]),
               name: z.string(),
               description: z.string(),
             })

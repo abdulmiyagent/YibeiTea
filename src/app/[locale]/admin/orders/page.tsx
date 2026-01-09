@@ -19,7 +19,9 @@ import {
   Package,
   Loader2,
   RefreshCw,
+  Zap,
 } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const statusColors = {
@@ -95,7 +97,7 @@ export default function AdminOrdersPage() {
     refetch,
   } = api.orders.getAll.useQuery(
     { limit: 100 },
-    { enabled: authStatus === "authenticated" && session?.user?.role === "ADMIN" }
+    { enabled: authStatus === "authenticated" && ["ADMIN", "SUPER_ADMIN"].includes(session?.user?.role || "") }
   );
 
   // Update status mutation
@@ -117,7 +119,7 @@ export default function AdminOrdersPage() {
     );
   }
 
-  if (authStatus === "unauthenticated" || session?.user?.role !== "ADMIN") {
+  if (authStatus === "unauthenticated" || !["ADMIN", "SUPER_ADMIN"].includes(session?.user?.role || "")) {
     router.push("/");
     return null;
   }
@@ -153,15 +155,23 @@ export default function AdminOrdersPage() {
               {t("manage")} ({orders?.length || 0} {t("total")})
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isLoading}
-          >
-            <RefreshCw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
-            {t("refresh")}
-          </Button>
+          <div className="flex gap-2">
+            <Link href="/admin/orders/active">
+              <Button variant="tea" size="sm">
+                <Zap className="mr-2 h-4 w-4" />
+                {t("liveMode")}
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isLoading}
+            >
+              <RefreshCw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
+              {t("refresh")}
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}

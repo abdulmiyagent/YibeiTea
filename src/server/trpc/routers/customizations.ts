@@ -6,7 +6,7 @@ export const customizationsRouter = router({
   getAll: publicProcedure
     .input(
       z.object({
-        locale: z.enum(["nl", "en"]).default("nl"),
+        locale: z.enum(["nl", "en", "ne"]).default("nl"),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -67,7 +67,7 @@ export const customizationsRouter = router({
         sortOrder: z.number().int().default(0),
         translations: z.array(
           z.object({
-            locale: z.enum(["nl", "en"]),
+            locale: z.enum(["nl", "en", "ne"]),
             label: z.string(),
           })
         ),
@@ -120,7 +120,7 @@ export const customizationsRouter = router({
         translations: z
           .array(
             z.object({
-              locale: z.enum(["nl", "en"]),
+              locale: z.enum(["nl", "en", "ne"]),
               label: z.string(),
             })
           )

@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { AdminLanguageSwitcher } from "@/components/admin/admin-language-switcher";
+import { ActiveOrdersWidget } from "@/components/admin/active-orders-widget";
 
 const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -230,77 +231,13 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
 
-        {/* Main Content */}
-        <div className="mt-8 grid gap-6 lg:grid-cols-3">
-          {/* Recent Orders */}
-          <Card className="lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>{t("recentOrders")}</CardTitle>
-              <Link href="/admin/orders">
-                <Button variant="ghost" size="sm">
-                  {t("viewAll")}
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
-            </CardHeader>
-            <CardContent>
-              {ordersLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-tea-600" />
-                </div>
-              ) : recentOrders && recentOrders.length > 0 ? (
-                <div className="space-y-4">
-                  {recentOrders.map((order) => (
-                    <div
-                      key={order.id}
-                      className="flex items-center justify-between rounded-lg border p-4"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tea-100">
-                          <Coffee className="h-5 w-5 text-tea-600" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium">{order.id}</p>
-                            <Badge
-                              className={
-                                statusColors[
-                                  order.status as keyof typeof statusColors
-                                ]
-                              }
-                            >
-                              {
-                                statusLabels[
-                                  order.status as keyof typeof statusLabels
-                                ]
-                              }
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {order.customer} • {order.items.slice(0, 2).join(", ")}{order.items.length > 2 ? ` +${order.items.length - 2}` : ""}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">€{order.total.toFixed(2)}</p>
-                        {order.time && (
-                          <p className="text-sm text-muted-foreground">
-                            {t("pickup")}: {order.time}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="py-8 text-center text-muted-foreground">
-                  {t("noOrders")}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+        {/* Active Orders Widget - Full width */}
+        <div className="mt-8">
+          <ActiveOrdersWidget />
+        </div>
 
-          {/* Popular Products */}
+        {/* Popular Products - Sidebar */}
+        <div className="mt-8 lg:max-w-sm">
           <Card>
             <CardHeader>
               <CardTitle>{t("popularProducts")}</CardTitle>

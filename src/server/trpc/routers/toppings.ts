@@ -5,7 +5,7 @@ export const toppingsRouter = router({
   getAll: publicProcedure
     .input(
       z.object({
-        locale: z.enum(["nl", "en"]).default("nl"),
+        locale: z.enum(["nl", "en", "ne"]).default("nl"),
         onlyAvailable: z.boolean().default(true),
       }).optional()
     )
@@ -26,7 +26,7 @@ export const toppingsRouter = router({
   getById: publicProcedure
     .input(z.object({
       id: z.string(),
-      locale: z.enum(["nl", "en"]).default("nl"),
+      locale: z.enum(["nl", "en", "ne"]).default("nl"),
     }))
     .query(async ({ ctx, input }) => {
       return ctx.db.topping.findUnique({
@@ -44,7 +44,7 @@ export const toppingsRouter = router({
       isAvailable: z.boolean().default(true),
       sortOrder: z.number().int().default(0),
       translations: z.array(z.object({
-        locale: z.enum(["nl", "en"]),
+        locale: z.enum(["nl", "en", "ne"]),
         name: z.string(),
       })),
     }))
@@ -74,7 +74,7 @@ export const toppingsRouter = router({
       isAvailable: z.boolean().optional(),
       sortOrder: z.number().int().optional(),
       translations: z.array(z.object({
-        locale: z.enum(["nl", "en"]),
+        locale: z.enum(["nl", "en", "ne"]),
         name: z.string(),
       })).optional(),
     }))

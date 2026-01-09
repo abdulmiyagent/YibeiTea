@@ -18,7 +18,7 @@ export const usersRouter = router({
       name: z.string().optional(),
       phone: z.string().optional(),
       dateOfBirth: z.string().optional(),
-      preferredLanguage: z.enum(["nl", "en"]).optional(),
+      preferredLanguage: z.enum(["nl", "en", "ne"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.user.update({
@@ -49,7 +49,7 @@ export const usersRouter = router({
     }),
 
   getFavorites: protectedProcedure
-    .input(z.object({ locale: z.enum(["nl", "en"]) }))
+    .input(z.object({ locale: z.enum(["nl", "en", "ne"]) }))
     .query(async ({ ctx, input }) => {
       const favorites = await ctx.db.favorite.findMany({
         where: { userId: ctx.session.user.id },

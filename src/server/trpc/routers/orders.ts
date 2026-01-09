@@ -480,4 +480,191 @@ export const ordersRouter = router({
       .sort((a, b) => b.orders - a.orders)
       .slice(0, 4);
   }),
+
+  // Get active orders (PAID + PREPARING) for dashboard widget
+  getActiveOrders: adminProcedure.query(async ({ ctx }) => {
+    const orders = await ctx.db.order.findMany({
+      where: {
+        status: { in: ["PAID", "PREPARING"] },
+      },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: { translations: true },
+            },
+          },
+        },
+      },
+      orderBy: [
+        { pickupTime: "asc" },
+        { createdAt: "asc" },
+      ],
+    });
+
+    return orders.map((order) => ({
+      id: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+      customerName: order.customerName,
+      customerEmail: order.customerEmail,
+      total: Number(order.total),
+      pickupTime: order.pickupTime,
+      createdAt: order.createdAt,
+      notes: order.notes,
+      items: order.items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+        productName: item.product.translations[0]?.name || item.product.slug,
+        customizations: item.customizations as Record<string, unknown> | null,
+      })),
+    }));
+  }),
+
+  // Cancel order with reason tracking
+  cancelOrder: adminProcedure
+    .input(z.object({
+      id: z.string(),
+      reason: z.enum(["BUSY", "OUT_OF_STOCK", "CUSTOMER_REQUEST", "OTHER"]),
+      customReason: z.string().max(200).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const order = await ctx.db.order.findUnique({
+        where: { id: input.id },
+        select: {
+          status: true,
+          createdAt: true,
+          customerEmail: true,
+          customerName: true,
+          orderNumber: true,
+          total: true,
+          pointsRedeemed: true,
+          userId: true,
+        },
+      });
+
+      if (!order) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Bestelling niet gevonden",
+        });
+      }
+
+      // Check if order can be cancelled (within 30 minutes of creation or still PAID/PREPARING)
+      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+      const canCancel = order.status === "PAID" || order.status === "PREPARING";
+
+      if (!canCancel) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Deze bestelling kan niet meer geannuleerd worden",
+        });
+      }
+
+      // Update order with cancellation info
+      const updatedOrder = await ctx.db.order.update({
+        where: { id: input.id },
+        data: {
+          status: "CANCELLED",
+          cancellationReason: input.reason,
+          cancelledAt: new Date(),
+          notes: input.customReason
+            ? `${order.orderNumber} - Reden: ${input.customReason}`
+            : undefined,
+        },
+      });
+
+      // Restore redeemed points if any
+      if (order.pointsRedeemed > 0 && order.userId) {
+        await ctx.db.user.update({
+          where: { id: order.userId },
+          data: {
+            loyaltyPoints: { increment: order.pointsRedeemed },
+          },
+        });
+
+        // Create refund transaction
+        await ctx.db.loyaltyTransaction.create({
+          data: {
+            id: crypto.randomUUID(),
+            userId: order.userId,
+            points: order.pointsRedeemed,
+            type: "ADJUSTMENT",
+            description: `Punten teruggestort: Bestelling ${order.orderNumber} geannuleerd`,
+            orderId: input.id,
+          },
+        });
+      }
+
+      // Send cancellation email
+      if (order.customerEmail) {
+        const { sendOrderCancellationEmail } = await import("@/lib/email");
+        await sendOrderCancellationEmail({
+          orderNumber: order.orderNumber,
+          customerName: order.customerName || "Klant",
+          customerEmail: order.customerEmail,
+          total: Number(order.total),
+          reason: input.reason,
+        });
+      }
+
+      return updatedOrder;
+    }),
+
+  // Bulk update status for multiple orders
+  bulkUpdateStatus: adminProcedure
+    .input(z.object({
+      orderIds: z.array(z.string()),
+      status: z.enum(["PREPARING", "READY", "COMPLETED"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const results = await Promise.allSettled(
+        input.orderIds.map(async (orderId) => {
+          const order = await ctx.db.order.update({
+            where: { id: orderId },
+            data: { status: input.status },
+          });
+
+          // Send notification email when order is ready
+          if (input.status === "READY" && order.customerEmail) {
+            const { sendOrderReadyNotification } = await import("@/lib/email");
+            await sendOrderReadyNotification({
+              orderNumber: order.orderNumber,
+              customerName: order.customerName || "Klant",
+              customerEmail: order.customerEmail,
+            });
+          }
+
+          return order;
+        })
+      );
+
+      const successful = results.filter((r) => r.status === "fulfilled").length;
+      const failed = results.filter((r) => r.status === "rejected").length;
+
+      return { successful, failed, total: input.orderIds.length };
+    }),
+
+  // Get order count for polling (lightweight endpoint)
+  getActiveOrderCount: adminProcedure.query(async ({ ctx }) => {
+    const count = await ctx.db.order.count({
+      where: {
+        status: { in: ["PAID", "PREPARING"] },
+      },
+    });
+
+    const latestOrder = await ctx.db.order.findFirst({
+      where: {
+        status: { in: ["PAID", "PREPARING"] },
+      },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, createdAt: true },
+    });
+
+    return {
+      count,
+      latestOrderId: latestOrder?.id || null,
+      latestOrderTime: latestOrder?.createdAt || null,
+    };
+  }),
 });

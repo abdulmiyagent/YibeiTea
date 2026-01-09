@@ -505,6 +505,7 @@
       "manage": "Beheer en volg alle bestellingen",
       "total": "totaal",
       "refresh": "Vernieuwen",
+      "liveMode": "Live Modus",
       "searchPlaceholder": "Zoek op bestelnummer of klant...",
       "guest": "Gast",
       "pickupAt": "Afhalen",
@@ -767,6 +768,42 @@
       "dutch": "Nederlands",
       "english": "Engels",
       "nepali": "Nepalees"
+    },
+    "activeOrders": {
+      "title": "Actieve Bestellingen",
+      "viewAll": "Alle bestellingen",
+      "noActiveOrders": "Geen actieve bestellingen",
+      "allCaughtUp": "Alles is bijgewerkt!",
+      "newOrders": "Nieuwe bestellingen",
+      "inProgress": "In bereiding",
+      "pickupAt": "Afhalen om",
+      "startPreparing": "Start",
+      "markReady": "Klaar",
+      "soundOn": "Geluid aan",
+      "soundOff": "Geluid uit",
+      "notificationsOn": "Notificaties aan",
+      "notificationsOff": "Notificaties uit",
+      "newOrderTitle": "Nieuwe bestelling!",
+      "newOrderBody": "{count, plural, =1 {Er is # nieuwe bestelling} other {Er zijn # nieuwe bestellingen}}",
+      "cancelOrder": "Bestelling annuleren",
+      "cancelOrderDescription": "Weet je zeker dat je bestelling {orderNumber} wilt annuleren? De klant ontvangt een e-mail en wordt terugbetaald.",
+      "cancelReason": "Reden voor annulering",
+      "cancelReasons": {
+        "busy": "Te druk",
+        "outOfStock": "Niet op voorraad",
+        "customerRequest": "Klantverzoek",
+        "other": "Anders"
+      },
+      "customReason": "Reden specificeren",
+      "customReasonPlaceholder": "Voer een reden in...",
+      "cancelWarning": "De klant ontvangt een e-mail met de reden en het bedrag wordt automatisch teruggestort.",
+      "keepOrder": "Behouden",
+      "confirmCancel": "Annuleren",
+      "selectedOrders": "{count} geselecteerd",
+      "clearSelection": "Wissen",
+      "markAllReady": "Alle klaar",
+      "readyForPickup": "Klaar voor afhalen",
+      "markCompleted": "Opgehaald"
     }
   }
 }

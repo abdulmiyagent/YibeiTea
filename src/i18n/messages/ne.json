@@ -517,6 +517,7 @@
       "markCompleted": "पूरा भयो भनी चिन्ह लगाउनुहोस्",
       "manage": "सबै अर्डरहरू व्यवस्थापन र ट्र्याक गर्नुहोस्",
       "refresh": "रिफ्रेश",
+      "liveMode": "लाइभ मोड",
       "searchPlaceholder": "अर्डर नम्बर वा ग्राहकले खोज्नुहोस्...",
       "guest": "अतिथि",
       "pickupAt": "पिकअप",
@@ -836,7 +837,9 @@
       "confirmCancel": "रद्द गर्नुहोस्",
       "selectedOrders": "{count} चयन गरिएको",
       "clearSelection": "हटाउनुहोस्",
-      "markAllReady": "सबै तयार"
+      "markAllReady": "सबै तयार",
+      "readyForPickup": "उठाउन तयार",
+      "markCompleted": "उठाइयो"
     }
   }
 }

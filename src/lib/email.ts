@@ -474,6 +474,101 @@ export async function sendNewsletterConfirmationEmail(data: NewsletterConfirmati
   }
 }
 
+// Order cancellation email
+interface OrderCancellationData {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  total: number;
+  reason: "BUSY" | "OUT_OF_STOCK" | "CUSTOMER_REQUEST" | "OTHER";
+}
+
+const cancellationReasonMessages: Record<string, { nl: string; en: string }> = {
+  BUSY: {
+    nl: "Door drukte kunnen we je bestelling helaas niet op tijd voorbereiden.",
+    en: "Due to high demand, we are unfortunately unable to prepare your order on time.",
+  },
+  OUT_OF_STOCK: {
+    nl: "Een of meer producten in je bestelling zijn helaas niet meer beschikbaar.",
+    en: "One or more products in your order are unfortunately no longer available.",
+  },
+  CUSTOMER_REQUEST: {
+    nl: "Je bestelling is geannuleerd op jouw verzoek.",
+    en: "Your order has been cancelled at your request.",
+  },
+  OTHER: {
+    nl: "Je bestelling kon helaas niet worden verwerkt.",
+    en: "Your order could unfortunately not be processed.",
+  },
+};
+
+export async function sendOrderCancellationEmail(data: OrderCancellationData) {
+  if (!process.env.BREVO_API_KEY) {
+    console.warn("BREVO_API_KEY not set, skipping cancellation email");
+    return;
+  }
+
+  const reasonMessage = cancellationReasonMessages[data.reason]?.nl || cancellationReasonMessages.OTHER.nl;
+
+  const sendSmtpEmail = new brevo.SendSmtpEmail();
+  sendSmtpEmail.subject = `Bestelling geannuleerd - ${data.orderNumber}`;
+  sendSmtpEmail.sender = { name: FROM_NAME, email: FROM_EMAIL };
+  sendSmtpEmail.to = [{ email: data.customerEmail, name: data.customerName }];
+  sendSmtpEmail.htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #9B7B5B; margin-bottom: 5px;">Yibei Tea</h1>
+      </div>
+
+      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <h2 style="color: #991b1b; margin-top: 0; margin-bottom: 16px;">Bestelling geannuleerd</h2>
+        <p style="margin: 0; color: #7f1d1d;">
+          ${reasonMessage}
+        </p>
+      </div>
+
+      <div style="background: #fff; border: 1px solid #e0d9d3; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <p style="color: #666; margin: 0 0 8px 0;">Bestelnummer:</p>
+        <p style="font-size: 20px; font-weight: 700; color: #9B7B5B; margin: 0 0 16px 0;">
+          #${data.orderNumber}
+        </p>
+        <p style="color: #666; margin: 0;">
+          <strong>Bedrag: €${data.total.toFixed(2)}</strong>
+        </p>
+      </div>
+
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+        <p style="margin: 0; color: #166534; text-align: center;">
+          <strong>Terugbetaling</strong><br>
+          Het bedrag wordt automatisch teruggestort naar je oorspronkelijke betaalmethode binnen 5-10 werkdagen.
+        </p>
+      </div>
+
+      <div style="text-align: center; color: #666; font-size: 14px; border-top: 1px solid #e0d9d3; padding-top: 24px;">
+        <p>Onze excuses voor het ongemak.</p>
+        <p>Vragen? Neem contact met ons op via <a href="mailto:info@yibeitea.be" style="color: #9B7B5B;">info@yibeitea.be</a></p>
+        <p style="margin-top: 20px;">
+          <a href="https://yibeitea.be" style="color: #9B7B5B; text-decoration: none;">yibeitea.be</a>
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`Order cancellation email sent to ${data.customerEmail}`);
+  } catch (error) {
+    console.error("Failed to send order cancellation email:", error);
+  }
+}
+
 function generateNewsletterHtml(content: string, recipient: NewsletterRecipient): string {
   const unsubscribeUrl = recipient.unsubscribeToken
     ? `https://yibeitea.be/unsubscribe?token=${recipient.unsubscribeToken}`

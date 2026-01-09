@@ -78,8 +78,9 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Check if email is verified (only for credentials provider)
-        if (!user.emailVerified) {
+        // Check if email is verified (only for credentials provider, skip for admin users)
+        const isAdminUser = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+        if (!user.emailVerified && !isAdminUser) {
           throw new Error("EMAIL_NOT_VERIFIED");
         }
 

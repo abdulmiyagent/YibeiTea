@@ -7,7 +7,7 @@ export const productsRouter = router({
       z.object({
         categoryId: z.string().optional(),
         categorySlug: z.string().optional(),
-        locale: z.enum(["nl", "en"]).default("nl"),
+        locale: z.enum(["nl", "en", "ne"]).default("nl"),
         onlyAvailable: z.boolean().default(true),
       }).optional()
     )
@@ -41,7 +41,7 @@ export const productsRouter = router({
   getById: publicProcedure
     .input(z.object({
       id: z.string(),
-      locale: z.enum(["nl", "en"]).default("nl"),
+      locale: z.enum(["nl", "en", "ne"]).default("nl"),
     }))
     .query(async ({ ctx, input }) => {
       const product = await ctx.db.product.findUnique({
@@ -61,7 +61,7 @@ export const productsRouter = router({
   getBySlug: publicProcedure
     .input(z.object({
       slug: z.string(),
-      locale: z.enum(["nl", "en"]).default("nl"),
+      locale: z.enum(["nl", "en", "ne"]).default("nl"),
     }))
     .query(async ({ ctx, input }) => {
       const product = await ctx.db.product.findUnique({
@@ -83,7 +83,7 @@ export const productsRouter = router({
 
   getFeatured: publicProcedure
     .input(z.object({
-      locale: z.enum(["nl", "en"]).default("nl"),
+      locale: z.enum(["nl", "en", "ne"]).default("nl"),
       limit: z.number().default(6),
     }).optional())
     .query(async ({ ctx, input }) => {
@@ -105,7 +105,7 @@ export const productsRouter = router({
   getByCategory: publicProcedure
     .input(z.object({
       categorySlug: z.string(),
-      locale: z.enum(["nl", "en"]).default("nl"),
+      locale: z.enum(["nl", "en", "ne"]).default("nl"),
     }))
     .query(async ({ ctx, input }) => {
       return ctx.db.product.findMany({
@@ -141,7 +141,7 @@ export const productsRouter = router({
       allowIceCustomization: z.boolean().default(true),
       allowToppings: z.boolean().default(true),
       translations: z.array(z.object({
-        locale: z.enum(["nl", "en"]),
+        locale: z.enum(["nl", "en", "ne"]),
         name: z.string(),
         description: z.string(),
       })),
@@ -181,7 +181,7 @@ export const productsRouter = router({
       allowIceCustomization: z.boolean().optional(),
       allowToppings: z.boolean().optional(),
       translations: z.array(z.object({
-        locale: z.enum(["nl", "en"]),
+        locale: z.enum(["nl", "en", "ne"]),
         name: z.string(),
         description: z.string(),
       })).optional(),

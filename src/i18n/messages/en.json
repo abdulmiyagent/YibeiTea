@@ -505,6 +505,7 @@
       "manage": "Manage and track all orders",
       "total": "total",
       "refresh": "Refresh",
+      "liveMode": "Live Mode",
       "searchPlaceholder": "Search by order number or customer...",
       "guest": "Guest",
       "pickupAt": "Pickup",
@@ -767,6 +768,42 @@
       "dutch": "Dutch",
       "english": "English",
       "nepali": "Nepali"
+    },
+    "activeOrders": {
+      "title": "Active Orders",
+      "viewAll": "View all orders",
+      "noActiveOrders": "No active orders",
+      "allCaughtUp": "All caught up!",
+      "newOrders": "New orders",
+      "inProgress": "In progress",
+      "pickupAt": "Pickup at",
+      "startPreparing": "Start",
+      "markReady": "Ready",
+      "soundOn": "Sound on",
+      "soundOff": "Sound off",
+      "notificationsOn": "Notifications on",
+      "notificationsOff": "Notifications off",
+      "newOrderTitle": "New order!",
+      "newOrderBody": "{count, plural, =1 {There is # new order} other {There are # new orders}}",
+      "cancelOrder": "Cancel order",
+      "cancelOrderDescription": "Are you sure you want to cancel order {orderNumber}? The customer will receive an email and be refunded.",
+      "cancelReason": "Reason for cancellation",
+      "cancelReasons": {
+        "busy": "Too busy",
+        "outOfStock": "Out of stock",
+        "customerRequest": "Customer request",
+        "other": "Other"
+      },
+      "customReason": "Specify reason",
+      "customReasonPlaceholder": "Enter a reason...",
+      "cancelWarning": "The customer will receive an email with the reason and the amount will be automatically refunded.",
+      "keepOrder": "Keep order",
+      "confirmCancel": "Cancel",
+      "selectedOrders": "{count} selected",
+      "clearSelection": "Clear",
+      "markAllReady": "Mark all ready",
+      "readyForPickup": "Ready for pickup",
+      "markCompleted": "Picked up"
     }
   }
 }

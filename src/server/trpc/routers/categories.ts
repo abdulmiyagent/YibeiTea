@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { db } from "@/lib/db";
 
 const translationSchema = z.object({
-  locale: z.enum(["nl", "en"]),
+  locale: z.enum(["nl", "en", "ne"]),
   name: z.string().min(1),
   description: z.string().optional(),
 });
@@ -15,7 +15,7 @@ export const categoriesRouter = router({
     .input(
       z.object({
         includeInactive: z.boolean().optional().default(false),
-        locale: z.enum(["nl", "en"]).optional(),
+        locale: z.enum(["nl", "en", "ne"]).optional(),
       }).optional()
     )
     .query(async ({ input }) => {
