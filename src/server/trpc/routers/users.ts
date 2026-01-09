@@ -7,7 +7,7 @@ export const usersRouter = router({
     return ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },
       include: {
-        favorites: { include: { product: true } },
+        favorites: { include: { Product: true } },
         loyaltyTransactions: { orderBy: { createdAt: "desc" }, take: 10 },
       },
     });
@@ -54,7 +54,7 @@ export const usersRouter = router({
       const favorites = await ctx.db.favorite.findMany({
         where: { userId: ctx.session.user.id },
         include: {
-          product: {
+          Product: {
             include: {
               translations: { where: { locale: input.locale } },
               category: {
@@ -66,7 +66,7 @@ export const usersRouter = router({
         orderBy: { createdAt: "desc" },
       });
 
-      return favorites.map((fav) => fav.product);
+      return favorites.map((fav) => fav.Product);
     }),
 
   getLoyaltyInfo: protectedProcedure.query(async ({ ctx }) => {
@@ -150,7 +150,7 @@ export const usersRouter = router({
         addresses: true,
         favorites: {
           include: {
-            product: {
+            Product: {
               include: { translations: true },
             },
           },
@@ -206,7 +206,7 @@ export const usersRouter = router({
         isDefault: a.isDefault,
       })),
       favorites: user.favorites.map((f) => ({
-        productName: f.product.translations[0]?.name || f.product.slug,
+        productName: f.Product.translations[0]?.name || f.Product.slug,
         addedAt: f.createdAt,
       })),
       orders: user.orders.map((o) => ({

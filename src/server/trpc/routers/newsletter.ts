@@ -69,10 +69,13 @@ export const newsletterRouter = router({
       // Create new subscriber (pending confirmation)
       const subscriber = await ctx.db.newsletterSubscriber.create({
         data: {
+          id: crypto.randomUUID(),
           email: input.email.toLowerCase(),
           name: input.name,
           locale: input.locale,
           status: "PENDING",
+          unsubscribeToken: crypto.randomUUID(),
+          updatedAt: new Date(),
         },
       });
 
@@ -325,8 +328,10 @@ export const newsletterRouter = router({
     .mutation(async ({ ctx, input }) => {
       const campaign = await ctx.db.newsletterCampaign.create({
         data: {
+          id: crypto.randomUUID(),
           subject: input.subject,
           content: input.content,
+          updatedAt: new Date(),
         },
       });
 

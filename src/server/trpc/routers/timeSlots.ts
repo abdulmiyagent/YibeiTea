@@ -141,11 +141,13 @@ export const timeSlotsRouter = router({
             reason: input.reason,
           },
           create: {
+            id: crypto.randomUUID(),
             date: date,
             time: input.time,
             isDisabled: input.isDisabled ?? false,
             maxCapacity: input.maxCapacity,
             reason: input.reason,
+            updatedAt: new Date(),
           },
         });
       } catch {
@@ -218,10 +220,12 @@ export const timeSlotsRouter = router({
               reason: input.reason || "Disabled by admin",
             },
             create: {
+              id: crypto.randomUUID(),
               date: date,
               time: time,
               isDisabled: true,
               reason: input.reason || "Disabled by admin",
+              updatedAt: new Date(),
             },
           })
         );

@@ -1144,7 +1144,7 @@ async function main() {
         id: crypto.randomUUID(),
         ...data,
         updatedAt: new Date(),
-        CategoryTranslation: {
+        translations: {
           create: [
             { id: crypto.randomUUID(), locale: "nl", name: translations.nl.name, description: translations.nl.description },
             { id: crypto.randomUUID(), locale: "en", name: translations.en.name, description: translations.en.description },
@@ -1167,7 +1167,7 @@ async function main() {
         id: crypto.randomUUID(),
         ...data,
         updatedAt: new Date(),
-        ToppingTranslation: {
+        translations: {
           create: [
             { id: crypto.randomUUID(), locale: "nl", name: translations.nl.name },
             { id: crypto.randomUUID(), locale: "en", name: translations.en.name },
@@ -1203,7 +1203,7 @@ async function main() {
           isDefault: value.isDefault,
           isAvailable: true,
           priceModifier: 0,
-          CustomizationValueTranslation: {
+          translations: {
             create: [
               { id: crypto.randomUUID(), locale: "nl", label: value.translations.nl },
               { id: crypto.randomUUID(), locale: "en", label: value.translations.en },
@@ -1233,7 +1233,7 @@ async function main() {
         ...data,
         categoryId,
         updatedAt: new Date(),
-        ProductTranslation: {
+        translations: {
           create: [
             { id: crypto.randomUUID(), locale: "nl", name: translations.nl.name, description: translations.nl.description },
             { id: crypto.randomUUID(), locale: "en", name: translations.en.name, description: translations.en.description },
@@ -1297,7 +1297,7 @@ async function main() {
         ...data,
         isAvailable: true,
         updatedAt: new Date(),
-        RewardTranslation: {
+        translations: {
           create: [
             { id: crypto.randomUUID(), locale: "nl", name: translations.nl.name, description: translations.nl.description },
             { id: crypto.randomUUID(), locale: "en", name: translations.en.name, description: translations.en.description },

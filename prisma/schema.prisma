@@ -68,8 +68,8 @@ model Category {
   imageUrl            String?
   createdAt           DateTime              @default(now())
   updatedAt           DateTime
-  CategoryTranslation CategoryTranslation[]
-  Product             Product[]
+  translations        CategoryTranslation[]
+  products            Product[]
 }
 
 model CategoryTranslation {
@@ -90,7 +90,7 @@ model CustomizationGroup {
   sortOrder          Int                  @default(0)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime
-  CustomizationValue CustomizationValue[]
+  values             CustomizationValue[]
 }
 
 model CustomizationOption {
@@ -98,8 +98,8 @@ model CustomizationOption {
   productId                String
   type                     CustomizationType
   priceModifier            Decimal                    @default(0) @db.Decimal(10, 2)
-  Product                  Product                    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  CustomizationTranslation CustomizationTranslation[]
+  product                  Product                    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  translations             CustomizationTranslation[]
 }
 
 model CustomizationTranslation {
@@ -120,8 +120,8 @@ model CustomizationValue {
   isDefault                     Boolean                         @default(false)
   isAvailable                   Boolean                         @default(true)
   sortOrder                     Int                             @default(0)
-  CustomizationGroup            CustomizationGroup              @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  CustomizationValueTranslation CustomizationValueTranslation[]
+  group                         CustomizationGroup              @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  translations                  CustomizationValueTranslation[]
 
   @@unique([groupId, value])
 }
@@ -154,7 +154,7 @@ model LoyaltyTransaction {
   points      Int
   description String?
   createdAt   DateTime               @default(now())
-  User        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
   @@index([userId])
@@ -205,8 +205,8 @@ model Order {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime
   isGuest         Boolean       @default(false)
-  User            User?         @relation(fields: [userId], references: [id])
-  OrderItem       OrderItem[]
+  user            User?         @relation(fields: [userId], references: [id])
+  items           OrderItem[]
 
   @@index([createdAt])
   @@index([customerEmail])
@@ -222,8 +222,8 @@ model OrderItem {
   unitPrice      Decimal @db.Decimal(10, 2)
   totalPrice     Decimal @db.Decimal(10, 2)
   customizations Json?
-  Order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  Product        Product @relation(fields: [productId], references: [id])
+  order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product        Product @relation(fields: [productId], references: [id])
 
   @@index([orderId])
   @@index([productId])
@@ -246,12 +246,12 @@ model Product {
   allowIceCustomization      Boolean                      @default(true)
   allowSugarCustomization    Boolean                      @default(true)
   allowToppings              Boolean                      @default(true)
-  CustomizationOption        CustomizationOption[]
-  Favorite                   Favorite[]
-  OrderItem                  OrderItem[]
+  customizationOptions       CustomizationOption[]
+  favorites                  Favorite[]
+  orderItems                 OrderItem[]
   category                   Category                     @relation(fields: [categoryId], references: [id])
-  ProductAllergen            ProductAllergen[]
-  ProductCustomizationConfig ProductCustomizationConfig[]
+  allergens                  ProductAllergen[]
+  customizationConfigs       ProductCustomizationConfig[]
   translations               ProductTranslation[]
 
   @@index([categoryId])
@@ -324,7 +324,7 @@ model Reward {
   rewardValue       Decimal             @db.Decimal(10, 2)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime
-  RewardTranslation RewardTranslation[]
+  translations      RewardTranslation[]
 }
 
 model RewardTranslation {
@@ -379,7 +379,7 @@ model Topping {
   sortOrder          Int                  @default(0)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime
-  ToppingTranslation ToppingTranslation[]
+  translations       ToppingTranslation[]
 }
 
 model ToppingTranslation {
@@ -410,13 +410,13 @@ model User {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime
   newsletterOptIn    Boolean              @default(false)
-  Account            Account[]
-  Address            Address[]
-  Favorite           Favorite[]
-  LoyaltyTransaction LoyaltyTransaction[]
-  Order              Order[]
-  Review             Review[]
-  Session            Session[]
+  accounts           Account[]
+  addresses          Address[]
+  favorites          Favorite[]
+  loyaltyTransactions LoyaltyTransaction[]
+  orders             Order[]
+  reviews            Review[]
+  sessions           Session[]
 }
 
 model VerificationToken {
