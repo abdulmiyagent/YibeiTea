@@ -687,7 +687,9 @@
       "newsletter": "न्युजलेटर",
       "subscribersCampaigns": "सदस्यहरू र अभियानहरू",
       "settings": "सेटिङहरू",
-      "storeLoyalty": "पसल र लोयल्टी"
+      "storeLoyalty": "पसल र लोयल्टी",
+      "security": "सुरक्षा",
+      "twoFactorAccount": "दुई-कारक प्रमाणीकरण र खाता सुरक्षा"
     },
     "language": {
       "title": "भाषा",

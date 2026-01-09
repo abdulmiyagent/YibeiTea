@@ -40,19 +40,22 @@ const statusColors = {
   CANCELLED: "bg-red-100 text-red-800",
 };
 
-const statusLabels = {
-  PENDING: "In afwachting",
-  PAID: "Betaald",
-  PREPARING: "In bereiding",
-  READY: "Klaar",
-  COMPLETED: "Afgehaald",
-  CANCELLED: "Geannuleerd",
-};
-
 export default function AdminDashboardPage() {
   const t = useTranslations("admin.dashboard");
+  const tOrders = useTranslations("admin.orders");
+  const tQuick = useTranslations("admin.quickActions");
   const { data: session, status } = useSession();
   const router = useRouter();
+
+  // Status labels from translations
+  const statusLabels = {
+    PENDING: tOrders("pending"),
+    PAID: tOrders("paid"),
+    PREPARING: tOrders("preparing"),
+    READY: tOrders("ready"),
+    COMPLETED: tOrders("completed"),
+    CANCELLED: tOrders("cancelled"),
+  };
 
   // Fetch real data from database
   const { data: todayStats, isLoading: statsLoading } = api.orders.getTodayStats.useQuery(
@@ -115,7 +118,7 @@ export default function AdminDashboardPage() {
           <div>
             <h1 className="heading-1">{t("title")}</h1>
             <p className="mt-2 text-muted-foreground">
-              Welkom terug! Hier is een overzicht van vandaag.
+              {t("welcome")}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -123,7 +126,7 @@ export default function AdminDashboardPage() {
             <Link href="/admin/orders">
               <Button variant="tea">
                 <Package className="mr-2 h-4 w-4" />
-                Bestellingen
+                {t("orders")}
               </Button>
             </Link>
           </div>
@@ -152,7 +155,7 @@ export default function AdminDashboardPage() {
                 ) : (
                   <TrendingDown className="mr-1 h-4 w-4" />
                 )}
-                {orderChange >= 0 ? "+" : ""}{orderChange}% t.o.v. gisteren
+                {orderChange >= 0 ? "+" : ""}{orderChange}% {t("vsYesterday")}
               </div>
             </CardContent>
           </Card>
@@ -178,7 +181,7 @@ export default function AdminDashboardPage() {
                 ) : (
                   <TrendingDown className="mr-1 h-4 w-4" />
                 )}
-                {revenueChange >= 0 ? "+" : ""}{revenueChange}% t.o.v. gisteren
+                {revenueChange >= 0 ? "+" : ""}{revenueChange}% {t("vsYesterday")}
               </div>
             </CardContent>
           </Card>
@@ -199,7 +202,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
               <div className="mt-2 text-sm text-muted-foreground">
-                Actie vereist
+                {t("actionRequired")}
               </div>
             </CardContent>
           </Card>
@@ -221,7 +224,7 @@ export default function AdminDashboardPage() {
               </div>
               <div className="mt-2 flex items-center text-sm text-matcha-600">
                 <TrendingUp className="mr-1 h-4 w-4" />
-                +{customerStats?.newThisWeek ?? 0} deze week
+                +{customerStats?.newThisWeek ?? 0} {t("thisWeek")}
               </div>
             </CardContent>
           </Card>
@@ -232,10 +235,10 @@ export default function AdminDashboardPage() {
           {/* Recent Orders */}
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Recente Bestellingen</CardTitle>
+              <CardTitle>{t("recentOrders")}</CardTitle>
               <Link href="/admin/orders">
                 <Button variant="ghost" size="sm">
-                  Alles bekijken
+                  {t("viewAll")}
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
@@ -282,7 +285,7 @@ export default function AdminDashboardPage() {
                         <p className="font-medium">€{order.total.toFixed(2)}</p>
                         {order.time && (
                           <p className="text-sm text-muted-foreground">
-                            Afhalen: {order.time}
+                            {t("pickup")}: {order.time}
                           </p>
                         )}
                       </div>
@@ -291,7 +294,7 @@ export default function AdminDashboardPage() {
                 </div>
               ) : (
                 <p className="py-8 text-center text-muted-foreground">
-                  Nog geen bestellingen vandaag
+                  {t("noOrders")}
                 </p>
               )}
             </CardContent>
@@ -300,7 +303,7 @@ export default function AdminDashboardPage() {
           {/* Popular Products */}
           <Card>
             <CardHeader>
-              <CardTitle>Populaire Producten</CardTitle>
+              <CardTitle>{t("popularProducts")}</CardTitle>
             </CardHeader>
             <CardContent>
               {productsLoading ? (
@@ -321,14 +324,14 @@ export default function AdminDashboardPage() {
                         <span className="font-medium">{product.name}</span>
                       </div>
                       <span className="text-sm text-muted-foreground">
-                        {product.orders} bestellingen
+                        {product.orders} {t("orders")}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
                 <p className="py-8 text-center text-muted-foreground">
-                  Nog geen data beschikbaar
+                  {t("noData")}
                 </p>
               )}
             </CardContent>
@@ -344,9 +347,9 @@ export default function AdminDashboardPage() {
                   <Coffee className="h-6 w-6 text-tea-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Producten Beheren</p>
+                  <p className="font-medium">{tQuick("manageProducts")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Voeg toe, bewerk of verwijder
+                    {tQuick("addEditDelete")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -362,9 +365,9 @@ export default function AdminDashboardPage() {
                     <FolderOpen className="h-6 w-6 text-matcha-600" />
                   </div>
                   <div>
-                    <p className="font-medium">Categorieën</p>
+                    <p className="font-medium">{tQuick("categories")}</p>
                     <p className="text-sm text-muted-foreground">
-                      Beheer productcategorieën
+                      {tQuick("manageCategories")}
                     </p>
                   </div>
                   <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -380,9 +383,9 @@ export default function AdminDashboardPage() {
                   <Cherry className="h-6 w-6 text-taro-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Toppings Beheren</p>
+                  <p className="font-medium">{tQuick("toppings")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Tapioca, boba en meer
+                    {tQuick("toppingsBoba")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -397,9 +400,9 @@ export default function AdminDashboardPage() {
                   <BarChart3 className="h-6 w-6 text-matcha-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Analytics</p>
+                  <p className="font-medium">{tQuick("analytics")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Bekijk statistieken en rapporten
+                    {tQuick("viewStats")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -414,9 +417,9 @@ export default function AdminDashboardPage() {
                   <Tag className="h-6 w-6 text-honey-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Promotiecodes</p>
+                  <p className="font-medium">{tQuick("promoCodes")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Beheer kortingscodes
+                    {tQuick("manageDiscounts")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -431,9 +434,9 @@ export default function AdminDashboardPage() {
                   <Gift className="h-6 w-6 text-taro-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Beloningen</p>
+                  <p className="font-medium">{tQuick("rewards")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Loyalty rewards beheren
+                    {tQuick("loyaltyRewards")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -448,9 +451,9 @@ export default function AdminDashboardPage() {
                   <Coins className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Klanten</p>
+                  <p className="font-medium">{tQuick("customers")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Punten en klantbeheer
+                    {tQuick("pointsManagement")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -465,9 +468,9 @@ export default function AdminDashboardPage() {
                   <Mail className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Nieuwsbrief</p>
+                  <p className="font-medium">{tQuick("newsletter")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Abonnees en campagnes
+                    {tQuick("subscribersCampaigns")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -482,9 +485,9 @@ export default function AdminDashboardPage() {
                   <Settings className="h-6 w-6 text-cream-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Instellingen</p>
+                  <p className="font-medium">{tQuick("settings")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Winkel en loyaliteit
+                    {tQuick("storeLoyalty")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
@@ -502,9 +505,9 @@ export default function AdminDashboardPage() {
                   <Shield className="h-6 w-6 text-tea-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Beveiliging</p>
+                  <p className="font-medium">{tQuick("security")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Twee-factor authenticatie en account beveiliging
+                    {tQuick("twoFactorAccount")}
                   </p>
                 </div>
                 <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />

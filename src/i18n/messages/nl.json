@@ -479,12 +479,29 @@
       "todayOrders": "Bestellingen Vandaag",
       "todayRevenue": "Omzet Vandaag",
       "pendingOrders": "Wachtende Bestellingen",
-      "totalCustomers": "Totaal Klanten"
+      "totalCustomers": "Totaal Klanten",
+      "welcome": "Welkom terug! Hier is een overzicht van vandaag.",
+      "recentOrders": "Recente Bestellingen",
+      "viewAll": "Alles bekijken",
+      "popularProducts": "Populaire Producten",
+      "noOrders": "Nog geen bestellingen vandaag",
+      "noData": "Nog geen data beschikbaar",
+      "orders": "bestellingen",
+      "pickup": "Afhalen",
+      "vsYesterday": "t.o.v. gisteren",
+      "actionRequired": "Actie vereist",
+      "thisWeek": "deze week"
     },
     "orders": {
       "title": "Bestellingen",
       "new": "Nieuw",
-      "updateStatus": "Status Bijwerken"
+      "updateStatus": "Status Bijwerken",
+      "pending": "In afwachting",
+      "paid": "Betaald",
+      "preparing": "In bereiding",
+      "ready": "Klaar",
+      "completed": "Afgehaald",
+      "cancelled": "Geannuleerd"
     },
     "products": {
       "title": "Producten",
@@ -505,6 +522,34 @@
       "store": "Winkel Instellingen",
       "openingHours": "Openingsuren",
       "loyalty": "Loyaliteit Instellingen"
+    },
+    "quickActions": {
+      "manageProducts": "Producten Beheren",
+      "addEditDelete": "Voeg toe, bewerk of verwijder",
+      "categories": "Categorieën",
+      "manageCategories": "Beheer productcategorieën",
+      "toppings": "Toppings Beheren",
+      "toppingsBoba": "Tapioca, boba en meer",
+      "analytics": "Analytics",
+      "viewStats": "Bekijk statistieken en rapporten",
+      "promoCodes": "Promotiecodes",
+      "manageDiscounts": "Beheer kortingscodes",
+      "rewards": "Beloningen",
+      "loyaltyRewards": "Loyalty rewards beheren",
+      "customers": "Klanten",
+      "pointsManagement": "Punten en klantbeheer",
+      "newsletter": "Nieuwsbrief",
+      "subscribersCampaigns": "Abonnees en campagnes",
+      "settings": "Instellingen",
+      "storeLoyalty": "Winkel en loyaliteit",
+      "security": "Beveiliging",
+      "twoFactorAccount": "Twee-factor authenticatie en account beveiliging"
+    },
+    "language": {
+      "title": "Taal",
+      "dutch": "Nederlands",
+      "english": "Engels",
+      "nepali": "Nepalees"
     }
   }
 }

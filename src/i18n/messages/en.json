@@ -479,12 +479,29 @@
       "todayOrders": "Orders Today",
       "todayRevenue": "Revenue Today",
       "pendingOrders": "Pending Orders",
-      "totalCustomers": "Total Customers"
+      "totalCustomers": "Total Customers",
+      "welcome": "Welcome back! Here is an overview of today.",
+      "recentOrders": "Recent Orders",
+      "viewAll": "View all",
+      "popularProducts": "Popular Products",
+      "noOrders": "No orders yet today",
+      "noData": "No data available yet",
+      "orders": "orders",
+      "pickup": "Pickup",
+      "vsYesterday": "vs yesterday",
+      "actionRequired": "Action required",
+      "thisWeek": "this week"
     },
     "orders": {
       "title": "Orders",
       "new": "New",
-      "updateStatus": "Update Status"
+      "updateStatus": "Update Status",
+      "pending": "Pending",
+      "paid": "Paid",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
     },
     "products": {
       "title": "Products",
@@ -505,6 +522,34 @@
       "store": "Store Settings",
       "openingHours": "Opening Hours",
       "loyalty": "Loyalty Settings"
+    },
+    "quickActions": {
+      "manageProducts": "Manage Products",
+      "addEditDelete": "Add, edit or delete",
+      "categories": "Categories",
+      "manageCategories": "Manage product categories",
+      "toppings": "Manage Toppings",
+      "toppingsBoba": "Tapioca, boba and more",
+      "analytics": "Analytics",
+      "viewStats": "View statistics and reports",
+      "promoCodes": "Promo Codes",
+      "manageDiscounts": "Manage discount codes",
+      "rewards": "Rewards",
+      "loyaltyRewards": "Manage loyalty rewards",
+      "customers": "Customers",
+      "pointsManagement": "Points and customer management",
+      "newsletter": "Newsletter",
+      "subscribersCampaigns": "Subscribers and campaigns",
+      "settings": "Settings",
+      "storeLoyalty": "Store and loyalty",
+      "security": "Security",
+      "twoFactorAccount": "Two-factor authentication and account security"
+    },
+    "language": {
+      "title": "Language",
+      "dutch": "Dutch",
+      "english": "English",
+      "nepali": "Nepali"
     }
   }
 }
