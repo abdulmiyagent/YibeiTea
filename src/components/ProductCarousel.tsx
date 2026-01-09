@@ -43,6 +43,27 @@ const categoryColors: Record<string, string> = {
   "frappucchino": "bg-gradient-to-b from-[#2C3E50] to-[#1a252f]",
 };
 
+// Get category placeholder image URL based on category slug
+function getCategoryPlaceholder(categorySlug: string | undefined): string {
+  const validCategories = [
+    "brown-sugar",
+    "milk-tea",
+    "cream-cheese",
+    "iced-coffee",
+    "hot-coffee",
+    "ice-tea",
+    "mojito",
+    "kids-star",
+    "latte-special",
+    "frappucchino",
+  ];
+
+  if (categorySlug && validCategories.includes(categorySlug)) {
+    return `/images/categories/${categorySlug}.svg`;
+  }
+  return "/images/categories/placeholder.svg";
+}
+
 interface Product {
   id: string;
   slug: string;
@@ -149,22 +170,16 @@ const ProductCard = memo(function ProductCard({
 
         {/* Product Image */}
         <div className="relative mt-auto flex flex-1 items-end justify-center pb-2">
-          {product.imageUrl ? (
-            <div className="relative h-[220px] w-full">
-              <Image
-                src={product.imageUrl}
-                alt={translation?.name || product.slug}
-                fill
-                sizes="(max-width: 640px) 80vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 20vw"
-                className="object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
-              />
-            </div>
-          ) : (
-            <span className="text-8xl drop-shadow-lg transition-transform duration-300 group-hover:scale-105">
-              🧋
-            </span>
-          )}
+          <div className="relative h-[220px] w-full">
+            <Image
+              src={product.imageUrl || getCategoryPlaceholder(categorySlug)}
+              alt={translation?.name || product.slug}
+              fill
+              sizes="(max-width: 640px) 80vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 20vw"
+              className="object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+            />
+          </div>
         </div>
 
         {/* Price Badge - Bottom Left */}

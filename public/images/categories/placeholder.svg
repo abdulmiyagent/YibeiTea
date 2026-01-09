@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="cupBodyPH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
+    </linearGradient>
+    <linearGradient id="placeholderDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4B896"/>
+      <stop offset="50%" style="stop-color:#C4A078"/>
+      <stop offset="100%" style="stop-color:#A08060"/>
+    </linearGradient>
+    <linearGradient id="lidGradientPH" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#B89878"/>
+      <stop offset="100%" style="stop-color:#987858"/>
+    </linearGradient>
+    <linearGradient id="strawGradientPH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a2a"/>
+      <stop offset="50%" style="stop-color:#404040"/>
+      <stop offset="100%" style="stop-color:#2a2a2a"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowPH" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowPH" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowPH)" opacity="0.88">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodyPH)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Drink -->
+    <path d="M52 85 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L148 85 Z" fill="url(#placeholderDrink)"/>
+
+    <!-- Subtle texture -->
+    <ellipse cx="80" cy="130" rx="15" ry="6" fill="#E8D4B8" opacity="0.3" transform="rotate(-15 80 130)"/>
+    <ellipse cx="120" cy="160" rx="12" ry="5" fill="#E8D4B8" opacity="0.25" transform="rotate(20 120 160)"/>
+    <ellipse cx="90" cy="185" rx="10" ry="4" fill="#E8D4B8" opacity="0.2" transform="rotate(-10 90 185)"/>
+  </g>
+
+  <!-- Foam top -->
+  <ellipse cx="100" cy="82" rx="50" ry="14" fill="#FFF8F0" opacity="0.92"/>
+  <ellipse cx="100" cy="79" rx="45" ry="11" fill="#FFFEF8" opacity="0.92"/>
+  <ellipse cx="85" cy="77" rx="15" ry="5" fill="#ffffff" opacity="0.55"/>
+
+  <!-- Tapioca pearls -->
+  <g opacity="0.85">
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowPH)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.45"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowPH)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.45"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowPH)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.45"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowPH)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.45"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowPH)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.45"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowPH)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowPH)"/>
+  </g>
+
+  <!-- Lid -->
+  <ellipse cx="100" cy="67" rx="54" ry="12" fill="url(#lidGradientPH)" opacity="0.92"/>
+  <ellipse cx="100" cy="64" rx="50" ry="10" fill="#A88868" opacity="0.92"/>
+  <ellipse cx="90" cy="62" rx="20" ry="5" fill="#C0A080" opacity="0.4"/>
+
+  <!-- Straw hole -->
+  <ellipse cx="100" cy="64" rx="9" ry="4" fill="#685848"/>
+
+  <!-- Straw -->
+  <rect x="95" y="15" width="10" height="55" rx="3" fill="url(#strawGradientPH)" opacity="0.92"/>
+  <rect x="96" y="15" width="3" height="55" fill="#555" opacity="0.22"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="145" cy="130" rx="3" ry="4" fill="#fff" opacity="0.38"/>
+  <ellipse cx="148" cy="170" rx="2" ry="3" fill="#fff" opacity="0.32"/>
+  <ellipse cx="55" cy="150" rx="2.5" ry="3.5" fill="#fff" opacity="0.35"/>
+
+  <!-- Placeholder indicator (question mark made of boba) -->
+  <g opacity="0.18">
+    <circle cx="100" cy="160" r="5" fill="#685848"/>
+    <path d="M90 135 Q90 115 100 115 Q112 115 112 128 Q112 142 100 148" stroke="#685848" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

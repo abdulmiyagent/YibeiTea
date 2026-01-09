@@ -26,6 +26,27 @@ function formatSlug(slug: string): string {
     .join(" ");
 }
 
+// Get category placeholder image URL based on category slug
+function getCategoryPlaceholder(categorySlug: string | undefined): string {
+  const validCategories = [
+    "brown-sugar",
+    "milk-tea",
+    "cream-cheese",
+    "iced-coffee",
+    "hot-coffee",
+    "ice-tea",
+    "mojito",
+    "kids-star",
+    "latte-special",
+    "frappucchino",
+  ];
+
+  if (categorySlug && validCategories.includes(categorySlug)) {
+    return `/images/categories/${categorySlug}.svg`;
+  }
+  return "/images/categories/placeholder.svg";
+}
+
 // Recent orders storage key
 const RECENT_ORDERS_KEY = "yibei-recent-orders";
 
@@ -302,20 +323,14 @@ export function MenuPageClient({
                 <div className="overflow-hidden rounded-lg border border-gray-100 bg-white transition-all duration-200 hover:shadow-md hover:border-tea-200 active:scale-[0.98]">
                   {/* Product Image */}
                   <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-cream-50 via-white to-tea-50/30">
-                    {product.imageUrl ? (
-                      <Image
-                        src={product.imageUrl}
-                        alt={translation?.name || product.slug}
-                        fill
-                        sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 16vw"
-                        className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-tea-50 to-cream-100">
-                        <span className="text-3xl transition-transform duration-300 group-hover:scale-110">🧋</span>
-                      </div>
-                    )}
+                    <Image
+                      src={product.imageUrl || getCategoryPlaceholder(product.category?.slug)}
+                      alt={translation?.name || product.slug}
+                      fill
+                      sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 16vw"
+                      className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
 
                     {/* Vegan badge */}
                     {product.vegan && (

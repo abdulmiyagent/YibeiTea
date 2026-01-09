@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/trpc";
+import { useTranslations } from "next-intl";
 import {
   DndContext,
   closestCenter,
@@ -172,6 +173,8 @@ export default function AdminToppingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const utils = api.useUtils();
+  const t = useTranslations("admin.toppings");
+  const tCommon = useTranslations("common");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -364,10 +367,10 @@ export default function AdminToppingsPage() {
 
   const handleDelete = async (toppingId: string) => {
     if (!isSuperAdmin) {
-      alert("Alleen Super Admins kunnen toppings verwijderen.");
+      alert(t("onlySuperAdminDelete"));
       return;
     }
-    if (confirm("Weet je zeker dat je deze topping wilt verwijderen?")) {
+    if (confirm(t("confirmDelete"))) {
       await deleteMutation.mutateAsync({ id: toppingId });
     }
   };
@@ -391,18 +394,18 @@ export default function AdminToppingsPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="heading-2">Toppings Beheren</h1>
+              <h1 className="heading-2">{t("manage")}</h1>
               <p className="text-muted-foreground">
                 {isSuperAdmin
-                  ? "Voeg toe, bewerk of verwijder toppings"
-                  : "Bekijk en bewerk toppings"}
+                  ? t("addEditDeleteDesc")
+                  : t("viewEdit")}
               </p>
             </div>
           </div>
           {isSuperAdmin && (
             <Button variant="tea" onClick={openAddModal}>
               <Plus className="mr-2 h-4 w-4" />
-              Nieuwe Topping
+              {t("newTopping")}
             </Button>
           )}
         </div>
@@ -413,7 +416,7 @@ export default function AdminToppingsPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Zoek op naam of slug..."
+                placeholder={t("searchPlaceholder")}
                 className="pl-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -426,7 +429,7 @@ export default function AdminToppingsPage() {
         <Card className="mb-6 border-tea-200 bg-tea-50">
           <CardContent className="py-4">
             <p className="text-sm text-tea-700">
-              <strong>Tip:</strong> Sleep toppings met het <GripVertical className="inline h-4 w-4" /> icoon om de volgorde aan te passen.
+              <strong>Tip:</strong> {t("dragTip")}
             </p>
           </CardContent>
         </Card>
@@ -462,11 +465,11 @@ export default function AdminToppingsPage() {
           <Card>
             <CardContent className="py-12 text-center">
               <Cherry className="mx-auto h-12 w-12 text-muted-foreground" />
-              <p className="mt-4 text-lg font-medium">Geen toppings gevonden</p>
+              <p className="mt-4 text-lg font-medium">{t("noToppingsFound")}</p>
               <p className="text-muted-foreground">
                 {searchQuery
-                  ? "Pas je zoekopdracht aan"
-                  : "Voeg je eerste topping toe"}
+                  ? t("adjustSearch")
+                  : t("addFirst")}
               </p>
             </CardContent>
           </Card>
@@ -477,10 +480,10 @@ export default function AdminToppingsPage() {
           <CardContent className="py-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
-                Totaal: <strong>{(toppings || []).length}</strong> toppings
+                {t("total")}: <strong>{(toppings || []).length}</strong> {t("toppings")}
               </span>
               <span className="text-muted-foreground">
-                Actief: <strong>{(toppings || []).filter((t) => t.isAvailable).length}</strong>
+                {t("active")}: <strong>{(toppings || []).filter((t) => t.isAvailable).length}</strong>
               </span>
             </div>
           </CardContent>
@@ -491,7 +494,7 @@ export default function AdminToppingsPage() {
           <Link href="/admin/products">
             <Button variant="outline" className="w-full">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Terug naar Producten
+              {t("backToProducts")}
             </Button>
           </Link>
         </div>
@@ -503,7 +506,7 @@ export default function AdminToppingsPage() {
           <Card className="w-full max-w-md">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>
-                {editingTopping ? "Topping Bewerken" : "Nieuwe Topping"}
+                {editingTopping ? t("editTopping") : t("newToppingTitle")}
               </CardTitle>
               <Button
                 variant="ghost"
@@ -517,7 +520,7 @@ export default function AdminToppingsPage() {
               {/* Basic Info */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="slug">Slug (URL)</Label>
+                  <Label htmlFor="slug">{t("slugUrl")}</Label>
                   <Input
                     id="slug"
                     placeholder="popping-boba"
@@ -528,7 +531,7 @@ export default function AdminToppingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="price">Prijs (EUR)</Label>
+                  <Label htmlFor="price">{t("priceEur")}</Label>
                   <Input
                     id="price"
                     type="number"
@@ -545,7 +548,7 @@ export default function AdminToppingsPage() {
 
               {/* Dutch name */}
               <div className="space-y-2">
-                <Label htmlFor="name">Naam (Nederlands)</Label>
+                <Label htmlFor="name">{t("nameDutch")}</Label>
                 <Input
                   id="name"
                   placeholder="Popping Boba"
@@ -558,7 +561,7 @@ export default function AdminToppingsPage() {
 
               {/* English name */}
               <div className="space-y-2">
-                <Label htmlFor="nameEn">Name (English)</Label>
+                <Label htmlFor="nameEn">{t("nameEnglish")}</Label>
                 <Input
                   id="nameEn"
                   placeholder="Popping Boba"
@@ -579,13 +582,13 @@ export default function AdminToppingsPage() {
                   }
                   className="h-4 w-4 rounded border-gray-300"
                 />
-                <span>Beschikbaar voor klanten</span>
+                <span>{t("availableForCustomers")}</span>
               </label>
 
               {/* Actions */}
               <div className="flex justify-end gap-2 border-t pt-4">
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                  Annuleren
+                  {tCommon("cancel")}
                 </Button>
                 <Button
                   variant="tea"
@@ -596,7 +599,7 @@ export default function AdminToppingsPage() {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   <Save className="mr-2 h-4 w-4" />
-                  Opslaan
+                  {t("save")}
                 </Button>
               </div>
             </CardContent>

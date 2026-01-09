@@ -19,6 +19,27 @@ import {
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
 import Image from "next/image";
 
+// Get category placeholder image URL based on category slug
+function getCategoryPlaceholder(categorySlug: string | undefined): string {
+  const validCategories = [
+    "brown-sugar",
+    "milk-tea",
+    "cream-cheese",
+    "iced-coffee",
+    "hot-coffee",
+    "ice-tea",
+    "mojito",
+    "kids-star",
+    "latte-special",
+    "frappucchino",
+  ];
+
+  if (categorySlug && validCategories.includes(categorySlug)) {
+    return `/images/categories/${categorySlug}.svg`;
+  }
+  return "/images/categories/placeholder.svg";
+}
+
 export default function FavoritesPage() {
   const t = useTranslations("account");
   const locale = useLocale() as "nl" | "en";
@@ -100,19 +121,13 @@ export default function FavoritesPage() {
                   <div className="flex items-center gap-3 p-3">
                     {/* Thumbnail */}
                     <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-tea-50 to-taro-50">
-                      {product.imageUrl ? (
-                        <Image
-                          src={product.imageUrl}
-                          alt={translation?.name || product.slug}
-                          fill
-                          sizes="64px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <span className="text-2xl">🧋</span>
-                        </div>
-                      )}
+                      <Image
+                        src={product.imageUrl || getCategoryPlaceholder(product.category?.slug)}
+                        alt={translation?.name || product.slug}
+                        fill
+                        sizes="64px"
+                        className={product.imageUrl ? "object-cover" : "object-contain p-1"}
+                      />
                     </div>
 
                     {/* Content */}

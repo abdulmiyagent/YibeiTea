@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/trpc";
+import { useTranslations } from "next-intl";
 import {
   BarChart3,
   TrendingUp,
@@ -22,15 +23,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-
-const statusLabels: Record<string, string> = {
-  PENDING: "In afwachting",
-  PAID: "Betaald",
-  PREPARING: "In bereiding",
-  READY: "Klaar",
-  COMPLETED: "Afgehaald",
-  CANCELLED: "Geannuleerd",
-};
 
 const statusColors: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -51,8 +43,20 @@ export default function AnalyticsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [timeRange, setTimeRange] = useState(30);
+  const t = useTranslations("admin.analytics");
+  const tOrders = useTranslations("admin.orders");
 
   const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN";
+
+  // Status labels from translations
+  const statusLabels: Record<string, string> = {
+    PENDING: tOrders("pending"),
+    PAID: tOrders("paid"),
+    PREPARING: tOrders("preparing"),
+    READY: tOrders("ready"),
+    COMPLETED: tOrders("completed"),
+    CANCELLED: tOrders("cancelled"),
+  };
 
   // Fetch all analytics data
   const { data: summaryStats, isLoading: summaryLoading } = api.analytics.getSummaryStats.useQuery(
@@ -134,17 +138,17 @@ export default function AnalyticsPage() {
           <Link href="/admin">
             <Button variant="ghost" size="sm" className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Terug naar dashboard
+              {t("backToDashboard")}
             </Button>
           </Link>
           <div className="flex items-center justify-between">
             <div>
               <h1 className="heading-1 flex items-center gap-3">
                 <BarChart3 className="h-8 w-8 text-tea-600" />
-                Analytics
+                {t("title")}
               </h1>
               <p className="mt-2 text-muted-foreground">
-                Uitgebreide statistieken en inzichten
+                {t("detailedStats")}
               </p>
             </div>
             <div className="flex gap-2">
@@ -168,7 +172,7 @@ export default function AnalyticsPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Omzet deze maand</p>
+                  <p className="text-sm text-muted-foreground">{t("revenueThisMonth")}</p>
                   <p className="text-3xl font-bold">
                     {summaryLoading ? (
                       <Loader2 className="h-8 w-8 animate-spin" />
@@ -188,7 +192,7 @@ export default function AnalyticsPage() {
                   ) : (
                     <TrendingDown className="mr-1 h-4 w-4" />
                   )}
-                  {summaryStats.revenueChange >= 0 ? "+" : ""}{summaryStats.revenueChange}% t.o.v. vorige maand
+                  {summaryStats.revenueChange >= 0 ? "+" : ""}{summaryStats.revenueChange}% {t("vsLastMonth")}
                 </div>
               )}
             </CardContent>
@@ -198,7 +202,7 @@ export default function AnalyticsPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Bestellingen deze maand</p>
+                  <p className="text-sm text-muted-foreground">{t("ordersThisMonth")}</p>
                   <p className="text-3xl font-bold">
                     {summaryLoading ? (
                       <Loader2 className="h-8 w-8 animate-spin" />
@@ -212,7 +216,7 @@ export default function AnalyticsPage() {
                 </div>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
-                {summaryStats?.thisWeekOrders ?? 0} deze week
+                {summaryStats?.thisWeekOrders ?? 0} {t("thisWeek")}
               </p>
             </CardContent>
           </Card>
@@ -221,7 +225,7 @@ export default function AnalyticsPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Gem. bestelwaarde</p>
+                  <p className="text-sm text-muted-foreground">{t("avgOrderValue")}</p>
                   <p className="text-3xl font-bold">
                     {summaryLoading ? (
                       <Loader2 className="h-8 w-8 animate-spin" />
@@ -235,7 +239,7 @@ export default function AnalyticsPage() {
                 </div>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
-                Totaal: {summaryStats?.allTimeOrders ?? 0} bestellingen
+                {t("total")}: {summaryStats?.allTimeOrders ?? 0} {t("allTimeOrders")}
               </p>
             </CardContent>
           </Card>
@@ -244,7 +248,7 @@ export default function AnalyticsPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Totale klanten</p>
+                  <p className="text-sm text-muted-foreground">{t("totalCustomers")}</p>
                   <p className="text-3xl font-bold">
                     {customerLoading ? (
                       <Loader2 className="h-8 w-8 animate-spin" />
@@ -264,7 +268,7 @@ export default function AnalyticsPage() {
                   ) : (
                     <TrendingDown className="mr-1 h-4 w-4" />
                   )}
-                  +{customerStats.newThisMonth} deze maand
+                  +{customerStats.newThisMonth} {t("thisWeek")}
                 </div>
               )}
             </CardContent>
@@ -276,7 +280,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Omzet & Bestellingen ({timeRange} dagen)
+              {t("revenueAndOrders")} ({timeRange} {t("days")})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -291,7 +295,7 @@ export default function AnalyticsPage() {
                     <div
                       key={day.date}
                       className="group relative flex-1"
-                      title={`${day.date}: €${day.revenue.toFixed(2)} (${day.orders} bestellingen)`}
+                      title={`${day.date}: €${day.revenue.toFixed(2)} (${day.orders} ${t("allTimeOrders")})`}
                     >
                       {/* Revenue bar */}
                       <div
@@ -307,7 +311,7 @@ export default function AnalyticsPage() {
                         <br />
                         €{day.revenue.toFixed(2)}
                         <br />
-                        {day.orders} bestellingen
+                        {day.orders} {t("allTimeOrders")}
                       </div>
                     </div>
                   ))}
@@ -319,7 +323,7 @@ export default function AnalyticsPage() {
               </div>
             ) : (
               <p className="py-12 text-center text-muted-foreground">
-                Geen data beschikbaar voor deze periode
+                {t("noDataPeriod")}
               </p>
             )}
           </CardContent>
@@ -331,7 +335,7 @@ export default function AnalyticsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-matcha-600" />
-                Top 10 Producten
+                {t("topProducts")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -349,7 +353,7 @@ export default function AnalyticsPage() {
                       <div className="flex-1">
                         <p className="font-medium">{product.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {product.quantity}x verkocht
+                          {product.quantity}x {t("sold")}
                         </p>
                       </div>
                       <p className="font-medium text-matcha-600">€{product.revenue.toFixed(2)}</p>
@@ -358,7 +362,7 @@ export default function AnalyticsPage() {
                 </div>
               ) : (
                 <p className="py-12 text-center text-muted-foreground">
-                  Geen productdata beschikbaar
+                  {t("noProductData")}
                 </p>
               )}
             </CardContent>
@@ -369,7 +373,7 @@ export default function AnalyticsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingDown className="h-5 w-5 text-red-500" />
-                Minst Verkochte Producten
+                {t("leastSoldProducts")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -387,7 +391,7 @@ export default function AnalyticsPage() {
                       <div className="flex-1">
                         <p className="font-medium">{product.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {product.quantity}x verkocht
+                          {product.quantity}x {t("sold")}
                         </p>
                       </div>
                       <p className="font-medium text-red-600">€{product.revenue.toFixed(2)}</p>
@@ -396,7 +400,7 @@ export default function AnalyticsPage() {
                 </div>
               ) : (
                 <p className="py-12 text-center text-muted-foreground">
-                  Geen productdata beschikbaar
+                  {t("noProductData")}
                 </p>
               )}
             </CardContent>
@@ -407,7 +411,7 @@ export default function AnalyticsPage() {
           {/* Sales by Category */}
           <Card>
             <CardHeader>
-              <CardTitle>Verkoop per Categorie</CardTitle>
+              <CardTitle>{t("salesByCategory")}</CardTitle>
             </CardHeader>
             <CardContent>
               {categoryLoading ? (
@@ -437,7 +441,7 @@ export default function AnalyticsPage() {
                 </div>
               ) : (
                 <p className="py-12 text-center text-muted-foreground">
-                  Geen categoriedata beschikbaar
+                  {t("noCategoryData")}
                 </p>
               )}
             </CardContent>
@@ -450,7 +454,7 @@ export default function AnalyticsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
-                Piekuren
+                {t("peakHours")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -467,7 +471,7 @@ export default function AnalyticsPage() {
                         <div
                           key={hour.hour}
                           className="group relative flex-1"
-                          title={`${hour.label}: ${hour.orders} bestellingen`}
+                          title={`${hour.label}: ${hour.orders} ${t("allTimeOrders")}`}
                         >
                           <div
                             className="w-full rounded-t bg-matcha-500 transition-all hover:bg-matcha-600"
@@ -490,7 +494,7 @@ export default function AnalyticsPage() {
                 </div>
               ) : (
                 <p className="py-12 text-center text-muted-foreground">
-                  Geen uurdata beschikbaar
+                  {t("noHourData")}
                 </p>
               )}
             </CardContent>
@@ -499,7 +503,7 @@ export default function AnalyticsPage() {
           {/* Order Status Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>Bestelstatus Verdeling</CardTitle>
+              <CardTitle>{t("orderStatusDistribution")}</CardTitle>
             </CardHeader>
             <CardContent>
               {statusLoading ? (
@@ -519,7 +523,7 @@ export default function AnalyticsPage() {
                 </div>
               ) : (
                 <p className="py-12 text-center text-muted-foreground">
-                  Geen statusdata beschikbaar
+                  {t("noStatusData")}
                 </p>
               )}
             </CardContent>
@@ -531,7 +535,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-yellow-500" />
-              Loyaliteitsprogramma
+              {t("loyaltyProgram")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -543,23 +547,23 @@ export default function AnalyticsPage() {
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {/* Points Overview */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold">Punten Overzicht</h3>
+                  <h3 className="font-semibold">{t("pointsOverview")}</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Totaal uitgegeven</span>
+                      <span className="text-muted-foreground">{t("totalIssued")}</span>
                       <span className="font-medium text-matcha-600">+{loyaltyStats.pointsEarned.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Ingewisseld</span>
+                      <span className="text-muted-foreground">{t("redeemed")}</span>
                       <span className="font-medium text-red-600">-{loyaltyStats.pointsRedeemed.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Bonuspunten</span>
+                      <span className="text-muted-foreground">{t("bonusPoints")}</span>
                       <span className="font-medium text-taro-600">+{loyaltyStats.bonusPoints.toLocaleString()}</span>
                     </div>
                     <hr />
                     <div className="flex justify-between">
-                      <span className="font-medium">In omloop</span>
+                      <span className="font-medium">{t("inCirculation")}</span>
                       <span className="font-bold text-tea-600">{loyaltyStats.totalPointsInCirculation.toLocaleString()}</span>
                     </div>
                   </div>
@@ -567,12 +571,12 @@ export default function AnalyticsPage() {
 
                 {/* Tier Distribution */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold">Niveau Verdeling</h3>
+                  <h3 className="font-semibold">{t("tierDistribution")}</h3>
                   <div className="space-y-3">
                     {loyaltyStats.tierDistribution.map((tier) => (
                       <div key={tier.tier} className="flex items-center justify-between">
                         <Badge className={tierColors[tier.tier]}>{tier.tier}</Badge>
-                        <span className="font-medium">{tier.count} leden</span>
+                        <span className="font-medium">{tier.count} {t("members")}</span>
                       </div>
                     ))}
                   </div>
@@ -580,7 +584,7 @@ export default function AnalyticsPage() {
 
                 {/* Top Members */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold">Top Leden</h3>
+                  <h3 className="font-semibold">{t("topMembers")}</h3>
                   <div className="space-y-2">
                     {loyaltyStats.topMembers.map((member, index) => (
                       <div key={index} className="flex items-center justify-between text-sm">
@@ -595,7 +599,7 @@ export default function AnalyticsPage() {
 
                 {/* Recent Redemptions */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold">Recente Inwisselingen</h3>
+                  <h3 className="font-semibold">{t("recentRedemptions")}</h3>
                   <div className="space-y-2">
                     {loyaltyStats.recentRedemptions.length > 0 ? (
                       loyaltyStats.recentRedemptions.map((redemption, index) => (
@@ -607,14 +611,14 @@ export default function AnalyticsPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted-foreground">Nog geen inwisselingen</p>
+                      <p className="text-sm text-muted-foreground">{t("noRedemptions")}</p>
                     )}
                   </div>
                 </div>
               </div>
             ) : (
               <p className="py-12 text-center text-muted-foreground">
-                Geen loyaliteitsdata beschikbaar
+                {t("noLoyaltyData")}
               </p>
             )}
           </CardContent>
@@ -625,7 +629,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Klantstatistieken
+              {t("customerStats")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -637,24 +641,24 @@ export default function AnalyticsPage() {
               <div className="grid gap-4 md:grid-cols-4">
                 <div className="rounded-lg border p-4 text-center">
                   <p className="text-3xl font-bold text-tea-600">{customerStats.totalCustomers}</p>
-                  <p className="text-sm text-muted-foreground">Totaal accounts</p>
+                  <p className="text-sm text-muted-foreground">{t("totalAccounts")}</p>
                 </div>
                 <div className="rounded-lg border p-4 text-center">
                   <p className="text-3xl font-bold text-matcha-600">{customerStats.customersWithOrders}</p>
-                  <p className="text-sm text-muted-foreground">Met bestellingen</p>
+                  <p className="text-sm text-muted-foreground">{t("withOrders")}</p>
                 </div>
                 <div className="rounded-lg border p-4 text-center">
                   <p className="text-3xl font-bold text-taro-600">{customerStats.repeatCustomers}</p>
-                  <p className="text-sm text-muted-foreground">Terugkerende klanten</p>
+                  <p className="text-sm text-muted-foreground">{t("returningCustomers")}</p>
                 </div>
                 <div className="rounded-lg border p-4 text-center">
                   <p className="text-3xl font-bold text-honey-600">{customerStats.retentionRate}%</p>
-                  <p className="text-sm text-muted-foreground">Retentiepercentage</p>
+                  <p className="text-sm text-muted-foreground">{t("retentionRate")}</p>
                 </div>
               </div>
             ) : (
               <p className="py-12 text-center text-muted-foreground">
-                Geen klantdata beschikbaar
+                {t("noCustomerData")}
               </p>
             )}
           </CardContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -12,264 +12,11 @@ import {
   Plus,
   Leaf,
   Coffee,
-  ShoppingCart,
   Check,
   ArrowLeft,
-  Heart,
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import Image from "next/image";
-
-// =============================================================================
-// HAPTIC FEEDBACK UTILITY
-// =============================================================================
-
-function triggerHaptic(type: "light" | "medium" | "heavy" = "medium") {
-  if (typeof window === "undefined" || !navigator.vibrate) return;
-
-  const patterns = {
-    light: [10],
-    medium: [20],
-    heavy: [30, 10, 30],
-  };
-
-  try {
-    navigator.vibrate(patterns[type]);
-  } catch {
-    // Silently fail - haptics not supported
-  }
-}
-
-// =============================================================================
-// VISUAL SLIDER COMPONENTS
-// =============================================================================
-
-interface SugarSliderProps {
-  value: number;
-  onChange: (value: number) => void;
-  options: Array<{ value: string; label: string }>;
-}
-
-function SugarSlider({ value, onChange, options }: SugarSliderProps) {
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-
-  // Map numeric values to slider positions
-  const numericOptions = options.map(o => parseInt(o.value)).sort((a, b) => a - b);
-  const currentIndex = numericOptions.indexOf(value);
-  const percentage = numericOptions.length > 1
-    ? (currentIndex / (numericOptions.length - 1)) * 100
-    : 50;
-
-  // Handle slider interaction (drag or click)
-  const handleSliderInteraction = useCallback((clientX: number) => {
-    if (!sliderRef.current) return;
-    const rect = sliderRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    const percent = x / rect.width;
-
-    // Snap to nearest option
-    const nearestIndex = Math.round(percent * (numericOptions.length - 1));
-    const newValue = numericOptions[nearestIndex];
-    if (newValue !== value) {
-      triggerHaptic("light");
-      onChange(newValue);
-    }
-  }, [numericOptions, value, onChange]);
-
-  // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    handleSliderInteraction(e.clientX);
-  };
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => handleSliderInteraction(e.clientX);
-    const handleMouseUp = () => setIsDragging(false);
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, handleSliderInteraction]);
-
-  // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    handleSliderInteraction(e.touches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging) handleSliderInteraction(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = () => setIsDragging(false);
-
-  return (
-    <div className="space-y-1.5">
-      {/* Simple level indicator */}
-      <span className="text-sm font-semibold text-amber-600">{value}%</span>
-
-      {/* Draggable slider track */}
-      <div
-        ref={sliderRef}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="relative h-7 rounded-full bg-amber-100 cursor-pointer touch-none select-none"
-      >
-        {/* Filled track */}
-        <div
-          className={cn(
-            "absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber-300 to-amber-500",
-            isDragging ? "" : "transition-all duration-150"
-          )}
-          style={{ width: `${percentage}%` }}
-        />
-        {/* Thumb */}
-        <div
-          className={cn(
-            "absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white border-2 border-amber-500 shadow-md",
-            isDragging ? "scale-110" : "transition-all duration-150"
-          )}
-          style={{ left: `calc(${percentage}% - 12px)` }}
-        />
-        {/* Tick marks */}
-        <div className="absolute inset-0 flex items-center justify-between px-3 pointer-events-none">
-          {numericOptions.map((_, i) => (
-            <div key={i} className="w-1.5 h-1.5 rounded-full bg-amber-300/60" />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface IceSliderProps {
-  value: string;
-  onChange: (value: string) => void;
-  options: Array<{ value: string; label: string }>;
-}
-
-function IceSlider({ value, onChange, options }: IceSliderProps) {
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-
-  // Calculate ice level based on position in options array
-  const currentIndex = options.findIndex(o => o.value === value);
-  const iceLevel = options.length > 1
-    ? ((currentIndex === -1 ? options.length - 1 : currentIndex) / (options.length - 1)) * 100
-    : 66;
-
-  // Handle slider interaction (drag or click)
-  const handleSliderInteraction = useCallback((clientX: number) => {
-    if (!sliderRef.current) return;
-    const rect = sliderRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    const percent = x / rect.width;
-
-    // Snap to nearest option
-    const nearestIndex = Math.round(percent * (options.length - 1));
-    const newValue = options[nearestIndex]?.value;
-    if (newValue && newValue !== value) {
-      triggerHaptic("light");
-      onChange(newValue);
-    }
-  }, [options, value, onChange]);
-
-  // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    handleSliderInteraction(e.clientX);
-  };
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => handleSliderInteraction(e.clientX);
-    const handleMouseUp = () => setIsDragging(false);
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, handleSliderInteraction]);
-
-  // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    handleSliderInteraction(e.touches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging) handleSliderInteraction(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = () => setIsDragging(false);
-
-  // Get current label for display
-  const currentLabel = options.find(o => o.value === value)?.label || value;
-
-  return (
-    <div className="space-y-1.5">
-      {/* Simple level indicator with ice cubes */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1">
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                "w-2.5 h-2.5 rounded-sm transition-all duration-150",
-                i <= currentIndex ? "bg-sky-400" : "bg-sky-100"
-              )}
-            />
-          ))}
-        </div>
-        <span className="text-sm font-semibold text-sky-600">{currentLabel}</span>
-      </div>
-
-      {/* Draggable slider track */}
-      <div
-        ref={sliderRef}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="relative h-7 rounded-full bg-sky-100 cursor-pointer touch-none select-none"
-      >
-        {/* Filled track */}
-        <div
-          className={cn(
-            "absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-sky-300 to-sky-500",
-            isDragging ? "" : "transition-all duration-150"
-          )}
-          style={{ width: `${iceLevel}%` }}
-        />
-        {/* Thumb */}
-        <div
-          className={cn(
-            "absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white border-2 border-sky-500 shadow-md",
-            isDragging ? "scale-110" : "transition-all duration-150"
-          )}
-          style={{ left: `calc(${iceLevel}% - 12px)` }}
-        />
-        {/* Tick marks */}
-        <div className="absolute inset-0 flex items-center justify-between px-3 pointer-events-none">
-          {options.map((_, i) => (
-            <div key={i} className="w-1.5 h-1.5 rounded-full bg-sky-300/60" />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // Format slug to display name (taro-milk-tea → Taro Milk Tea)
 function formatSlug(slug: string): string {
@@ -277,6 +24,27 @@ function formatSlug(slug: string): string {
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+// Get category placeholder image URL based on category slug
+function getCategoryPlaceholder(categorySlug: string | undefined): string {
+  const validCategories = [
+    "brown-sugar",
+    "milk-tea",
+    "cream-cheese",
+    "iced-coffee",
+    "hot-coffee",
+    "ice-tea",
+    "mojito",
+    "kids-star",
+    "latte-special",
+    "frappucchino",
+  ];
+
+  if (categorySlug && validCategories.includes(categorySlug)) {
+    return `/images/categories/${categorySlug}.svg`;
+  }
+  return "/images/categories/placeholder.svg";
 }
 
 // =============================================================================
@@ -458,9 +226,6 @@ export function ProductCustomization({
 
   // Handle add to cart (or update in edit mode)
   const handleAddToCart = () => {
-    // Haptic feedback on add/update
-    triggerHaptic("medium");
-
     const toppingNames = selectedToppings
       .map((id) => filteredToppings.find((t) => t.id === id)?.translations[0]?.name || "")
       .filter(Boolean);
@@ -523,149 +288,93 @@ export function ProductCustomization({
   const productDescription = product.translations[0]?.description;
   const categoryName = product.category?.translations[0]?.name || (product.category?.slug && formatSlug(product.category.slug));
 
-  // Modal variant: clean, spacious, easy to tap
+  // Modal variant: Takeaway-style clean list design
   if (variant === "modal") {
     return (
-      <div className="flex flex-col">
-        {/* Product Image Header - Larger, more appetizing */}
-        <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-cream-100 via-tea-50 to-taro-50">
-          {product.imageUrl ? (
+      <div className="flex flex-col bg-white">
+        {/* Product Header - Compact with image */}
+        <div className="flex items-center gap-4 p-4 border-b border-gray-100">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-50">
             <Image
-              src={product.imageUrl}
+              src={product.imageUrl || getCategoryPlaceholder(product.category?.slug)}
               alt={productName}
               fill
-              sizes="(max-width: 640px) 100vw, 400px"
+              sizes="80px"
               className="object-contain"
             />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <span className="text-6xl">🧋</span>
-            </div>
-          )}
-          {/* Subtle gradient overlay */}
-          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-base font-semibold text-gray-900 line-clamp-2">{productName}</h2>
+            {categoryName && (
+              <p className="text-sm text-gray-500 mt-0.5">{categoryName}</p>
+            )}
+            <p className="text-base font-semibold text-gray-900 mt-1">
+              €{Number(product.price).toFixed(2)}
+            </p>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="px-5 pb-5 -mt-8 relative">
-          {/* Product Info */}
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div className="min-w-0 flex-1">
-              <h2 className="text-lg font-semibold leading-tight text-gray-900 line-clamp-2">{productName}</h2>
-              {categoryName && (
-                <p className="text-sm text-tea-600 font-medium mt-1">{categoryName}</p>
-              )}
-            </div>
-            <span className="text-xl font-bold text-tea-600 shrink-0">
-              €{Number(product.price).toFixed(2)}
-            </span>
-          </div>
+        {/* Customization Options - Simple list style */}
+        <div className="divide-y divide-gray-100">
+          {filteredCustomizationGroups.map((group) => (
+            <div key={group.id} className="p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                {getGroupLabel(group.type)}
+              </h3>
+              <div className="space-y-1">
+                {group.values.map((option) => {
+                  const label = option.translations[0]?.label || option.value;
+                  const isSelected = selectedOptions[group.type] === option.value;
+                  const hasModifier = Number(option.priceModifier) > 0;
 
-          {/* Customization Options - Visual sliders for sugar/ice */}
-          {filteredCustomizationGroups.length > 0 && (
-            <div className="space-y-4">
-              {filteredCustomizationGroups.map((group) => {
-                // Use visual slider for sugar level
-                if (group.type === "SUGAR_LEVEL") {
-                  const options = group.values.map((v) => ({
-                    value: v.value,
-                    label: v.translations[0]?.label || v.value,
-                  }));
                   return (
-                    <div key={group.id}>
-                      <label className="mb-2 block text-sm font-semibold text-gray-700">
-                        {getGroupLabel(group.type)}
-                      </label>
-                      <SugarSlider
-                        value={parseInt(selectedOptions["SUGAR_LEVEL"] || "100")}
-                        onChange={(val) =>
-                          setSelectedOptions({ ...selectedOptions, SUGAR_LEVEL: String(val) })
-                        }
-                        options={options}
-                      />
-                    </div>
+                    <button
+                      key={option.id}
+                      onClick={() =>
+                        setSelectedOptions({
+                          ...selectedOptions,
+                          [group.type]: option.value,
+                        })
+                      }
+                      className="flex w-full items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-gray-50 active:bg-gray-100"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors",
+                            isSelected
+                              ? "border-orange-500 bg-orange-500"
+                              : "border-gray-300"
+                          )}
+                        >
+                          {isSelected && (
+                            <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                          )}
+                        </div>
+                        <span className="text-sm text-gray-900">{label}</span>
+                      </div>
+                      {hasModifier && (
+                        <span className="text-sm text-gray-500">
+                          + €{Number(option.priceModifier).toFixed(2)}
+                        </span>
+                      )}
+                    </button>
                   );
-                }
-
-                // Use visual slider for ice level
-                if (group.type === "ICE_LEVEL") {
-                  const options = group.values.map((v) => ({
-                    value: v.value,
-                    label: v.translations[0]?.label || v.value,
-                  }));
-                  // Find default or use last option (usually "normal")
-                  const defaultIce = group.values.find(v => v.isDefault)?.value || options[options.length - 1]?.value || "";
-                  return (
-                    <div key={group.id}>
-                      <label className="mb-2 block text-sm font-semibold text-gray-700">
-                        {getGroupLabel(group.type)}
-                      </label>
-                      <IceSlider
-                        value={selectedOptions["ICE_LEVEL"] || defaultIce}
-                        onChange={(val) =>
-                          setSelectedOptions({ ...selectedOptions, ICE_LEVEL: val })
-                        }
-                        options={options}
-                      />
-                    </div>
-                  );
-                }
-
-                // Default button style for other customization types
-                return (
-                  <div key={group.id}>
-                    <label className="mb-2 block text-sm font-semibold text-gray-700">
-                      {getGroupLabel(group.type)}
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {group.values.map((option) => {
-                        const label = option.translations[0]?.label || option.value;
-                        const isSelected = selectedOptions[group.type] === option.value;
-                        const hasModifier = Number(option.priceModifier) > 0;
-
-                        return (
-                          <button
-                            key={option.id}
-                            onClick={() => {
-                              triggerHaptic("light");
-                              setSelectedOptions({
-                                ...selectedOptions,
-                                [group.type]: option.value,
-                              });
-                            }}
-                            className={cn(
-                              "rounded-full px-4 py-2 text-sm font-medium transition-all border min-h-[40px]",
-                              isSelected
-                                ? "bg-tea-600 text-white border-tea-600 shadow-sm"
-                                : "bg-white text-gray-700 border-gray-200 hover:border-tea-300 hover:bg-tea-50 active:bg-tea-100"
-                            )}
-                          >
-                            {label}
-                            {hasModifier && (
-                              <span className={cn("ml-1", isSelected ? "text-white/70" : "text-gray-400")}>
-                                +€{Number(option.priceModifier).toFixed(2)}
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+                })}
+              </div>
             </div>
-          )}
+          ))}
 
-          {/* Toppings - Clearer pricing, better touch targets */}
+          {/* Toppings */}
           {filteredToppings.length > 0 && (
-            <div className="mt-4">
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+            <div className="p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">
                 {t("customize.toppings")}
-                <span className="ml-1 text-xs font-normal text-gray-400">
-                  ({locale === "nl" ? "optioneel" : "optional"})
-                </span>
-              </label>
-              <div className="flex flex-wrap gap-2">
+              </h3>
+              <p className="text-xs text-gray-500 mb-3">
+                {locale === "nl" ? "Selecteer je extra's" : "Select your extras"}
+              </p>
+              <div className="space-y-1">
                 {filteredToppings.map((topping) => {
                   const isSelected = selectedToppings.includes(topping.id);
                   return (
@@ -678,17 +387,27 @@ export function ProductCustomization({
                             : [...prev, topping.id]
                         )
                       }
-                      className={cn(
-                        "rounded-full px-4 py-2 text-sm font-medium transition-all border flex items-center gap-2 min-h-[40px]",
-                        isSelected
-                          ? "bg-tea-600 text-white border-tea-600 shadow-sm"
-                          : "bg-white text-gray-700 border-gray-200 hover:border-tea-300 hover:bg-tea-50 active:bg-tea-100"
-                      )}
+                      className="flex w-full items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-gray-50 active:bg-gray-100"
                     >
-                      {isSelected && <Check className="h-4 w-4" />}
-                      <span>{topping.translations[0]?.name || formatSlug(topping.slug)}</span>
-                      <span className={cn("text-sm", isSelected ? "text-white/70" : "text-gray-400")}>
-                        +€{Number(topping.price).toFixed(2)}
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "h-5 w-5 rounded border-2 flex items-center justify-center transition-colors",
+                            isSelected
+                              ? "border-orange-500 bg-orange-500"
+                              : "border-gray-300"
+                          )}
+                        >
+                          {isSelected && (
+                            <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                          )}
+                        </div>
+                        <span className="text-sm text-gray-900">
+                          {topping.translations[0]?.name || formatSlug(topping.slug)}
+                        </span>
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        + €{Number(topping.price).toFixed(2)}
                       </span>
                     </button>
                   );
@@ -696,44 +415,46 @@ export function ProductCustomization({
               </div>
             </div>
           )}
+        </div>
 
-          {/* Footer: Quantity + Add Button - More prominent */}
-          <div className="mt-5 flex items-center gap-3 pt-4 border-t border-gray-100">
-            {/* Quantity controls - Larger */}
-            <div className="flex items-center rounded-full bg-gray-100 border border-gray-200">
+        {/* Footer: Quantity + Add Button */}
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+          <div className="flex items-center gap-3">
+            {/* Quantity controls */}
+            <div className="flex items-center border border-gray-300 rounded-lg">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={quantity <= 1}
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full transition-all",
-                  quantity <= 1 ? "text-gray-300" : "text-gray-600 hover:bg-white active:bg-gray-50"
+                  "flex h-10 w-10 items-center justify-center transition-colors",
+                  quantity <= 1 ? "text-gray-300" : "text-gray-600 hover:bg-gray-50 active:bg-gray-100"
                 )}
               >
-                <Minus className="h-5 w-5" />
+                <Minus className="h-4 w-4" />
               </button>
-              <span className="w-8 text-center text-base font-bold">{quantity}</span>
+              <span className="w-8 text-center text-sm font-semibold">{quantity}</span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition-all hover:bg-white active:bg-gray-50"
+                className="flex h-10 w-10 items-center justify-center text-gray-600 transition-colors hover:bg-gray-50 active:bg-gray-100"
               >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Add to Cart / Update Button - More prominent */}
+            {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
               disabled={isAddedToCart}
               className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-base font-semibold transition-all",
+                "flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold transition-colors",
                 isAddedToCart
-                  ? "bg-matcha-500 text-white"
-                  : "bg-tea-600 text-white hover:bg-tea-700 active:bg-tea-800 shadow-lg shadow-tea-600/20"
+                  ? "bg-green-500 text-white"
+                  : "bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700"
               )}
             >
               {isAddedToCart ? (
                 <>
-                  <Check className="h-5 w-5" />
+                  <Check className="h-4 w-4" />
                   <span>
                     {editMode
                       ? (locale === "nl" ? "Bijgewerkt!" : "Updated!")
@@ -744,11 +465,11 @@ export function ProductCustomization({
                 <>
                   <span>
                     {editMode
-                      ? (locale === "nl" ? "Bijwerken" : "Update")
+                      ? (locale === "nl" ? "Bijwerken" : "Update cart")
                       : (locale === "nl" ? "Toevoegen" : "Add to cart")}
                   </span>
-                  <span className="mx-1.5 h-5 w-px bg-white/30" />
-                  <span className="tabular-nums font-bold">€{totalPrice.toFixed(2)}</span>
+                  <span>•</span>
+                  <span className="tabular-nums">€{totalPrice.toFixed(2)}</span>
                 </>
               )}
             </button>
@@ -758,28 +479,34 @@ export function ProductCustomization({
     );
   }
 
-  // Page variant: full layout with large image
+  // Page variant: Takeaway-style with image
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
-      {/* Product Image - large for page view */}
-      <div className="relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-tea-50 to-taro-50">
-        {product.imageUrl ? (
+    <div className="max-w-2xl mx-auto bg-white">
+      {/* Product Header with Image */}
+      <div className="relative">
+        <div className="relative h-48 sm:h-64 w-full overflow-hidden bg-gray-50">
           <Image
-            src={product.imageUrl}
+            src={product.imageUrl || getCategoryPlaceholder(product.category?.slug)}
             alt={productName}
             fill
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
+            sizes="(max-width: 672px) 100vw, 672px"
+            className={product.imageUrl ? "object-contain" : "object-contain p-8"}
             priority
           />
-        ) : (
-          <div className="flex h-full min-h-[200px] items-center justify-center">
-            <span className="text-8xl">🧋</span>
-          </div>
-        )}
+        </div>
+
+        {/* Back button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute left-3 top-3 h-10 w-10 bg-white/90 backdrop-blur hover:bg-white rounded-full shadow-sm"
+          onClick={handleBack}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
 
         {/* Badges */}
-        <div className="absolute left-3 top-3 flex flex-col gap-1">
+        <div className="absolute right-3 top-3 flex flex-col gap-1">
           {product.vegan && (
             <Badge variant="matcha" className="text-xs">
               <Leaf className="mr-1 h-3 w-3" />
@@ -787,113 +514,106 @@ export function ProductCustomization({
             </Badge>
           )}
           {!product.caffeine && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs bg-white/90">
               <Coffee className="mr-1 h-3 w-3" />
               {locale === "nl" ? "Cafeïnevrij" : "Caffeine-free"}
             </Badge>
           )}
         </div>
-
-        {/* Back button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute left-3 top-3 mt-12 h-10 w-10 bg-white/80 backdrop-blur hover:bg-white"
-          onClick={handleBack}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
       </div>
 
-      {/* Customization Options */}
-      <div className="flex flex-col gap-6 py-4">
-        {/* Header */}
-        <div>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              {categoryName && (
-                <p className="text-xs font-medium text-tea-600 mb-1">{categoryName}</p>
-              )}
-              <h2 className="text-3xl font-bold">{productName}</h2>
-              <p className="text-xl font-bold text-tea-600 mt-1">
-                €{Number(product.price).toFixed(2)}
+      {/* Product Info */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            {categoryName && (
+              <p className="text-sm text-gray-500 mb-1">{categoryName}</p>
+            )}
+            <h2 className="text-xl font-semibold text-gray-900">{productName}</h2>
+            {productDescription && (
+              <p className="text-sm text-gray-600 mt-1">{productDescription}</p>
+            )}
+            {product.calories && (
+              <p className="text-sm text-gray-500 mt-1">
+                {product.calories} {tMenu("calories")}
               </p>
-            </div>
+            )}
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <span className="text-xl font-semibold text-gray-900">
+              €{Number(product.price).toFixed(2)}
+            </span>
             <FavoriteButton
               productId={product.id}
               size="default"
               variant="outline"
-              className="h-10 w-10"
+              className="h-9 w-9"
             />
           </div>
-          {productDescription && (
-            <p className="text-muted-foreground mt-2">{productDescription}</p>
-          )}
-          {product.calories && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {product.calories} {tMenu("calories")}
-            </p>
-          )}
         </div>
+      </div>
 
-        {/* Dynamic Customization Groups */}
-        {filteredCustomizationGroups.length > 0 && (
-          <div className="space-y-5 border-t border-gray-100 pt-6">
-            <h3 className="text-sm font-semibold">{t("customize.title")}</h3>
+      {/* Customization Options - Simple list style */}
+      <div className="divide-y divide-gray-100">
+        {filteredCustomizationGroups.map((group) => (
+          <div key={group.id} className="p-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">
+              {getGroupLabel(group.type)}
+            </h3>
+            <div className="space-y-1">
+              {group.values.map((option) => {
+                const label = option.translations[0]?.label || option.value;
+                const isSelected = selectedOptions[group.type] === option.value;
+                const hasModifier = Number(option.priceModifier) > 0;
 
-            {filteredCustomizationGroups.map((group) => (
-              <div key={group.id}>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
-                  {getGroupLabel(group.type)}
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {group.values.map((option) => {
-                    const label = option.translations[0]?.label || option.value;
-                    const isSelected = selectedOptions[group.type] === option.value;
-                    const hasModifier = Number(option.priceModifier) > 0;
-
-                    return (
-                      <button
-                        key={option.id}
-                        onClick={() =>
-                          setSelectedOptions({
-                            ...selectedOptions,
-                            [group.type]: option.value,
-                          })
-                        }
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() =>
+                      setSelectedOptions({
+                        ...selectedOptions,
+                        [group.type]: option.value,
+                      })
+                    }
+                    className="flex w-full items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-gray-50 active:bg-gray-100"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
                         className={cn(
-                          "rounded-full px-4 py-2 text-sm font-medium transition-all",
-                          "border",
+                          "h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors",
                           isSelected
-                            ? "border-tea-300 bg-tea-500 text-white shadow-md"
-                            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+                            ? "border-orange-500 bg-orange-500"
+                            : "border-gray-300"
                         )}
                       >
-                        {label}
-                        {hasModifier && (
-                          <span className={cn(
-                            "ml-1 text-xs",
-                            isSelected ? "text-white/80" : "text-gray-400"
-                          )}>
-                            +€{Number(option.priceModifier).toFixed(2)}
-                          </span>
+                        {isSelected && (
+                          <Check className="h-3 w-3 text-white" strokeWidth={3} />
                         )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+                      </div>
+                      <span className="text-sm text-gray-900">{label}</span>
+                    </div>
+                    {hasModifier && (
+                      <span className="text-sm text-gray-500">
+                        + €{Number(option.priceModifier).toFixed(2)}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        )}
+        ))}
 
         {/* Toppings */}
         {filteredToppings.length > 0 && (
-          <div className="border-t border-gray-100 pt-6">
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+          <div className="p-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">
               {t("customize.toppings")}
-            </label>
-            <div className="flex flex-wrap gap-2">
+            </h3>
+            <p className="text-xs text-gray-500 mb-3">
+              {locale === "nl" ? "Selecteer je extra's" : "Select your extras"}
+            </p>
+            <div className="space-y-1">
               {filteredToppings.map((topping) => {
                 const isSelected = selectedToppings.includes(topping.id);
                 return (
@@ -906,21 +626,27 @@ export function ProductCustomization({
                           : [...prev, topping.id]
                       )
                     }
-                    className={cn(
-                      "rounded-full px-4 py-2 text-sm font-medium transition-all",
-                      "border flex items-center gap-2",
-                      isSelected
-                        ? "border-tea-300 bg-tea-500 text-white shadow-md"
-                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300"
-                    )}
+                    className="flex w-full items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-gray-50 active:bg-gray-100"
                   >
-                    {isSelected && <Check className="h-3 w-3" />}
-                    {topping.translations[0]?.name || formatSlug(topping.slug)}
-                    <span className={cn(
-                      "text-xs",
-                      isSelected ? "text-white/80" : "text-gray-400"
-                    )}>
-                      +€{Number(topping.price).toFixed(2)}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={cn(
+                          "h-5 w-5 rounded border-2 flex items-center justify-center transition-colors",
+                          isSelected
+                            ? "border-orange-500 bg-orange-500"
+                            : "border-gray-300"
+                        )}
+                      >
+                        {isSelected && (
+                          <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                        )}
+                      </div>
+                      <span className="text-sm text-gray-900">
+                        {topping.translations[0]?.name || formatSlug(topping.slug)}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      + €{Number(topping.price).toFixed(2)}
                     </span>
                   </button>
                 );
@@ -928,70 +654,57 @@ export function ProductCustomization({
             </div>
           </div>
         )}
+      </div>
 
-        {/* Quantity & Total */}
-        <div className="space-y-4 border-t border-gray-100 pt-6">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600">
-              {locale === "nl" ? "Aantal" : "Quantity"}
-            </span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                disabled={quantity <= 1}
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full border transition-all",
-                  quantity <= 1
-                    ? "border-gray-200 text-gray-300"
-                    : "border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50"
-                )}
-              >
-                <Minus className="h-4 w-4" />
-              </button>
-              <span className="w-8 text-center text-lg font-semibold">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50"
-              >
-                <Plus className="h-4 w-4" />
-              </button>
-            </div>
+      {/* Footer: Quantity + Add Button */}
+      <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+        <div className="flex items-center gap-3">
+          {/* Quantity controls */}
+          <div className="flex items-center border border-gray-300 rounded-lg">
+            <button
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={quantity <= 1}
+              className={cn(
+                "flex h-11 w-11 items-center justify-center transition-colors",
+                quantity <= 1 ? "text-gray-300" : "text-gray-600 hover:bg-gray-50 active:bg-gray-100"
+              )}
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+            <span className="w-10 text-center text-base font-semibold">{quantity}</span>
+            <button
+              onClick={() => setQuantity(quantity + 1)}
+              className="flex h-11 w-11 items-center justify-center text-gray-600 transition-colors hover:bg-gray-50 active:bg-gray-100"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
           </div>
 
-          <div className="flex items-center justify-between">
-            <span className="font-medium">
-              {locale === "nl" ? "Totaal" : "Total"}
-            </span>
-            <span className="text-2xl font-bold text-tea-600">
-              €{totalPrice.toFixed(2)}
-            </span>
-          </div>
+          {/* Add to Cart Button */}
+          <button
+            onClick={handleAddToCart}
+            disabled={isAddedToCart}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-2 rounded-lg py-3.5 text-base font-semibold transition-colors",
+              isAddedToCart
+                ? "bg-green-500 text-white"
+                : "bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700"
+            )}
+          >
+            {isAddedToCart ? (
+              <>
+                <Check className="h-5 w-5" />
+                <span>{locale === "nl" ? "Toegevoegd!" : "Added!"}</span>
+              </>
+            ) : (
+              <>
+                <span>{locale === "nl" ? "Toevoegen" : "Add to cart"}</span>
+                <span>•</span>
+                <span className="tabular-nums">€{totalPrice.toFixed(2)}</span>
+              </>
+            )}
+          </button>
         </div>
-
-        {/* Add to Cart */}
-        <button
-          onClick={handleAddToCart}
-          disabled={isAddedToCart}
-          className={cn(
-            "flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-semibold transition-all",
-            "shadow-lg",
-            isAddedToCart
-              ? "bg-green-500 text-white shadow-green-500/25"
-              : "bg-tea-500 text-white shadow-tea-500/30 hover:bg-tea-600 hover:shadow-xl hover:shadow-tea-500/40"
-          )}
-        >
-          {isAddedToCart ? (
-            <>
-              <Check className="h-5 w-5" />
-              {locale === "nl" ? "Toegevoegd!" : "Added!"}
-            </>
-          ) : (
-            <>
-              <ShoppingCart className="h-5 w-5" />
-              {tMenu("addToCart")}
-            </>
-          )}
-        </button>
       </div>
     </div>
   );

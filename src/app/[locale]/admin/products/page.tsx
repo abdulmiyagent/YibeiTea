@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { api } from "@/lib/trpc";
+import { useTranslations } from "next-intl";
 import {
   Plus,
   Pencil,
@@ -53,6 +54,8 @@ export default function AdminProductsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const utils = api.useUtils();
+  const t = useTranslations("admin.products");
+  const tCommon = useTranslations("common");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -238,10 +241,10 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (productId: string) => {
     if (!isSuperAdmin) {
-      alert("Alleen Super Admins kunnen producten verwijderen.");
+      alert(t("onlySuperAdminDelete"));
       return;
     }
-    if (confirm("Weet je zeker dat je dit product wilt verwijderen?")) {
+    if (confirm(t("confirmDelete"))) {
       await deleteMutation.mutateAsync({ id: productId });
     }
   };
@@ -281,18 +284,18 @@ export default function AdminProductsPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="heading-2">Producten Beheren</h1>
+              <h1 className="heading-2">{t("manage")}</h1>
               <p className="text-muted-foreground">
                 {isSuperAdmin
-                  ? "Voeg toe, bewerk of verwijder producten"
-                  : "Bekijk en bewerk producten"}
+                  ? t("addEditDeleteDesc")
+                  : t("viewEdit")}
               </p>
             </div>
           </div>
           {isSuperAdmin && (
             <Button variant="tea" onClick={openAddModal}>
               <Plus className="mr-2 h-4 w-4" />
-              Nieuw Product
+              {t("newProduct")}
             </Button>
           )}
         </div>
@@ -304,7 +307,7 @@ export default function AdminProductsPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Zoek op naam of slug..."
+                  placeholder={t("searchPlaceholder")}
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -317,7 +320,7 @@ export default function AdminProductsPage() {
                   size="sm"
                   onClick={() => setSelectedCategory(null)}
                 >
-                  Alle
+                  {t("all")}
                 </Button>
                 {categories?.slice(0, 5).map((cat) => (
                   <Button
@@ -351,7 +354,7 @@ export default function AdminProductsPage() {
                     </Badge>
                   )}
                   {!product.isAvailable && (
-                    <Badge variant="secondary">Uitgeschakeld</Badge>
+                    <Badge variant="secondary">{t("disabled")}</Badge>
                   )}
                 </div>
 
@@ -394,12 +397,12 @@ export default function AdminProductsPage() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   {product.caffeine && (
                     <Badge variant="outline" className="text-xs">
-                      Cafeïne
+                      {t("caffeine")}
                     </Badge>
                   )}
                   {product.vegan && (
                     <Badge variant="outline" className="text-xs">
-                      Vegan
+                      {t("vegan")}
                     </Badge>
                   )}
                   <Badge variant="outline" className="text-xs">
@@ -459,9 +462,9 @@ export default function AdminProductsPage() {
           <Card>
             <CardContent className="py-12 text-center">
               <Coffee className="mx-auto h-12 w-12 text-muted-foreground" />
-              <p className="mt-4 text-lg font-medium">Geen producten gevonden</p>
+              <p className="mt-4 text-lg font-medium">{t("noProductsFound")}</p>
               <p className="text-muted-foreground">
-                Pas je zoekopdracht of filters aan
+                {t("adjustSearch")}
               </p>
             </CardContent>
           </Card>
@@ -476,9 +479,9 @@ export default function AdminProductsPage() {
                   <Plus className="h-6 w-6 text-taro-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Toppings Beheren</p>
+                  <p className="font-medium">{t("toppingsManage")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Beheer tapioca, popping boba, en andere toppings
+                    {t("toppingsDesc")}
                   </p>
                 </div>
               </CardContent>
@@ -493,7 +496,7 @@ export default function AdminProductsPage() {
           <Card className="max-h-[90vh] w-full max-w-2xl overflow-y-auto">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>
-                {editingProduct ? "Product Bewerken" : "Nieuw Product"}
+                {editingProduct ? t("editProduct") : t("newProductTitle")}
               </CardTitle>
               <Button
                 variant="ghost"
@@ -506,21 +509,21 @@ export default function AdminProductsPage() {
             <CardContent className="space-y-6">
               {/* Image Upload */}
               <div className="space-y-2">
-                <Label>Product Afbeelding</Label>
+                <Label>{t("productImage")}</Label>
                 <ImageUpload
                   value={formData.imageUrl}
                   onChange={(url) => setFormData({ ...formData, imageUrl: url })}
                   folder="products"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Upload een afbeelding voor dit product. Max 5MB, formaten: JPG, PNG, WebP
+                  {t("imageUploadDesc")}
                 </p>
               </div>
 
               {/* Basic Info */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="slug">Slug (URL)</Label>
+                  <Label htmlFor="slug">{t("slugUrl")}</Label>
                   <Input
                     id="slug"
                     placeholder="taro-milk-tea"
@@ -531,7 +534,7 @@ export default function AdminProductsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="category">Categorie</Label>
+                  <Label htmlFor="category">{t("category")}</Label>
                   <select
                     id="category"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -550,7 +553,7 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Prijs (EUR)</Label>
+                <Label htmlFor="price">{t("priceEur")}</Label>
                 <Input
                   id="price"
                   type="number"
@@ -566,9 +569,9 @@ export default function AdminProductsPage() {
 
               {/* Dutch translations */}
               <div className="space-y-4 rounded-lg border p-4">
-                <h4 className="font-medium">Nederlands</h4>
+                <h4 className="font-medium">{t("dutch")}</h4>
                 <div className="space-y-2">
-                  <Label htmlFor="name">Naam</Label>
+                  <Label htmlFor="name">{t("name")}</Label>
                   <Input
                     id="name"
                     placeholder="Taro Melkthee"
@@ -579,7 +582,7 @@ export default function AdminProductsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Beschrijving</Label>
+                  <Label htmlFor="description">{t("description")}</Label>
                   <Textarea
                     id="description"
                     placeholder="Romige taro melkthee met authentieke smaak"
@@ -593,7 +596,7 @@ export default function AdminProductsPage() {
 
               {/* English translations */}
               <div className="space-y-4 rounded-lg border p-4">
-                <h4 className="font-medium">English</h4>
+                <h4 className="font-medium">{t("english")}</h4>
                 <div className="space-y-2">
                   <Label htmlFor="nameEn">Name</Label>
                   <Input
@@ -629,7 +632,7 @@ export default function AdminProductsPage() {
                     }
                     className="h-4 w-4 rounded border-gray-300"
                   />
-                  <span>Beschikbaar</span>
+                  <span>{t("available")}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -640,7 +643,7 @@ export default function AdminProductsPage() {
                     }
                     className="h-4 w-4 rounded border-gray-300"
                   />
-                  <span>Featured op homepage</span>
+                  <span>{t("featuredHomepage")}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -651,7 +654,7 @@ export default function AdminProductsPage() {
                     }
                     className="h-4 w-4 rounded border-gray-300"
                   />
-                  <span>Bevat cafeïne</span>
+                  <span>{t("containsCaffeine")}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -662,13 +665,13 @@ export default function AdminProductsPage() {
                     }
                     className="h-4 w-4 rounded border-gray-300"
                   />
-                  <span>Vegan</span>
+                  <span>{t("vegan")}</span>
                 </label>
               </div>
 
               {/* Customization Options */}
               <div className="space-y-4 rounded-lg border border-tea-200 bg-tea-50 p-4">
-                <h4 className="font-medium text-tea-800">Aanpassingsmogelijkheden</h4>
+                <h4 className="font-medium text-tea-800">{t("customizationOptions")}</h4>
                 <div className="grid gap-4 md:grid-cols-3">
                   <label className="flex items-center gap-2">
                     <input
@@ -679,7 +682,7 @@ export default function AdminProductsPage() {
                       }
                       className="h-4 w-4 rounded border-gray-300"
                     />
-                    <span>Suikerniveau aanpasbaar</span>
+                    <span>{t("sugarCustomizable")}</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -690,7 +693,7 @@ export default function AdminProductsPage() {
                       }
                       className="h-4 w-4 rounded border-gray-300"
                     />
-                    <span>IJsniveau aanpasbaar</span>
+                    <span>{t("iceCustomizable")}</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -701,18 +704,18 @@ export default function AdminProductsPage() {
                       }
                       className="h-4 w-4 rounded border-gray-300"
                     />
-                    <span>Toppings toevoegbaar</span>
+                    <span>{t("toppingsAddable")}</span>
                   </label>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Bepaal welke aanpassingen klanten kunnen maken bij dit product
+                  {t("customizationDesc")}
                 </p>
               </div>
 
               {/* Actions */}
               <div className="flex justify-end gap-2 border-t pt-4">
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                  Annuleren
+                  {tCommon("cancel")}
                 </Button>
                 <Button
                   variant="tea"
@@ -723,7 +726,7 @@ export default function AdminProductsPage() {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   <Save className="mr-2 h-4 w-4" />
-                  Opslaan
+                  {t("save")}
                 </Button>
               </div>
             </CardContent>

@@ -141,20 +141,14 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       <div className="flex gap-3">
                         {/* Product Image */}
                         <div className="relative h-16 w-16 flex-shrink-0 rounded-xl bg-gradient-to-br from-cream-50 to-tea-50 overflow-hidden">
-                          {item.imageUrl ? (
-                            <Image
-                              src={item.imageUrl}
-                              alt={item.name}
-                              fill
-                              sizes="64px"
-                              className="object-cover"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <span className="text-2xl">🧋</span>
-                            </div>
-                          )}
+                          <Image
+                            src={item.imageUrl || "/images/categories/placeholder.svg"}
+                            alt={item.name}
+                            fill
+                            sizes="64px"
+                            className={item.imageUrl ? "object-cover" : "object-contain p-1"}
+                            loading="lazy"
+                          />
                         </div>
 
                         {/* Product Info */}

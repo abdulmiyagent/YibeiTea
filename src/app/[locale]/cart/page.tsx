@@ -99,20 +99,14 @@ export default function CartPage() {
                   >
                     {/* Product Image */}
                     <div className="relative h-20 w-20 flex-shrink-0 rounded-lg bg-gradient-to-br from-tea-50 to-taro-50 overflow-hidden">
-                      {item.imageUrl ? (
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.name}
-                          fill
-                          sizes="80px"
-                          className="object-contain p-1"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <span className="text-4xl">🧋</span>
-                        </div>
-                      )}
+                      <Image
+                        src={item.imageUrl || "/images/categories/placeholder.svg"}
+                        alt={item.name}
+                        fill
+                        sizes="80px"
+                        className="object-contain p-1"
+                        loading="lazy"
+                      />
                     </div>
 
                     {/* Product Info */}

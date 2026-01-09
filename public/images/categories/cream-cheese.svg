@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="cupBodyCC" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
+    </linearGradient>
+    <linearGradient id="creamCheeseDrink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#90C090"/>
+      <stop offset="50%" style="stop-color:#70A070"/>
+      <stop offset="100%" style="stop-color:#508050"/>
+    </linearGradient>
+    <linearGradient id="creamCheeseTopping" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFEF5"/>
+      <stop offset="50%" style="stop-color:#FFF8E8"/>
+      <stop offset="100%" style="stop-color:#F5E6C8"/>
+    </linearGradient>
+    <linearGradient id="lidGradientCC" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8D8B8"/>
+      <stop offset="100%" style="stop-color:#D4C4A4"/>
+    </linearGradient>
+    <linearGradient id="strawGradientCC" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a2a"/>
+      <stop offset="50%" style="stop-color:#404040"/>
+      <stop offset="100%" style="stop-color:#2a2a2a"/>
+    </linearGradient>
+    <radialGradient id="bobaGlowCC" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </radialGradient>
+    <filter id="shadowCC" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Cup with shadow -->
+  <g filter="url(#shadowCC)" opacity="0.92">
+    <!-- Cup body -->
+    <path d="M50 70 L45 235 Q45 255 65 255 L135 255 Q155 255 155 235 L150 70 Z" fill="url(#cupBodyCC)" stroke="#ddd" stroke-width="1"/>
+
+    <!-- Drink (green tea base) -->
+    <path d="M52 110 L48 230 Q48 248 65 248 L135 248 Q152 248 152 230 L148 110 Z" fill="url(#creamCheeseDrink)"/>
+
+    <!-- Cream cheese layer -->
+    <path d="M52 85 L52 115 Q52 125 65 125 L135 125 Q148 125 148 115 L148 85 Z" fill="url(#creamCheeseTopping)"/>
+
+    <!-- Cream cheese texture -->
+    <ellipse cx="75" cy="100" rx="12" ry="4" fill="#FFF8E8" opacity="0.6"/>
+    <ellipse cx="115" cy="105" rx="10" ry="3" fill="#FFF8E8" opacity="0.5"/>
+    <ellipse cx="95" cy="95" rx="8" ry="3" fill="#FFFFFF" opacity="0.4"/>
+  </g>
+
+  <!-- Foam top with cream cheese -->
+  <ellipse cx="100" cy="82" rx="50" ry="14" fill="#FFF8E8" opacity="0.95"/>
+  <ellipse cx="100" cy="79" rx="45" ry="11" fill="#FFFEF8" opacity="0.95"/>
+  <ellipse cx="85" cy="77" rx="15" ry="5" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Tapioca pearls -->
+  <g opacity="0.9">
+    <circle cx="62" cy="225" r="9" fill="url(#bobaGlowCC)"/>
+    <circle cx="58" cy="221" r="3" fill="#555" opacity="0.5"/>
+    <circle cx="82" cy="235" r="8" fill="url(#bobaGlowCC)"/>
+    <circle cx="78" cy="231" r="2.5" fill="#555" opacity="0.5"/>
+    <circle cx="100" cy="228" r="9" fill="url(#bobaGlowCC)"/>
+    <circle cx="96" cy="224" r="3" fill="#555" opacity="0.5"/>
+    <circle cx="118" cy="237" r="8" fill="url(#bobaGlowCC)"/>
+    <circle cx="114" cy="233" r="2.5" fill="#555" opacity="0.5"/>
+    <circle cx="138" cy="226" r="9" fill="url(#bobaGlowCC)"/>
+    <circle cx="134" cy="222" r="3" fill="#555" opacity="0.5"/>
+    <circle cx="72" cy="210" r="7" fill="url(#bobaGlowCC)"/>
+    <circle cx="128" cy="212" r="7" fill="url(#bobaGlowCC)"/>
+  </g>
+
+  <!-- Lid -->
+  <ellipse cx="100" cy="67" rx="54" ry="12" fill="url(#lidGradientCC)" opacity="0.95"/>
+  <ellipse cx="100" cy="64" rx="50" ry="10" fill="#E8D8B8" opacity="0.95"/>
+  <ellipse cx="90" cy="62" rx="20" ry="5" fill="#F0E0C0" opacity="0.5"/>
+
+  <!-- Straw hole -->
+  <ellipse cx="100" cy="64" rx="9" ry="4" fill="#A09070"/>
+
+  <!-- Straw -->
+  <rect x="95" y="15" width="10" height="55" rx="3" fill="url(#strawGradientCC)" opacity="0.95"/>
+  <rect x="96" y="15" width="3" height="55" fill="#555" opacity="0.25"/>
+
+  <!-- Condensation drops -->
+  <ellipse cx="145" cy="140" rx="3" ry="4" fill="#fff" opacity="0.4"/>
+  <ellipse cx="148" cy="180" rx="2" ry="3" fill="#fff" opacity="0.35"/>
+  <ellipse cx="55" cy="160" rx="2.5" ry="3.5" fill="#fff" opacity="0.38"/>
+
+  <!-- Subtle placeholder indicator -->
+  <g opacity="0.12">
+    <circle cx="100" cy="175" r="4" fill="#508050"/>
+    <path d="M92 155 Q92 140 100 140 Q108 140 108 150 Q108 160 100 165" stroke="#508050" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>
