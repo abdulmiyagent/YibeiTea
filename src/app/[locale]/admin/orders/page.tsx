@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { api } from "@/lib/trpc";
 import { formatPrice } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -20,6 +21,8 @@ import {
   Sparkles,
   Coffee,
   ArrowRight,
+  Search,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,8 +58,10 @@ export default function AdminOrdersPage() {
   const t = useTranslations("admin.orders");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [now, setNow] = useState(new Date());
+  const [searchQuery, setSearchQuery] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastOrderCountRef = useRef<number>(0);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Update clock every second for pickup timers
   useEffect(() => {
@@ -106,7 +111,7 @@ export default function AdminOrdersPage() {
 
   if (authStatus === "loading" || isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-tea-50 via-cream-100 to-matcha-50">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <Coffee className="h-16 w-16 text-tea-600 animate-gentle-pulse" />
@@ -123,10 +128,20 @@ export default function AdminOrdersPage() {
     return null;
   }
 
+  // Filter orders by search query
+  const filterOrders = (orderList: Order[]) => {
+    if (!searchQuery.trim()) return orderList;
+    const query = searchQuery.toLowerCase().trim();
+    return orderList.filter(order =>
+      order.orderNumber.toLowerCase().includes(query) ||
+      (order.customerName?.toLowerCase().includes(query))
+    );
+  };
+
   // Categorize orders
-  const paidOrders = (orders || []).filter(o => o.status === "PAID");
-  const preparingOrders = (orders || []).filter(o => o.status === "PREPARING");
-  const readyOrders = (orders || []).filter(o => o.status === "READY");
+  const paidOrders = filterOrders((orders || []).filter(o => o.status === "PAID"));
+  const preparingOrders = filterOrders((orders || []).filter(o => o.status === "PREPARING"));
+  const readyOrders = filterOrders((orders || []).filter(o => o.status === "READY"));
 
   const updateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
     updateStatusMutation.mutate({ id: orderId, status: newStatus });
@@ -161,56 +176,73 @@ export default function AdminOrdersPage() {
   const sortedReady = [...readyOrders].sort(sortByUrgency);
 
   const totalActive = paidOrders.length + preparingOrders.length + readyOrders.length;
+  const totalUnfiltered = (orders || []).filter(o => ["PAID", "PREPARING", "READY"].includes(o.status)).length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-tea-50/50 via-cream-100/30 to-matcha-50/50">
-      {/* Floating Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-tea-200/50 shadow-soft">
-        <div className="mx-auto max-w-[1800px] px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Coffee className="h-8 w-8 text-tea-600" />
-                  {totalActive > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-bordeaux-600 text-[10px] font-bold text-white">
-                      {totalActive}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-tea-900">{t("title")}</h1>
-                  <p className="text-xs text-tea-600/70">{t("manage")}</p>
-                </div>
-              </div>
-            </div>
+      {/* Toolbar */}
+      <div className="mx-auto max-w-[1800px] px-4 pt-4 pb-2">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Search Bar */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tea-400" />
+            <Input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Zoek klant of bestelnummer..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10 bg-white/80 border-tea-200 focus:border-tea-400 focus:ring-tea-400"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-tea-400 hover:text-tea-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSoundEnabled(!soundEnabled)}
-                className="text-tea-700 hover:bg-tea-100"
-              >
-                {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => refetch()}
-                disabled={isLoading}
-                className="text-tea-700 hover:bg-tea-100"
-              >
-                <RefreshCw className={cn("h-5 w-5", isLoading && "animate-spin")} />
-              </Button>
-            </div>
+          {/* Controls */}
+          <div className="flex items-center gap-2">
+            {totalUnfiltered > 0 && (
+              <span className="text-sm text-tea-600 mr-2">
+                {searchQuery ? `${totalActive} van ${totalUnfiltered}` : `${totalActive} actief`}
+              </span>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={cn(
+                "text-tea-700 hover:bg-tea-100",
+                soundEnabled && "bg-tea-100"
+              )}
+              title={soundEnabled ? "Geluid uit" : "Geluid aan"}
+            >
+              {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="text-tea-700 hover:bg-tea-100"
+              title="Vernieuwen"
+            >
+              <RefreshCw className={cn("h-5 w-5", isLoading && "animate-spin")} />
+            </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Kanban Board */}
       <main className="mx-auto max-w-[1800px] p-4">
-        {totalActive === 0 ? (
+        {totalActive === 0 && !searchQuery ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="relative mb-6">
               <div className="absolute inset-0 rounded-full bg-matcha-200/50 blur-2xl" />
@@ -218,6 +250,19 @@ export default function AdminOrdersPage() {
             </div>
             <p className="text-2xl font-bold text-matcha-700">{t("noOrdersReceived")}</p>
             <p className="mt-2 text-matcha-600/70">Wachtend op nieuwe bestellingen...</p>
+          </div>
+        ) : totalActive === 0 && searchQuery ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <Search className="h-16 w-16 text-tea-300 mb-4" />
+            <p className="text-xl font-bold text-tea-700">Geen resultaten voor "{searchQuery}"</p>
+            <p className="mt-2 text-tea-500">Probeer een andere zoekterm</p>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => setSearchQuery("")}
+            >
+              Wis zoekopdracht
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -241,6 +286,7 @@ export default function AdminOrdersPage() {
                   onAdvance={() => updateOrderStatus(order.id, "PREPARING")}
                   onCancel={() => updateOrderStatus(order.id, "CANCELLED")}
                   isUpdating={updateStatusMutation.isPending}
+                  searchQuery={searchQuery}
                   t={t}
                 />
               ))}
@@ -266,6 +312,7 @@ export default function AdminOrdersPage() {
                   onAdvance={() => updateOrderStatus(order.id, "READY")}
                   onCancel={() => updateOrderStatus(order.id, "CANCELLED")}
                   isUpdating={updateStatusMutation.isPending}
+                  searchQuery={searchQuery}
                   t={t}
                 />
               ))}
@@ -290,6 +337,7 @@ export default function AdminOrdersPage() {
                   isOverdue={isOverdue(order.pickupTime)}
                   onAdvance={() => updateOrderStatus(order.id, "COMPLETED")}
                   isUpdating={updateStatusMutation.isPending}
+                  searchQuery={searchQuery}
                   t={t}
                 />
               ))}
@@ -354,7 +402,7 @@ function KanbanColumn({ title, count, icon, color, isEmpty, emptyText, children 
       </div>
 
       {/* Column Content */}
-      <div className="flex-1 p-3 space-y-3 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto">
+      <div className="flex-1 p-3 space-y-3 min-h-[400px] max-h-[calc(100vh-280px)] overflow-y-auto">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className={cn("opacity-30 mb-2", classes.empty)}>{icon}</div>
@@ -368,6 +416,26 @@ function KanbanColumn({ title, count, icon, color, isEmpty, emptyText, children 
   );
 }
 
+// Highlight matching text
+function HighlightMatch({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <>{text}</>;
+
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const parts = text.split(regex);
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} className="bg-amber-200 text-amber-900 rounded px-0.5">{part}</mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
 // Order Card Component
 interface OrderCardProps {
   order: Order;
@@ -378,6 +446,7 @@ interface OrderCardProps {
   onAdvance: () => void;
   onCancel?: () => void;
   isUpdating: boolean;
+  searchQuery: string;
   t: ReturnType<typeof useTranslations>;
 }
 
@@ -390,6 +459,7 @@ function OrderCard({
   onAdvance,
   onCancel,
   isUpdating,
+  searchQuery,
   t,
 }: OrderCardProps) {
   const formatCustomizations = (customizations: unknown): string | null => {
@@ -431,13 +501,19 @@ function OrderCard({
     READY: "bg-gradient-to-r from-matcha-600 to-matcha-500 hover:from-matcha-700 hover:to-matcha-600",
   };
 
+  const isHighlighted = searchQuery && (
+    order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.customerName?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div
       className={cn(
         "group relative rounded-xl border-2 bg-white p-4 transition-all hover:shadow-soft-lg",
         isOverdue && "border-bordeaux-400 bg-bordeaux-50/50 animate-gentle-pulse",
         isUrgent && !isOverdue && "border-amber-400 bg-amber-50/50",
-        !isUrgent && !isOverdue && "border-tea-100"
+        !isUrgent && !isOverdue && "border-tea-100",
+        isHighlighted && !isUrgent && !isOverdue && "border-tea-400 ring-2 ring-tea-200"
       )}
     >
       {/* Urgency Glow Effect */}
@@ -451,9 +527,13 @@ function OrderCard({
       {/* Header: Order Number + Total */}
       <div className="flex items-start justify-between mb-3">
         <div>
-          <span className="text-xl font-bold text-tea-900">{order.orderNumber}</span>
+          <span className="text-xl font-bold text-tea-900">
+            <HighlightMatch text={order.orderNumber} query={searchQuery} />
+          </span>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-sm text-tea-600">{order.customerName || t("guest")}</span>
+            <span className="text-sm text-tea-600">
+              <HighlightMatch text={order.customerName || t("guest")} query={searchQuery} />
+            </span>
           </div>
         </div>
         <div className="text-right">
