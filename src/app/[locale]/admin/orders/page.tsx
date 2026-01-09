@@ -379,12 +379,12 @@ export default function AdminOrdersPage() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Column 1: New Orders (PAID) */}
             <KanbanColumn
-              title={t("paid")}
+              title={tLocal("paid")}
               count={sortedPaid.length}
               icon={<Clock className="h-5 w-5" />}
               color="amber"
               isEmpty={sortedPaid.length === 0}
-              emptyText="Geen nieuwe bestellingen"
+              emptyText={tLocal("noNewOrders")}
             >
               {sortedPaid.map((order) => (
                 <OrderCard
@@ -398,19 +398,19 @@ export default function AdminOrdersPage() {
                   onCancel={() => updateOrderStatus(order.id, "CANCELLED")}
                   isUpdating={updateStatusMutation.isPending}
                   searchQuery={searchQuery}
-                  t={t}
+                  tLocal={tLocal}
                 />
               ))}
             </KanbanColumn>
 
             {/* Column 2: Preparing */}
             <KanbanColumn
-              title={t("preparing")}
+              title={tLocal("preparing")}
               count={sortedPreparing.length}
               icon={<ChefHat className="h-5 w-5" />}
               color="orange"
               isEmpty={sortedPreparing.length === 0}
-              emptyText="Geen bestellingen in bereiding"
+              emptyText={tLocal("noOrdersPreparing")}
             >
               {sortedPreparing.map((order) => (
                 <OrderCard
@@ -424,7 +424,7 @@ export default function AdminOrdersPage() {
                   onCancel={() => updateOrderStatus(order.id, "CANCELLED")}
                   isUpdating={updateStatusMutation.isPending}
                   searchQuery={searchQuery}
-                  t={t}
+                  tLocal={tLocal}
                 />
               ))}
             </KanbanColumn>
@@ -438,6 +438,7 @@ export default function AdminOrdersPage() {
               onPickupSearchChange={setPickupSearch}
               isEmpty={sortedReady.length === 0}
               emptyText={tLocal("noOrdersReady")}
+              tLocal={tLocal}
             >
               {sortedReady.map((order) => (
                 <OrderCard
@@ -450,7 +451,7 @@ export default function AdminOrdersPage() {
                   onAdvance={() => updateOrderStatus(order.id, "COMPLETED")}
                   isUpdating={updateStatusMutation.isPending}
                   searchQuery={pickupSearch || searchQuery}
-                  t={t}
+                  tLocal={tLocal}
                 />
               ))}
             </ReadyColumn>
@@ -538,6 +539,7 @@ interface ReadyColumnProps {
   isEmpty: boolean;
   emptyText: string;
   children: React.ReactNode;
+  tLocal: (key: keyof typeof ordersPageTranslations.nl) => string;
 }
 
 function ReadyColumn({
@@ -549,6 +551,7 @@ function ReadyColumn({
   isEmpty,
   emptyText,
   children,
+  tLocal,
 }: ReadyColumnProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -587,7 +590,7 @@ function ReadyColumn({
                   ? "bg-white text-matcha-600"
                   : "bg-matcha-600 hover:bg-matcha-700"
               )}
-              title="Zoek afhaler"
+              title={tLocal("searchPlaceholder")}
             >
               {isSearchOpen || pickupSearch ? (
                 <X className="h-4 w-4" />
@@ -609,7 +612,7 @@ function ReadyColumn({
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Zoek naam of bestelnr..."
+              placeholder={tLocal("searchPlaceholder")}
               value={pickupSearch}
               onChange={(e) => onPickupSearchChange(e.target.value)}
               className="w-full rounded-lg bg-white/90 px-3 py-2 text-sm text-matcha-900 placeholder-matcha-400 focus:outline-none focus:ring-2 focus:ring-white"
@@ -671,7 +674,7 @@ interface OrderCardProps {
   onCancel?: () => void;
   isUpdating: boolean;
   searchQuery: string;
-  t: ReturnType<typeof useTranslations>;
+  tLocal: (key: keyof typeof ordersPageTranslations.nl) => string;
 }
 
 function OrderCard({
@@ -684,7 +687,7 @@ function OrderCard({
   onCancel,
   isUpdating,
   searchQuery,
-  t,
+  tLocal,
 }: OrderCardProps) {
   const formatCustomizations = (customizations: unknown): string | null => {
     if (!customizations || typeof customizations !== "object") return null;
