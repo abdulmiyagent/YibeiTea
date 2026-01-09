@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/trpc";
 import { formatPrice } from "@/lib/utils";
-import { useTranslations } from "next-intl";
 import {
   Clock,
   CheckCircle,
@@ -146,7 +145,6 @@ const POLLING_INTERVAL = 5000;
 export default function AdminOrdersPage() {
   const { data: session, status: authStatus } = useSession();
   const router = useRouter();
-  const t = useTranslations("admin.orders");
   const { lang, toggleLang, tLocal } = useOrdersPageLang();
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [now, setNow] = useState(new Date());
@@ -711,9 +709,9 @@ function OrderCard({
     : null;
 
   const actionLabels = {
-    PAID: "Start bereiding",
-    PREPARING: "Klaar voor afhalen",
-    READY: "Afgehaald",
+    PAID: tLocal("startPreparing"),
+    PREPARING: tLocal("readyForPickup"),
+    READY: tLocal("pickedUp"),
   };
 
   const actionIcons = {
@@ -759,7 +757,7 @@ function OrderCard({
           </span>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-sm text-tea-600">
-              <HighlightMatch text={order.customerName || t("guest")} query={searchQuery} />
+              <HighlightMatch text={order.customerName || tLocal("guest")} query={searchQuery} />
             </span>
           </div>
         </div>
@@ -779,7 +777,7 @@ function OrderCard({
                   "ml-1 text-xs",
                   isOverdue ? "text-bordeaux-500" : ""
                 )}>
-                  ({minutesUntilPickup > 0 ? `${minutesUntilPickup}m` : `${Math.abs(minutesUntilPickup)}m te laat`})
+                  ({minutesUntilPickup > 0 ? `${minutesUntilPickup}m` : `${Math.abs(minutesUntilPickup)}${tLocal("minutesLate")}`})
                 </span>
               )}
             </div>
@@ -811,7 +809,7 @@ function OrderCard({
       {/* Notes */}
       {order.notes && (
         <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
-          <span className="font-medium">Opmerking:</span> {order.notes}
+          <span className="font-medium">{tLocal("note")}:</span> {order.notes}
         </div>
       )}
 
