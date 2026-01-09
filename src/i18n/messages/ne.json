@@ -474,6 +474,29 @@
     "copyright": "© {year} Yibei Tea। सर्वाधिकार सुरक्षित।"
   },
   "admin": {
+    "ordersPage": {
+      "searchPlaceholder": "ग्राहक वा अर्डर नम्बर खोज्नुहोस्...",
+      "active": "सक्रिय",
+      "of": "मध्ये",
+      "waitingForOrders": "नयाँ अर्डरको पर्खाइमा...",
+      "noResultsFor": "को लागि कुनै परिणाम छैन",
+      "tryOtherTerm": "अर्को खोज शब्द प्रयोग गर्नुहोस्",
+      "clearSearch": "खोज हटाउनुहोस्",
+      "noNewOrders": "कुनै नयाँ अर्डर छैन",
+      "noOrdersPreparing": "तयारीमा कुनै अर्डर छैन",
+      "noOrdersReady": "कुनै अर्डर तयार छैन",
+      "note": "टिप्पणी",
+      "startPreparing": "तयारी सुरु गर्नुहोस्",
+      "readyForPickup": "लिन तयार",
+      "pickedUp": "लिइयो",
+      "soundOn": "आवाज अन",
+      "soundOff": "आवाज अफ",
+      "refresh": "रिफ्रेश",
+      "minutesLate": "मिनेट ढिलो",
+      "languageToggle": "भाषा",
+      "nepali": "नेपाली",
+      "dutch": "NL"
+    },
     "dashboard": {
       "title": "ड्यासबोर्ड",
       "todayOrders": "आजका अर्डरहरू",

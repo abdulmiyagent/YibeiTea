@@ -474,6 +474,29 @@
     "copyright": "© {year} Yibei Tea. Alle rechten voorbehouden."
   },
   "admin": {
+    "ordersPage": {
+      "searchPlaceholder": "Zoek klant of bestelnummer...",
+      "active": "actief",
+      "of": "van",
+      "waitingForOrders": "Wachtend op nieuwe bestellingen...",
+      "noResultsFor": "Geen resultaten voor",
+      "tryOtherTerm": "Probeer een andere zoekterm",
+      "clearSearch": "Wis zoekopdracht",
+      "noNewOrders": "Geen nieuwe bestellingen",
+      "noOrdersPreparing": "Geen bestellingen in bereiding",
+      "noOrdersReady": "Geen bestellingen klaar",
+      "note": "Opmerking",
+      "startPreparing": "Start bereiding",
+      "readyForPickup": "Klaar voor afhalen",
+      "pickedUp": "Afgehaald",
+      "soundOn": "Geluid aan",
+      "soundOff": "Geluid uit",
+      "refresh": "Vernieuwen",
+      "minutesLate": "m te laat",
+      "languageToggle": "Taal",
+      "nepali": "नेपाली",
+      "dutch": "NL"
+    },
     "dashboard": {
       "title": "Dashboard",
       "todayOrders": "Bestellingen Vandaag",
