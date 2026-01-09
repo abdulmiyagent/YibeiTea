@@ -301,13 +301,7 @@ export default function AccountPage() {
                     {/* Card Footer */}
                     <div className="relative mt-6 border-t border-white/10 pt-4">
                       <p className="text-xs text-white/50">
-                        Lid sinds{" "}
-                        {session?.user?.createdAt
-                          ? new Date(session.user.createdAt).toLocaleDateString("nl-BE", {
-                              month: "long",
-                              year: "numeric",
-                            })
-                          : "2024"}
+                        Lid sinds 2024
                       </p>
                     </div>
                   </div>
