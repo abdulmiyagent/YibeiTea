@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/trpc";
+import { getDisplayName } from "@/lib/utils";
 import {
   Gift,
   Plus,
@@ -275,7 +276,7 @@ export default function RewardsAdminPage() {
                       <div>
                         <div className="flex items-center gap-3">
                           <p className="text-lg font-bold">
-                            {nlTranslation?.name || reward.slug}
+                            {getDisplayName(nlTranslation?.name, reward.slug)}
                           </p>
                           <Badge className={reward.isAvailable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
                             {reward.isAvailable ? "Actief" : "Inactief"}

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
-import { cn } from "@/lib/utils";
+import { cn, getDisplayName } from "@/lib/utils";
 import Image from "next/image";
 
 // Skeleton loader for product cards - compact layout
@@ -415,7 +415,7 @@ export function MenuPageContent() {
                     <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-cream-50 via-white to-tea-50/30">
                       <Image
                         src={product.imageUrl || getCategoryPlaceholder(product.category?.slug)}
-                        alt={translation?.name || product.slug}
+                        alt={getDisplayName(translation?.name, product.slug)}
                         fill
                         sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 16vw"
                         className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"

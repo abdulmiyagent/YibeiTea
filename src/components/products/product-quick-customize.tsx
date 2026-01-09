@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cart-store";
 import { api } from "@/lib/trpc";
 import { Settings2, Plus, Check, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getDisplayName } from "@/lib/utils";
 
 interface ProductQuickCustomizeProps {
   product: {
@@ -160,7 +160,7 @@ export function ProductQuickCustomize({
             {/* Header */}
             <div className="border-b border-cream-100 px-4 py-3">
               <h3 className="font-medium text-tea-900 line-clamp-1">
-                {product.translations[0]?.name || product.slug}
+                {getDisplayName(product.translations[0]?.name, product.slug)}
               </h3>
               <p className="text-sm text-tea-600 font-semibold">
                 €{Number(product.price).toFixed(2)}
@@ -235,7 +235,7 @@ export function ProductQuickCustomize({
                           )}
                         >
                           {isSelected && <Check className="mr-1 inline h-3 w-3" />}
-                          {topping.translations[0]?.name || topping.slug}
+                          {getDisplayName(topping.translations[0]?.name, topping.slug)}
                           <span className="ml-1 opacity-70">
                             +€{Number(topping.price).toFixed(2)}
                           </span>

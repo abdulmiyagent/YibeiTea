@@ -17,6 +17,7 @@ import {
   Leaf,
 } from "lucide-react";
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
+import { getDisplayName } from "@/lib/utils";
 import Image from "next/image";
 
 // Get category placeholder image URL based on category slug
@@ -123,7 +124,7 @@ export default function FavoritesPage() {
                     <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-tea-50 to-taro-50">
                       <Image
                         src={product.imageUrl || getCategoryPlaceholder(product.category?.slug)}
-                        alt={translation?.name || product.slug}
+                        alt={getDisplayName(translation?.name, product.slug)}
                         fill
                         sizes="64px"
                         className={product.imageUrl ? "object-cover" : "object-contain p-1"}
@@ -134,14 +135,14 @@ export default function FavoritesPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <p className="text-xs text-tea-600 font-medium">
-                          {categoryTranslation?.name || product.category?.slug}
+                          {getDisplayName(categoryTranslation?.name, product.category?.slug || "")}
                         </p>
                         {product.vegan && (
                           <Leaf className="h-3 w-3 text-matcha-500" />
                         )}
                       </div>
                       <h3 className="font-semibold text-sm mt-0.5 line-clamp-1 group-hover:text-tea-600 transition-colors">
-                        {translation?.name || product.slug}
+                        {getDisplayName(translation?.name, product.slug)}
                       </h3>
                       <span className="text-sm font-bold text-tea-600 mt-0.5 block">
                         €{Number(product.price).toFixed(2)}

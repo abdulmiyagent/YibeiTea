@@ -31,3 +31,29 @@ export function formatDate(date: Date, locale: string = "nl-BE"): string {
     timeStyle: "short",
   }).format(date);
 }
+
+/**
+ * Format a slug to a readable name
+ * e.g., "boba-milk-tea" -> "Boba Milk Tea"
+ */
+export function formatSlugToName(slug: string): string {
+  return slug
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+/**
+ * Get display name from a translation or formatted slug
+ * Use this for products, categories, toppings, etc.
+ */
+export function getDisplayName(
+  translationName: string | undefined | null,
+  slug: string
+): string {
+  // Return translation if it exists and is different from slug
+  if (translationName && translationName !== slug) {
+    return translationName;
+  }
+  return formatSlugToName(slug);
+}

@@ -12,6 +12,7 @@ import {
 import { ProductCustomization, ProductData, CustomizationGroup, ToppingData } from "./product-customization";
 import { api } from "@/lib/trpc";
 import { CartItemCustomization } from "@/stores/cart-store";
+import { getDisplayName } from "@/lib/utils";
 
 interface ProductCustomizeDialogProps {
   product: {
@@ -121,7 +122,7 @@ export function ProductCustomizeDialog({
         showCloseButton={false}
         className="max-w-md w-[calc(100vw-2rem)] p-0 gap-0 overflow-hidden rounded-3xl !fixed !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 !bottom-auto !right-auto max-h-[90vh] overflow-y-auto">
         <DialogTitle className="sr-only">
-          {product.translations[0]?.name || product.slug}
+          {getDisplayName(product.translations[0]?.name, product.slug)}
         </DialogTitle>
         <DialogDescription className="sr-only">
           {locale === "nl"

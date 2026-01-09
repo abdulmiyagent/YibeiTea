@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { api } from "@/lib/trpc";
+import { getDisplayName } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import {
   Plus,
@@ -272,32 +273,6 @@ export default function AdminProductsPage() {
     return Number(price) || 0;
   };
 
-  // Format slug to readable name (e.g., "boba-milk-tea" -> "Boba Milk Tea")
-  const formatSlugToName = (slug: string): string => {
-    return slug
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
-
-  // Get product display name - prefer translation, fallback to formatted slug
-  const getProductName = (product: Product): string => {
-    const translationName = product.translations[0]?.name;
-    if (translationName && translationName !== product.slug) {
-      return translationName;
-    }
-    return formatSlugToName(product.slug);
-  };
-
-  // Get category display name
-  const getCategoryName = (product: Product): string => {
-    const translationName = product.category.translations[0]?.name;
-    if (translationName && translationName !== product.category.slug) {
-      return translationName;
-    }
-    return formatSlugToName(product.category.slug);
-  };
-
   return (
     <div className="section-padding bg-muted/30">
       <div className="container-custom">
@@ -355,7 +330,7 @@ export default function AdminProductsPage() {
                     size="sm"
                     onClick={() => setSelectedCategory(cat.id)}
                   >
-                    {cat.translations[0]?.name || cat.slug}
+                    {getDisplayName(cat.translations[0]?.name, cat.slug)}
                   </Button>
                 ))}
               </div>
@@ -390,7 +365,7 @@ export default function AdminProductsPage() {
                     <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-muted">
                       <Image
                         src={product.imageUrl}
-                        alt={getProductName(product)}
+                        alt={getDisplayName(product.translations[0]?.name, product.slug)}
                         fill
                         className="object-cover"
                         sizes="64px"
@@ -403,10 +378,10 @@ export default function AdminProductsPage() {
                   )}
                   <div className="flex-1">
                     <h3 className="font-semibold">
-                      {getProductName(product)}
+                      {getDisplayName(product.translations[0]?.name, product.slug)}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {getCategoryName(product)}
+                      {getDisplayName(product.category.translations[0]?.name, product.category.slug)}
                     </p>
                     <p className="mt-1 text-lg font-bold text-tea-600">
                       €{getPrice(product.price).toFixed(2)}
@@ -571,7 +546,7 @@ export default function AdminProductsPage() {
                   >
                     {categories?.map((cat) => (
                       <option key={cat.id} value={cat.id}>
-                        {cat.translations[0]?.name || cat.slug}
+                        {getDisplayName(cat.translations[0]?.name, cat.slug)}
                       </option>
                     ))}
                   </select>

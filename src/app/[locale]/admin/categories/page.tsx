@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/trpc";
+import { getDisplayName } from "@/lib/utils";
 import {
   DndContext,
   closestCenter,
@@ -135,7 +136,7 @@ function SortableCategoryItem({
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <h3 className="font-semibold">
-                {nlTranslation?.name || category.slug}
+                {getDisplayName(nlTranslation?.name, category.slug)}
               </h3>
               <span className="text-sm text-muted-foreground">
                 ({enTranslation?.name || "-"})

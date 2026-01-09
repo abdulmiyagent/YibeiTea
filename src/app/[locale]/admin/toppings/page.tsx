@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/trpc";
+import { getDisplayName } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import {
   DndContext,
@@ -112,7 +113,7 @@ function SortableToppingItem({
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <h3 className="font-semibold">
-                {topping.translations[0]?.name || topping.slug}
+                {getDisplayName(topping.translations[0]?.name, topping.slug)}
               </h3>
               {!topping.isAvailable && (
                 <Badge variant="secondary" className="text-xs">

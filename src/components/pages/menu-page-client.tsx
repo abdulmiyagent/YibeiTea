@@ -14,17 +14,9 @@ import {
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ProductCustomizeDialog } from "@/components/products/product-customize-dialog";
-import { cn } from "@/lib/utils";
+import { cn, getDisplayName, formatSlugToName } from "@/lib/utils";
 import Image from "next/image";
 import type { MenuProduct, Category, Topping, CustomizationOption } from "@/lib/server-data";
-
-// Format slug to display name (brown-sugar → Brown Sugar)
-function formatSlug(slug: string): string {
-  return slug
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
 
 // Get category placeholder image URL based on category slug
 function getCategoryPlaceholder(categorySlug: string | undefined): string {
@@ -224,7 +216,7 @@ export function MenuPageClient({
                       )}
                       onClick={() => toggleCategory(category.slug)}
                     >
-                      {translation?.name || formatSlug(category.slug)}
+                      {translation?.name || formatSlugToName(category.slug)}
                     </button>
                   );
                 })}
@@ -325,7 +317,7 @@ export function MenuPageClient({
                   <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-cream-50 via-white to-tea-50/30">
                     <Image
                       src={product.imageUrl || getCategoryPlaceholder(product.category?.slug)}
-                      alt={translation?.name || product.slug}
+                      alt={getDisplayName(translation?.name, product.slug)}
                       fill
                       sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 16vw"
                       className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
@@ -351,7 +343,7 @@ export function MenuPageClient({
                   {/* Product Info */}
                   <div className="p-1.5">
                     <h3 className="font-medium text-gray-900 text-xs leading-tight truncate">
-                      {translation?.name || formatSlug(product.slug)}
+                      {translation?.name || formatSlugToName(product.slug)}
                     </h3>
                     <div className="flex items-center justify-between mt-1">
                       <span className="text-xs font-bold text-tea-600">

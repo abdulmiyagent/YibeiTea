@@ -6,7 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight, Plus, Heart, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getDisplayName } from "@/lib/utils";
 import { api } from "@/lib/trpc";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -164,7 +164,7 @@ const ProductCard = memo(function ProductCard({
         {/* Product Name */}
         <div className="flex items-start justify-between gap-2 pr-12">
           <h3 className="font-serif text-xl font-bold uppercase leading-tight tracking-wide drop-shadow-md sm:text-2xl line-clamp-2">
-            {translation?.name || product.slug}
+            {getDisplayName(translation?.name, product.slug)}
           </h3>
         </div>
 
@@ -173,7 +173,7 @@ const ProductCard = memo(function ProductCard({
           <div className="relative h-[220px] w-full">
             <Image
               src={product.imageUrl || getCategoryPlaceholder(categorySlug)}
-              alt={translation?.name || product.slug}
+              alt={getDisplayName(translation?.name, product.slug)}
               fill
               sizes="(max-width: 640px) 80vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 20vw"
               className="object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
