@@ -514,7 +514,8 @@
       "noOrdersReceived": "Nog geen bestellingen ontvangen.",
       "noOrdersFilter": "Geen bestellingen gevonden met deze filters.",
       "sugarLevel": "suiker",
-      "ice": "ijs"
+      "ice": "ijs",
+      "all": "Alle"
     },
     "products": {
       "title": "Producten",

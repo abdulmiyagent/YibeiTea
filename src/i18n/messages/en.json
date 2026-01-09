@@ -514,7 +514,8 @@
       "noOrdersReceived": "No orders received yet.",
       "noOrdersFilter": "No orders found with these filters.",
       "sugarLevel": "sugar",
-      "ice": "ice"
+      "ice": "ice",
+      "all": "All"
     },
     "products": {
       "title": "Products",

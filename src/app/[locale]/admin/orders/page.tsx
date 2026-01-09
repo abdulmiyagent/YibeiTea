@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/trpc";
 import { formatPrice } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import {
   Search,
   Clock,
@@ -21,75 +22,71 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const statusConfig = {
-  PENDING: {
-    label: "In afwachting",
-    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    icon: Clock,
-  },
-  PAID: {
-    label: "Betaald",
-    color: "bg-blue-100 text-blue-800 border-blue-200",
-    icon: CheckCircle,
-  },
-  PREPARING: {
-    label: "In bereiding",
-    color: "bg-orange-100 text-orange-800 border-orange-200",
-    icon: ChefHat,
-  },
-  READY: {
-    label: "Klaar",
-    color: "bg-green-100 text-green-800 border-green-200",
-    icon: Package,
-  },
-  COMPLETED: {
-    label: "Afgehaald",
-    color: "bg-gray-100 text-gray-800 border-gray-200",
-    icon: CheckCircle,
-  },
-  CANCELLED: {
-    label: "Geannuleerd",
-    color: "bg-red-100 text-red-800 border-red-200",
-    icon: XCircle,
-  },
+const statusColors = {
+  PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  PAID: "bg-blue-100 text-blue-800 border-blue-200",
+  PREPARING: "bg-orange-100 text-orange-800 border-orange-200",
+  READY: "bg-green-100 text-green-800 border-green-200",
+  COMPLETED: "bg-gray-100 text-gray-800 border-gray-200",
+  CANCELLED: "bg-red-100 text-red-800 border-red-200",
+};
+
+const statusIcons = {
+  PENDING: Clock,
+  PAID: CheckCircle,
+  PREPARING: ChefHat,
+  READY: Package,
+  COMPLETED: CheckCircle,
+  CANCELLED: XCircle,
 };
 
 const statusFlow = ["PENDING", "PAID", "PREPARING", "READY", "COMPLETED"] as const;
 
-type OrderStatus = keyof typeof statusConfig;
-
-// Format customizations JSON to readable string
-function formatCustomizations(customizations: unknown): string | null {
-  if (!customizations || typeof customizations !== "object") return null;
-
-  const c = customizations as Record<string, unknown>;
-  const parts: string[] = [];
-
-  if (c.sugarLevel !== undefined) {
-    parts.push(`${c.sugarLevel}% suiker`);
-  }
-  if (c.iceLevel) {
-    parts.push(`${c.iceLevel} ijs`);
-  }
-  if (c.size) {
-    parts.push(`${c.size}`);
-  }
-  if (c.milkType) {
-    parts.push(`${c.milkType} melk`);
-  }
-  if (Array.isArray(c.toppings) && c.toppings.length > 0) {
-    parts.push(`+${c.toppings.join(", ")}`);
-  }
-
-  return parts.length > 0 ? parts.join(", ") : null;
-}
+type OrderStatus = keyof typeof statusColors;
 
 export default function AdminOrdersPage() {
   const { data: session, status: authStatus } = useSession();
   const router = useRouter();
+  const t = useTranslations("admin.orders");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+
+  // Status labels from translations
+  const statusLabels: Record<string, string> = {
+    PENDING: t("pending"),
+    PAID: t("paid"),
+    PREPARING: t("preparing"),
+    READY: t("ready"),
+    COMPLETED: t("completed"),
+    CANCELLED: t("cancelled"),
+  };
+
+  // Format customizations JSON to readable string
+  const formatCustomizations = (customizations: unknown): string | null => {
+    if (!customizations || typeof customizations !== "object") return null;
+
+    const c = customizations as Record<string, unknown>;
+    const parts: string[] = [];
+
+    if (c.sugarLevel !== undefined) {
+      parts.push(`${c.sugarLevel}% ${t("sugarLevel")}`);
+    }
+    if (c.iceLevel) {
+      parts.push(`${c.iceLevel} ${t("ice")}`);
+    }
+    if (c.size) {
+      parts.push(`${c.size}`);
+    }
+    if (c.milkType) {
+      parts.push(`${c.milkType}`);
+    }
+    if (Array.isArray(c.toppings) && c.toppings.length > 0) {
+      parts.push(`+${c.toppings.join(", ")}`);
+    }
+
+    return parts.length > 0 ? parts.join(", ") : null;
+  };
 
   // Fetch orders from database
   const {
@@ -151,9 +148,9 @@ export default function AdminOrdersPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="heading-1">Bestellingen</h1>
+            <h1 className="heading-1">{t("title")}</h1>
             <p className="mt-2 text-muted-foreground">
-              Beheer en volg alle bestellingen ({orders?.length || 0} totaal)
+              {t("manage")} ({orders?.length || 0} {t("total")})
             </p>
           </div>
           <Button
@@ -163,7 +160,7 @@ export default function AdminOrdersPage() {
             disabled={isLoading}
           >
             <RefreshCw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
-            Vernieuwen
+            {t("refresh")}
           </Button>
         </div>
 
@@ -172,7 +169,7 @@ export default function AdminOrdersPage() {
           <div className="relative flex-1 md:max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Zoek op bestelnummer of klant..."
+              placeholder={t("searchPlaceholder")}
               className="pl-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -184,16 +181,16 @@ export default function AdminOrdersPage() {
               size="sm"
               onClick={() => setStatusFilter(null)}
             >
-              Alle
+              {t("all") || "All"}
             </Button>
-            {Object.entries(statusConfig).map(([status, config]) => (
+            {Object.keys(statusColors).map((status) => (
               <Button
                 key={status}
                 variant={statusFilter === status ? "tea" : "outline"}
                 size="sm"
                 onClick={() => setStatusFilter(status)}
               >
-                {config.label}
+                {statusLabels[status]}
               </Button>
             ))}
           </div>
@@ -202,8 +199,8 @@ export default function AdminOrdersPage() {
         {/* Orders Grid */}
         <div className="grid gap-4 lg:grid-cols-2">
           {filteredOrders.map((order) => {
-            const config = statusConfig[order.status as OrderStatus];
-            const StatusIcon = config?.icon || Clock;
+            const statusColor = statusColors[order.status as OrderStatus];
+            const StatusIcon = statusIcons[order.status as OrderStatus] || Clock;
             const nextStatus = getNextStatus(order.status);
             const pickupTime = order.pickupTime
               ? new Date(order.pickupTime).toLocaleTimeString("nl-BE", {
@@ -229,9 +226,9 @@ export default function AdminOrdersPage() {
                       <CardTitle className="text-lg">
                         {order.orderNumber}
                       </CardTitle>
-                      <Badge className={config?.color}>
+                      <Badge className={statusColor}>
                         <StatusIcon className="mr-1 h-3 w-3" />
-                        {config?.label}
+                        {statusLabels[order.status]}
                       </Badge>
                     </div>
                     <span className="text-lg font-bold text-tea-600">
@@ -243,10 +240,10 @@ export default function AdminOrdersPage() {
                   <div className="space-y-3">
                     {/* Customer Info */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">{order.customerName || "Gast"}</span>
+                      <span className="font-medium">{order.customerName || t("guest")}</span>
                       {pickupTime && (
                         <span className="text-muted-foreground">
-                          Afhalen: {pickupTime}
+                          {t("pickupAt")}: {pickupTime}
                         </span>
                       )}
                     </div>
@@ -298,7 +295,7 @@ export default function AdminOrdersPage() {
                             {updateStatusMutation.isPending ? (
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             ) : null}
-                            Markeer als {statusConfig[nextStatus]?.label}
+                            {t("markAs")} {statusLabels[nextStatus]}
                           </Button>
                         )}
                         {order.status !== "COMPLETED" &&
@@ -313,7 +310,7 @@ export default function AdminOrdersPage() {
                                 updateOrderStatus(order.id, "CANCELLED");
                               }}
                             >
-                              Annuleren
+                              {t("cancel")}
                             </Button>
                           )}
                       </div>
@@ -329,8 +326,8 @@ export default function AdminOrdersPage() {
           <div className="mt-12 text-center">
             <p className="text-muted-foreground">
               {orders?.length === 0
-                ? "Nog geen bestellingen ontvangen."
-                : "Geen bestellingen gevonden met deze filters."}
+                ? t("noOrdersReceived")
+                : t("noOrdersFilter")}
             </p>
           </div>
         )}
