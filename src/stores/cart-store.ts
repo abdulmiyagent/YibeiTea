@@ -7,6 +7,7 @@ export interface CartItemCustomization {
   toppings?: string[];
   milkType?: string;
   size?: string;
+  customImage?: string; // Base64 data URL for user-captured photo
 }
 
 export interface CartItem {

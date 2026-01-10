@@ -18,6 +18,7 @@ import {
   Heart,
 } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { CameraCapture } from "@/components/products/camera-capture";
 
 // =============================================================================
 // HAPTIC FEEDBACK UTILITY
@@ -346,6 +347,21 @@ export function ProductCustomization({
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const [customImage, setCustomImage] = useState<string | null>(
+    initialCustomizations?.customImage ?? null
+  );
+
+  // Camera capture translations
+  const cameraTranslations = {
+    takePhoto: locale === "nl" ? "Foto maken" : "Take Photo",
+    retake: locale === "nl" ? "Opnieuw" : "Retake",
+    usePhoto: locale === "nl" ? "Gebruiken" : "Use Photo",
+    switchCamera: locale === "nl" ? "Camera wisselen" : "Switch Camera",
+    cameraError: locale === "nl" ? "Camera niet beschikbaar" : "Camera not available",
+    cameraPermission: locale === "nl" ? "Camera toegang geweigerd" : "Camera access denied",
+    addYourPhoto: locale === "nl" ? "Voeg je foto toe" : "Add your photo",
+    yourPhoto: locale === "nl" ? "Jouw foto" : "Your photo",
+  };
 
   // Filter customization groups based on product settings
   // Use === false to only filter out explicitly disabled options (not undefined)
@@ -452,7 +468,7 @@ export function ProductCustomization({
       name: product.translations[0]?.name || formatSlug(product.slug),
       price: totalPrice / quantity,
       quantity,
-      imageUrl: product.imageUrl || undefined,
+      imageUrl: customImage || product.imageUrl || undefined,
       customizations: {
         sugarLevel: selectedOptions["SUGAR_LEVEL"]
           ? parseInt(selectedOptions["SUGAR_LEVEL"])
@@ -461,6 +477,7 @@ export function ProductCustomization({
         size: selectedOptions["SIZE"],
         milkType: selectedOptions["MILK_TYPE"],
         toppings: toppingNames.length > 0 ? toppingNames : undefined,
+        customImage: customImage || undefined,
       },
     });
 
@@ -506,7 +523,13 @@ export function ProductCustomization({
       <div className="flex flex-col max-h-[85vh]">
         {/* Product Image Header - Larger, more appetizing */}
         <div className="relative h-44 w-full flex-shrink-0 overflow-hidden bg-gradient-to-br from-cream-100 via-tea-50 to-taro-50">
-          {product.imageUrl ? (
+          {customImage ? (
+            <img
+              src={customImage}
+              alt={productName}
+              className="h-full w-full object-cover"
+            />
+          ) : product.imageUrl ? (
             <img
               src={product.imageUrl}
               alt={productName}
@@ -543,6 +566,19 @@ export function ProductCustomization({
             <span className="text-xl font-bold text-tea-600 shrink-0">
               €{Number(product.price).toFixed(2)}
             </span>
+          </div>
+
+          {/* Camera Capture - Add your own photo */}
+          <div className="mb-5">
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
+              {locale === "nl" ? "Maak het persoonlijk" : "Make it personal"}
+            </label>
+            <CameraCapture
+              onCapture={setCustomImage}
+              onClear={() => setCustomImage(null)}
+              capturedImage={customImage}
+              translations={cameraTranslations}
+            />
           </div>
 
           {/* Customization Options - Visual sliders for sugar/ice */}
@@ -749,7 +785,13 @@ export function ProductCustomization({
     <div className="grid gap-8 lg:grid-cols-2">
       {/* Product Image - large for page view */}
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-tea-50 to-taro-50">
-        {product.imageUrl ? (
+        {customImage ? (
+          <img
+            src={customImage}
+            alt={productName}
+            className="h-full w-full object-cover"
+          />
+        ) : product.imageUrl ? (
           <img
             src={product.imageUrl}
             alt={productName}
@@ -817,6 +859,19 @@ export function ProductCustomization({
               {product.calories} {tMenu("calories")}
             </p>
           )}
+        </div>
+
+        {/* Camera Capture - Add your own photo */}
+        <div className="border-t border-gray-100 pt-6">
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            {locale === "nl" ? "Maak het persoonlijk" : "Make it personal"}
+          </label>
+          <CameraCapture
+            onCapture={setCustomImage}
+            onClear={() => setCustomImage(null)}
+            capturedImage={customImage}
+            translations={cameraTranslations}
+          />
         </div>
 
         {/* Dynamic Customization Groups */}
